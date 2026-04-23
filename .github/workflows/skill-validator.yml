@@ -1,0 +1,49 @@
+# Validates all packages under skills/ with agent-ecosystem/skill-validator.
+# Keep SKILL_VALIDATOR_VERSION in sync with scripts/validate-skill.sh message and CONTRIBUTING.md.
+name: skill-validator
+
+on:
+  pull_request:
+    paths:
+      - "skills/**"
+      - ".github/workflows/skill-validator.yml"
+      - "scripts/validate-skill.sh"
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - "skills/**"
+      - ".github/workflows/skill-validator.yml"
+      - "scripts/validate-skill.sh"
+
+env:
+  SKILL_VALIDATOR_VERSION: v1.5.5
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.x"
+
+      - name: Install skill-validator
+        run: |
+          go install "github.com/agent-ecosystem/skill-validator/cmd/skill-validator@${SKILL_VALIDATOR_VERSION}"
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - name: Validate skills (strict + annotations)
+        run: ./scripts/validate-skill.sh --ci
+
+      - name: Append markdown report to job summary
+        if: success()
+        run: |
+          {
+            echo "## skill-validator"
+            skill-validator check --strict \
+              --allow-flat-layouts --allow-extra-frontmatter \
+              -o markdown skills/
+          } >> "$GITHUB_STEP_SUMMARY"
