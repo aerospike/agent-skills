@@ -29,6 +29,7 @@ Indexes have memory and write-amplification cost. Wrong index choices yield larg
 
 **See also**
 
+- [query-sindex-by-access-path.md](query-sindex-by-access-path.md) (order access paths, then add indexes)
 - [policy-send-key.md](policy-send-key.md) (when query results must return stored user keys)
 - [model-access-paths-denormalization.md](model-access-paths-denormalization.md)
 - [single-record-operations.md](single-record-operations.md)

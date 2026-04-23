@@ -35,8 +35,9 @@ If the user asks an operational question (for example adding nodes or choosing r
 
 - **Key-value first:** Primary-key get/put/delete is the fastest path; design for it.
 - **Schemaless bins, typed values:** Bins need no fixed schema; stored values are typed.
-- **No server-side joins:** Denormalize or embed; use lists/maps (CDTs) where appropriate.
-- **Compute to data:** Prefer filter expressions and CDT/record operations on the server over shipping large payloads to the client.
+- **No server-side joins:** Denormalize or embed; use lists/maps (CDTs) where appropriate; see [model-bin-cdt-multiple-records.md](references/model-bin-cdt-multiple-records.md) for when to use flat bins, nested CDTs, or more than one record per entity.
+- **Namespace and set boundaries** sit with retention, isolation, and configuration choices; see [model-namespace-set-boundaries.md](references/model-namespace-set-boundaries.md). **Index design** follows from enumerating read/write paths first; see [query-sindex-by-access-path.md](references/query-sindex-by-access-path.md).
+- **Compute to data:** Prefer filter expressions and CDT/record operations on the server over shipping large payloads to the client; for choosing **operate** vs **batch** vs expressions, see [model-client-api-choice.md](references/model-client-api-choice.md).
 
 ## Client best practices (enforce in generated or reviewed code)
 
@@ -72,11 +73,11 @@ Modular rules and example walkthroughs live under [`references/`](references/REA
 | `policy-` | Timeouts/retries, client-level defaults, replica & AP/SC read modes, sendKey, commit level, generation/CAS, replace |
 | `cdt-` | Lists/maps, nesting (K-order, context), growth limits, server-side collection ops |
 | `expr-` | Filter/operation/path expressions vs heavier alternatives |
-| `query-` | Secondary indexes and query-oriented modeling |
+| `query-` | Secondary indexes, [cardinality/cost](references/query-secondary-index-discipline.md), and [deriving index needs from access paths](references/query-sindex-by-access-path.md) |
 | `batch-` | Many primary-key reads/writes; one key per batch entry, coalesce, batch `operate` |
 | `binop-` | `operate`, one record lock, mixed read/write, atomic multi-bin updates |
 | `single-` | Whole-record vs partial/bin operations; TTL void-time and NSUP/default-ttl; delete and durable deletes (EE) |
-| `model-` | Keys, denormalization, access paths, record size vs index RAM and disk, hot keys and error 14 / KEY_BUSY |
+| `model-` | [Namespace and set](references/model-namespace-set-boundaries.md) boundaries; [flat bins vs CDTs vs multiple records](references/model-bin-cdt-multiple-records.md); keys, denormalization, access paths; [operate / batch / expressions](references/model-client-api-choice.md); record size vs index RAM and disk; hot keys and error 14 / KEY_BUSY |
 | `sec-` | TLS and access control on the client |
 
 Copy [`references/_template.md`](references/_template.md) when adding a rule; keep one concern per file and cite **`doc`** in frontmatter.

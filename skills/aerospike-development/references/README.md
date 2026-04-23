@@ -33,11 +33,11 @@ TOC: [examples.md](../examples.md).
 | `policy-` | Policies: timeouts/retries, client defaults, replica & read modes, sendKey, commit level, generation/CAS, replace |
 | `cdt-` | Lists/maps, nesting, bounded growth, server-side collection ops |
 | `expr-` | Filter and operation expressions; compute-to-data |
-| `query-` | Queries, secondary indexes, cardinality |
+| `query-` | Queries, secondary indexes, cardinality, index choices from access paths |
 | `batch-` | Batch reads/writes across keys; dedupe keys, `operate` per key |
 | `binop-` | `operate`, record lock, mixed read/write, bin-level atomicity |
 | `single-` | Single-record CRUD, TTL/void-time, NSUP/default-ttl, delete, durable deletes (EE) |
-| `model-` | Keys, sets, bins, denormalization, record size vs index and disk, hot keys / contention |
+| `model-` | Keys, namespace/set boundaries, flat bins vs CDT vs multiple records, denormalization, access paths, record size vs index and disk, hot keys, client API choice |
 | `sec-` | App-facing security (TLS, auth); not cluster ops |
 
 ## Rule files
@@ -69,6 +69,9 @@ TOC: [examples.md](../examples.md).
 ### model-
 
 - [model-access-paths-denormalization.md](model-access-paths-denormalization.md)
+- [model-namespace-set-boundaries.md](model-namespace-set-boundaries.md)
+- [model-bin-cdt-multiple-records.md](model-bin-cdt-multiple-records.md)
+- [model-client-api-choice.md](model-client-api-choice.md)
 - [model-record-size-hardware-efficiency.md](model-record-size-hardware-efficiency.md)
 - [model-hot-keys.md](model-hot-keys.md)
 
@@ -85,6 +88,7 @@ TOC: [examples.md](../examples.md).
 ### query-
 
 - [query-secondary-index-discipline.md](query-secondary-index-discipline.md)
+- [query-sindex-by-access-path.md](query-sindex-by-access-path.md)
 
 ### batch-
 

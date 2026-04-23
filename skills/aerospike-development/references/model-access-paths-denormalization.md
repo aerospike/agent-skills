@@ -29,6 +29,8 @@ Relational normalization without access-pattern alignment forces multi-round-tri
 
 **See also**
 
+- [model-namespace-set-boundaries.md](model-namespace-set-boundaries.md)
+- [model-bin-cdt-multiple-records.md](model-bin-cdt-multiple-records.md)
 - [model-record-size-hardware-efficiency.md](model-record-size-hardware-efficiency.md)
 - [query-secondary-index-discipline.md](query-secondary-index-discipline.md)
 - [cdt-server-side-ops.md](cdt-server-side-ops.md)
