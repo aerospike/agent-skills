@@ -12,11 +12,24 @@ Thanks for helping improve this repository. It holds **Agent Skills** under [`sk
 - **[`skills/aerospike-getting-started/`](skills/aerospike-getting-started/)** — Aerospike Database getting started: single-node local setup (Docker), ports/namespaces/TTL, official client snippets, Community vs Enterprise pointers, troubleshooting for new users, anti-hallucination rules. Not a substitute for full production or multi-region guides—link to [Aerospike documentation](https://aerospike.com/docs/) for that.
 - **[`skills/aerospike-development/`](skills/aerospike-development/)** — Application-level client guidance: modular rules and `ex-*` examples under [`references/`](skills/aerospike-development/references/README.md), doc map in [`reference.md`](skills/aerospike-development/reference.md). Not cluster operations.
 
+## Adding a new skill (especially Aerospike)
+
+1. Create `skills/<skill-name>/` with a required `SKILL.md` at the skill root. YAML **`name`** must match the parent folder name; **`description`** explains what and when; optional **`last_verified`** after you validate facts. For frontmatter shape, see an existing skill such as [`skills/aerospike-getting-started/SKILL.md`](skills/aerospike-getting-started/SKILL.md).
+2. Add any companion files inside that folder only (skill markdown must not link outside the skill directory—see validator note below).
+3. Run [`./scripts/validate-skill.sh`](scripts/validate-skill.sh) from the repo root and fix reported issues.
+4. Update [`skills/README.md`](skills/README.md) with a table row linking to the new `SKILL.md`.
+5. Keep human and assistant entrypoints in sync so the skill is discoverable:
+   - [`README.md`](README.md) — skill catalog and “what’s in the repo” as appropriate.
+   - [`AGENTS.md`](AGENTS.md) — routing or read order when the new skill has a distinct trigger.
+   - [`.github/copilot-instructions.md`](.github/copilot-instructions.md) — when GitHub Copilot should follow the new skill, add a routing bullet (same relative-link rules as today).
+6. Add a bullet under **Current skills** in this file (above) summarizing scope and out-of-scope in one line each.
+7. Open a PR with a focused diff; re-run the validator after edits.
+
 ## Where to edit
 
 | Change | Prefer |
 |--------|--------|
-| New or existing skill content | [`skills/<skill-name>/`](skills/) (see [`skills/README.md`](skills/README.md)) |
+| New or existing skill content | [`skills/<skill-name>/`](skills/) (see [`skills/README.md`](skills/README.md); new skills: checklist **Adding a new skill** above) |
 | Aerospike workflow, critical rules, Docker happy path | [skills/aerospike-getting-started/SKILL.md](skills/aerospike-getting-started/SKILL.md) |
 | Aerospike language examples, batching patterns | [skills/aerospike-getting-started/examples.md](skills/aerospike-getting-started/examples.md) |
 | Aerospike Compose, custom config, editions, platform notes | [skills/aerospike-getting-started/reference.md](skills/aerospike-getting-started/reference.md) |
