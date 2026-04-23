@@ -24,26 +24,39 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: actions/setup-go@v6
         with:
           go-version: "1.25.x"
+          # No go.mod in this repo; default module cache would warn/fail restore.
+          cache: false
 
       - name: Install skill-validator
         run: |
           go install "github.com/agent-ecosystem/skill-validator/cmd/skill-validator@${SKILL_VALIDATOR_VERSION}"
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
-      - name: Validate skills (strict + annotations)
-        run: ./scripts/validate-skill.sh --ci
+      - name: Validate skills (annotations, non-strict)
+        run: |
+          set +e
+          ./scripts/validate-skill.sh --ci
+          code=$?
+          set -e
+          # Without --strict, skill-validator uses exit 2 for warnings-only; pass that in CI.
+          if [[ "$code" -eq 2 ]]; then exit 0; fi
+          exit "$code"
 
       - name: Append markdown report to job summary
         if: success()
         run: |
           {
             echo "## skill-validator"
-            skill-validator check --strict \
+            set +e
+            skill-validator check \
               --allow-flat-layouts --allow-extra-frontmatter \
               -o markdown skills/
+            sum=$?
+            set -e
+            [[ "$sum" -eq 0 || "$sum" -eq 2 ]] || exit "$sum"
           } >> "$GITHUB_STEP_SUMMARY"

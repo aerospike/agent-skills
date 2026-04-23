@@ -67,14 +67,15 @@ CI runs [agent-ecosystem/skill-validator](https://github.com/agent-ecosystem/ski
    ./scripts/validate-skill.sh
    ```
 
-   - Use `./scripts/validate-skill.sh --ci` only when you want **GitHub Actions-style** `::error` / `::warning` lines (e.g. debugging CI output); normally omit it locally.
-   - **Raw one-liner** (equivalent flags):
+   - Use `./scripts/validate-skill.sh --ci` to match **CI** (annotations, **no** `--strict`; the workflow treats validator exit `2` warnings-only as success).
+   - **Local default** uses **`--strict`**, so warnings are reported as exit `1` like errors.
+   - **Raw one-liner** (strict, same as local script default):
 
      ```bash
      skill-validator check --strict --allow-flat-layouts --allow-extra-frontmatter skills/
      ```
 
-   With `--strict`, warnings fail the run (exit `1`). Optional: [Homebrew install](https://github.com/agent-ecosystem/skill-validator#install-cli) (`brew tap agent-ecosystem/tap && brew install skill-validator`) if you prefer not to use `go install`.
+   Optional: [Homebrew install](https://github.com/agent-ecosystem/skill-validator#install-cli) (`brew tap agent-ecosystem/tap && brew install skill-validator`) if you prefer not to use `go install`.
 
 **Note:** Skill markdown must not link **outside** the skill directory (e.g. no `../README.md`); describe repo-level files in prose instead.
 

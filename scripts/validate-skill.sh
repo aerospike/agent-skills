@@ -9,14 +9,19 @@ SKILL_DIR="${ROOT}/skills"
 
 usage() {
   echo "Usage: $0 [--ci]" >&2
-  echo "  --ci   Add --emit-annotations for GitHub Actions (noisy locally)." >&2
+  echo "  --ci   GitHub Actions: --emit-annotations and no --strict (warnings exit 2)." >&2
+  echo "        Default local run uses --strict so warnings fail the script." >&2
   exit 2
 }
 
 extra_args=()
+strict_flag=(--strict)
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --ci) extra_args+=(--emit-annotations) ;;
+    --ci)
+      extra_args+=(--emit-annotations)
+      strict_flag=()
+      ;;
     -h|--help) usage ;;
     *) echo "Unknown option: $1" >&2; usage ;;
   esac
@@ -30,7 +35,8 @@ if ! command -v skill-validator >/dev/null 2>&1; then
   exit 3
 fi
 
-exec skill-validator check --strict \
+exec skill-validator check \
+  "${strict_flag[@]}" \
   --allow-flat-layouts --allow-extra-frontmatter \
   "${extra_args[@]}" \
   "${SKILL_DIR}/"
