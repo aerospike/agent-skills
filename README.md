@@ -22,7 +22,10 @@ This repository holds **Agent Skills** under [`skills/`](skills/). Today the mai
 | [skills/aerospike-getting-started/examples.md](skills/aerospike-getting-started/examples.md) | Client SDK examples and Node.js batching notes |
 | [skills/aerospike-getting-started/reference.md](skills/aerospike-getting-started/reference.md) | Custom config, Docker Compose, Community vs Enterprise, troubleshooting |
 | [AGENTS.md](AGENTS.md) | Short read order and scope for any AI assistant |
+| [compiled-skills/SKILLS.md](compiled-skills/SKILLS.md) | Published agent rules (auto-updated from `skills/` on merge to `init`) |
 | [.github/copilot-instructions.md](.github/copilot-instructions.md) | GitHub Copilot repository instructions |
+
+Skill packaging evaluation (structure A/B tests, coverage gates) lives in the separate [agent-skills-eval](https://github.com/citrusleaf/agent-skills-eval) repository.
 
 The **canonical** `aerospike.conf` and commands for local setup live in `SKILL.md` (not duplicated here).
 
@@ -30,10 +33,11 @@ The **canonical** `aerospike.conf` and commands for local setup live in `SKILL.m
 
 | Tool | What to do |
 |------|----------------|
-| **Cursor** | Copy the folder `skills/aerospike-getting-started` to `<project>/.cursor/skills/aerospike-getting-started/` (or `~/.cursor/skills/` for all projects). Restart Cursor. The skill is discovered via the YAML `description` in `SKILL.md`. |
-| **GitHub Copilot** | Uses [`.github/copilot-instructions.md`](.github/copilot-instructions.md) automatically in supported clients; see also [AGENTS.md](AGENTS.md). |
-| **Claude Code / similar** | Open [CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md); full detail is under `skills/aerospike-getting-started/`. |
-| **Other chats (Claude, ChatGPT, etc.)** | Add the `skills/aerospike-getting-started/` files (or this whole repo) to a **project** / **knowledge** set, or paste the path to `SKILL.md` when asking questions. |
+| **Any agent (recommended)** | Add [`compiled-skills/SKILLS.md`](compiled-skills/SKILLS.md) to always-on context. [Install guide](compiled-skills/README.md). Raw URL: `https://raw.githubusercontent.com/aerospike/agent-skills/init/compiled-skills/SKILLS.md` |
+| **Cursor (skill folders)** | Copy `skills/aerospike-getting-started` (and optionally `skills/aerospike-development`) to `<project>/.cursor/skills/` or `~/.cursor/skills/`. Restart Cursor. |
+| **GitHub Copilot** | Uses [`.github/copilot-instructions.md`](.github/copilot-instructions.md) → `compiled-skills/SKILLS.md` in supported clients; see also [AGENTS.md](AGENTS.md). |
+| **Claude Code / similar** | Open [CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md); for one file, use [`compiled-skills/SKILLS.md`](compiled-skills/SKILLS.md). |
+| **Other chats** | Upload or link [`compiled-skills/SKILLS.md`](compiled-skills/SKILLS.md), or add the full `skills/` trees to a project knowledge set. |
 
 ## Install for Cursor (optional)
 

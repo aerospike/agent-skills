@@ -8,11 +8,16 @@ Apply when the user (or task) involves **Aerospike**, **Docker-based Aerospike**
 
 ## Read order
 
+**Fast path:** [`compiled-skills/SKILLS.md`](compiled-skills/SKILLS.md) — published rules for both skills, updated on every merge to `init`. [Install guide](compiled-skills/README.md).
+
+**More detail** (optional, under `skills/`):
+
 1. [`skills/aerospike-getting-started/SKILL.md`](skills/aerospike-getting-started/SKILL.md) — Critical rules, hallucination blacklist, autonomous first-run Docker steps, documentation links.
 2. [`skills/aerospike-getting-started/examples.md`](skills/aerospike-getting-started/examples.md) — Per-language put/get examples and Node.js batching notes.
 3. [`skills/aerospike-getting-started/reference.md`](skills/aerospike-getting-started/reference.md) — Custom config, Docker Compose, Community vs Enterprise, troubleshooting.
+4. [`skills/aerospike-development/SKILL.md`](skills/aerospike-development/SKILL.md) and [`skills/aerospike-development/references/`](skills/aerospike-development/references/README.md) — Application-level client rules.
 
-Do not invent REST APIs, SQL DDL, or wrong package names; follow the blacklist in `SKILL.md`.
+Do not invent REST APIs, SQL DDL, or wrong package names; follow the blacklist in `SKILL.md` / `compiled-skills/SKILLS.md`.
 
 ## Humans
 

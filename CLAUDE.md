@@ -1,3 +1,3 @@
 # Claude Code
 
-Start with [`AGENTS.md`](AGENTS.md) for AI assistant context, then [`skills/aerospike-getting-started/SKILL.md`](skills/aerospike-getting-started/SKILL.md) for Aerospike getting started and rules.
+Start with [`AGENTS.md`](AGENTS.md), then [`compiled-skills/SKILLS.md`](compiled-skills/SKILLS.md) for Aerospike rules. Source material lives under [`skills/`](skills/).
