@@ -53,9 +53,24 @@ See [references/model-deliverables-schema-guide-summary.md](references/model-del
 
 Aerospike is neither a relational database nor a document database.
 
-- **Records are the unit of I/O.** There are no server-side joins. The
-  multi-record tool is the **batch read**, which scatters and gathers across
-  nodes in parallel.
+- **Records are semi-structured.** A record is a collection of **strongly typed
+  bins**, and the typing is per bin per record — there is no set-level schema.
+  Two records in the same set can have entirely different bins, and the server
+  enforces nothing. Absent bins cost nothing, so sparse and heterogeneous shapes
+  are cheap rather than wasteful. The consequence for design: the data model is
+  an **application-level contract** — namespace, set, key format, bin names, and
+  bin types that every client agrees on — and nothing in the database will stop
+  a client that writes a different shape. Write the contract down; that is what
+  the schema guide is for.
+- **Records are the unit of I/O.** Record data is stored **contiguously**, so
+  every read fetches the **entire record** from storage, and every write
+  **rewrites the entire record** — Aerospike does not do in-place updates.
+  Requesting a subset of bins trims what crosses the *network*, not what is read
+  from *device*. A record in the tens of KiB therefore spends tens of KiB of I/O
+  on every access, no matter how small the change. Record size is an I/O budget,
+  not just a storage number.
+- **There are no server-side joins.** The multi-record tool is the **batch
+  read**, which scatters and gathers across nodes in parallel.
 - **Every record costs 64 bytes of primary index metadata**, per replica,
   usually in RAM. Many tiny records spend more memory on index than on data.
 - **Access patterns drive the model** — not entity normalization, and not
@@ -70,6 +85,16 @@ embedded document, you will produce a bad Aerospike model.
 architectural ceiling are three different bounds that are easy to conflate. Do
 not carry a number from memory; read the current values from the data modeling
 guide (see Escalation below).
+
+Whatever the band's endpoints are, read it as a **distribution, not a target**:
+design so the **bulk of records sit at the low end** (single-digit KiB), and
+treat the upper end as headroom for **outliers** and **slowly-changing
+consolidated structures** — 1:N and N:M relationship lists, where one record per
+edge would cost more. Size only hurts once multiplied by **write frequency**: a large record on a
+**hot write path** is a design defect even when it fits, because every update
+rewrites it in full — but the same size where writes are infrequent relative to
+reads is a legitimate design, not a compromise. Ask for the **update rate**, not
+just the byte count.
 
 ## Do not design without clarifying first
 
