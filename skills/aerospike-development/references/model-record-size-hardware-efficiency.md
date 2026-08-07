@@ -18,19 +18,27 @@ Aerospike does **not** keep its **own large DRAM cache of whole record payloads*
 
 **Read hot spots** (the same data read heavily) can **sometimes** be **mitigated on the node** by **namespace / storage** tuning—for example **`read-page-cache`**, which allows the **host OS page cache** to satisfy repeated block reads under the right **storage-engine** and kernel assumptions. See the [`read-page-cache`](https://aerospike.com/docs/database/reference/config#namespace__read-page-cache) parameter and [Buffering and Caching in Aerospike](https://support.aerospike.com/s/article/Buffering-and-Caching-in-Aerospike); validate in **staging** (not every workload benefits). This is **operations-level** tuning and **does not replace** good **key design** (e.g. [model-hot-keys.md](model-hot-keys.md)).
 
-Each stored record costs about **64 bytes of RAM per replica** in the **primary index** (metadata to locate the object). **Hardware efficiency** depends on the **ratio** between **payload size** and that **fixed per-record overhead**: the **sweet spot** is often on the order of **a few kilobytes (roughly 1–10 KiB)** for many workloads, but it **depends on throughput**:
+Each stored record costs about **64 bytes of RAM per replica** in the **primary index** (metadata to locate the object). **Hardware efficiency** depends on the **ratio** between **payload size** and that **fixed per-record overhead**: the **sweet spot** is **1–128 KiB** per record (the Goldilocks band). Note that "a few KiB" in Aerospike modeling means that **whole** range, not single-digit KiB. Where you sit *within* the band depends on throughput:
 
 - **Oversized records** drive **disk bandwidth** hard—every read/write touches the full object on storage (see [single-record-operations.md](single-record-operations.md)).
 - **Undersized records** (tiny values) mean you spend **a lot of memory on index entries** (many **64-byte** slots per gigabyte of “useful” data) and can push **RAM** limits before capacity.
-- **Lower throughput** tolerates **larger** objects per key and stays efficient; **higher throughput** generally favors **smaller** objects in that **1–10 KiB** band so disk and replication keep up.
+- **Throughput shifts where in the band to aim.** Lower-throughput workloads sit comfortably toward the **upper** end; high-throughput workloads should bias toward the **lower** end (single-digit KiB) so disk bandwidth and replication keep up. The band does not change — the target within it does.
 
 **Why**
 
 Modeling ignores index overhead and device I/O until clusters hit **latency**, **device saturation**, or **memory for the index**. The **64-byte**-per-record **per replica** rule of thumb makes **micro-records** surprisingly expensive in RAM, while **multi-megabyte** blobs stress devices even for “small” logical updates.
 
+This band is a design target derived from index-to-data ratio, I/O size, and
+defragmentation cost — not a measured hard boundary. If benchmarking on your
+hardware and workload shows a different range, replace it here with the
+verified figures and note the test conditions. The internal
+`aerospike/data-modeling-guide` repository holds the fuller treatment, including
+the distinction between this target band, the configured `max-record-size`
+limit, and the architectural ceiling.
+
 **Prefer**
 
-- **A few kilobytes per record** as a starting design point when it fits the access pattern; tune toward **smaller** objects when **read/write rates** rise
+- **1–128 KiB per record** as the design target when it fits the access pattern; bias toward the lower end of the band as **read/write rates** rise
 - Splitting or denormalizing **huge** documents across keys when hot paths only need part of the data
 - Capacity planning that includes **index RAM** (records × replicas × ~64 B) **and** **device throughput** for object size × QPS
 - Coordinating with **operations** on **`read-page-cache`** and related **storage** settings when **read-heavy** access to the **same blocks** dominates latency (after confirming **namespace** layout and doc constraints)
