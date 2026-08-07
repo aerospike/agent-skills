@@ -67,7 +67,7 @@ Follow this order:
 - **`last_verified`:** The skill frontmatter in [SKILL.md](skills/aerospike-getting-started/SKILL.md) includes `last_verified`. When you change Docker images, client commands, or major facts, re-run the Docker flow and one client example, then update that date.
 - **Linting skills:** Run `./scripts/validate-skill.sh` (see [CONTRIBUTING.md](CONTRIBUTING.md#validate-the-skill-package-skill-validator)); CI runs the same check via [`.github/workflows/skill-validator.yml`](.github/workflows/skill-validator.yml).
 - **Contributing:** See [CONTRIBUTING.md](CONTRIBUTING.md) for scope, which file to edit, and PR expectations.
-- **Redistribution:** Add a `LICENSE` file to the repository if you want explicit terms for copying this package; this README does not impose a license by itself.
+- **Redistribution:** This repository is licensed under the [Apache License 2.0](LICENSE), matching [aerospike/data-modeling-guide](https://github.com/aerospike/data-modeling-guide).
 
 ## Official documentation
 
