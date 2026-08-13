@@ -74,6 +74,31 @@ CI runs [agent-ecosystem/skill-validator](https://github.com/agent-ecosystem/ski
 
 For **Aerospike** changes specifically: verify ports, namespaces, TTL/NSUP, and image names against [Aerospike documentation](https://aerospike.com/docs/); run the Docker flow and at least **one** client example from [`examples.md`](skills/aerospike-getting-started/examples.md) for a stack you have installed. Avoid duplicating the full `aerospike.conf` in multiple files—keep one canonical copy in [`SKILL.md`](skills/aerospike-getting-started/SKILL.md) unless you have a strong reason.
 
+### Commit messages
+
+Commits follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```text
+type(scope): description
+```
+
+Common types here are `docs` (skill content), `feat` (a new skill or capability), `fix`, and `chore` (tooling and repo plumbing). The rules come from `@commitlint/config-conventional` via [`commitlint.config.mjs`](commitlint.config.mjs), matching [aerospike/data-modeling-guide](https://github.com/aerospike/data-modeling-guide).
+
+### Local hooks
+
+Hooks live in [`.pre-commit-config.yaml`](.pre-commit-config.yaml): secret scanning (gitleaks), shellcheck, whitespace fixes, and commitlint. They are **not** active until you install them:
+
+```bash
+pip install pre-commit          # or: brew install pre-commit
+pre-commit install --hook-type pre-commit --hook-type commit-msg
+```
+
+The `--hook-type commit-msg` part is required for commitlint — without it, the message check never runs.
+
+### Reviews
+
+The default branch requires a pull request with one approving review from a [code owner](.github/CODEOWNERS). Any one owner satisfies it, and GitHub does not let a pull request author approve their own.
+
 ## Style
 
 - **Concise:** The agent already knows generic programming; add only **Aerospike-oriented** or failure-prone detail when editing the Aerospike skill, and the same idea—product-oriented, non-generic detail—for other skills.

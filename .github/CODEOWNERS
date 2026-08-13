@@ -1,0 +1,10 @@
+# Code owners for aerospike/agent-skills
+#
+# Any one of these owners can approve a pull request. The organization ruleset
+# on the default branch requires one approving review from a code owner, so at
+# least one review from this list is needed before merge.
+#
+# Kept in sync with aerospike/data-modeling-guide, which the
+# aerospike-data-modeling skill escalates to.
+
+* @rbotzer @realmgic @tim-aero @lyndonbauto

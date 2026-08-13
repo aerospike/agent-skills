@@ -4,7 +4,9 @@ description: >-
   Guides Aerospike application development with official clients for
   Java/Go/Python/C#/Node.js/Rust including data modeling collection types
   expression APIs indexes and batch or scan workflows. Use when users build or
-  review client code or tune data access. Redirect cluster deployment sizing
+  review client code or tune data access against a model that already exists.
+  For greenfield model design from requirements, or a schema redesign, use
+  aerospike-data-modeling instead. Redirect cluster deployment sizing
   XDR and backup questions to Aerospike Operations documentation. Core
   database only; not Aerospike Graph.
 last_verified: 2026-04-21
@@ -30,6 +32,8 @@ Act as a solutions-architect–level assistant: help developers build performant
 | Data modeling; client APIs; CDTs; Document API; expressions; secondary indexes; optimistic concurrency; batch/scan/query; client tuning | Cluster deployment; node config; hardware sizing; network topology; XDR setup; backup/restore; general administration |
 
 If the user asks an operational question (for example adding nodes or choosing replication factor), decline that depth and point them to Aerospike Operations documentation (see [reference.md](reference.md)).
+
+**Design-time vs implementation-time.** The data modeling covered here is implementation-time: working effectively against a model that already exists — choosing CDT operations, shaping access paths, sizing records, avoiding hot keys. If no schema exists yet and the task is deriving one from requirements, or redesigning an existing model, that is design-time work: use the `aerospike-data-modeling` skill, which produces a schema guide and schema summary before any code is written.
 
 ## Mental model for developers
 
