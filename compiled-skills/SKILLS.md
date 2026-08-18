@@ -65,11 +65,11 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 - policy- -> Timeouts/retries, client-level defaults, replica & AP/SC read modes, sendKey, commit level, generation/CAS, replace
 - cdt- -> Lists/maps, nesting (K-order, context), growth limits, server-side collection ops
 - expr- -> Filter/operation/path expressions vs heavier alternatives
-- query- -> Secondary indexes and query-oriented modeling
+- query- -> Secondary indexes, cardinality/cost, and deriving index needs from access paths
 - batch- -> Many primary-key reads/writes; one key per batch entry, coalesce, batch operate
 - binop- -> operate, one record lock, mixed read/write, atomic multi-bin updates
 - single- -> Whole-record vs partial/bin operations; TTL void-time and NSUP/default-ttl; delete and durable deletes (EE)
-- model- -> Keys, denormalization, access paths, record size vs index RAM and disk, hot keys and error 14 / KEY_BUSY
+- model- -> Namespace and set boundaries; flat bins vs CDTs vs multiple records; keys, denormalization, access paths; operate / batch / expressions; record size vs index RAM and disk; hot keys and error 14 / KEY_BUSY
 - sec- -> TLS and access control on the client
 
 ### Use batch APIs for many primary-key operations [MEDIUM]
@@ -132,10 +132,25 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 - Prefer: Access-pattern-first key design; CDTs for embedded aggregates when reads are colocated by key
 - Avoid: Join-shaped APIs in application code mirroring SQL without redesign
 
+### Choose flat bins, nested CDTs, or multiple records for one logical entity [HIGH]
+- Flat bins: prefer when fields are read or written together under one primary key, record size stays within bounds, and you do not need deep partial structure. Nested CDTs (lists/maps): use when a sub-structure is updated in place (server-side operate on a path), you need ordering or map key semantics from the type system, and growth is bounded per cdt-bounded-collections.md. Multiple records (same or related keys): use when different slices of a logical entity have different read/write hotness, independent primary-key access paths, or you must stay under max record size and avoid a single contended row—accept fan-out reads or batch to reassemble, and denormalize where a single PK read must win.
+- Prefer: One PK + flat bins when the happy path is one get/put or one operate over known bin names; CDT operate on a nested path when updates are partial and colocated with the same key; Extra records keyed by a natural access path (for example user:orders:<id>) when paths split cleanly and you can batch or index only what queries need; pair with query-sindex-by-access-path.md for predicate-driven indexes
+- Avoid: Unbounded list/map growth on a “document-shaped” record; see cdt-bounded-collections.md; Giant nested JSON-like blobs updated only via full-record get/put under concurrent writers; prefer binop and expressions on the server; Multiple records for “normalization” alone when every read still needs all of them—denormalize for the dominant path
+
+### Pick client APIs by key cardinality and work done per request [MEDIUM]
+- One key, multiple bins or a record-shaped update: prefer operate (and record lock / mixed R/W semantics) so the server does one round-trip and you avoid get/put races. Many keys, each known: prefer batch (reads, writes, or batch operate with one entry per key). Server-side predicate, trim, or numeric/bin patch on read or write: use filter/operation expressions so work stays on the data nodes. Do not string together serial get/put when a single operate or single expression chain can express the work.
+- Prefer: operate for one key, N bins, or CDT paths in one call; Batch with coalesced keys and per-key result handling; Expressions for “read only if condition” or “write only if bin matches”; Deeper reading: binop-operate-record-lock-read-write.md, binop-operate-atomicity.md, batch-parallel-key-operations.md, expr-compute-to-data.md
+- Avoid: Parallel single-key calls in a loop for hundreds+ hot keys with no batching when the API is appropriate; read-modify-write in the app for bins that the server can operate or express into one request
+
 ### Design and mitigate hot keys (error 14 / KEY_BUSY) [HIGH]
 - When many clients hit the same primary key at once, that record becomes a hot key: work serializes on the server and you can see high latency, timeouts, or failures such as error code 14 / KEY_BUSY (exact name depends on the client—see the support article and your SDK). That usually means too much load on one key, not a random cluster bug.
 - Prefer: Spreading work across more keys when the product allows—shard counters or aggregates instead of a single global row everyone updates; One operate (or one batch entry) per key when a key needs several changes—see batch-parallel-key-operations.md and binop-operate-record-lock-read-write.md; Read policies that spread read load when slightly stale data is OK—policy-read-replica-consistency.md (MASTER_PROLES, etc.); Server-side namespace tuning such as read-page-cache so the OS page cache can absorb repeated reads of the same device blocks—can ease read-heavy hot keys when storage layout fits; see model-record-size-hardware-efficiency.md and the read-page-cache reference (not a substitute for sharding hot keys in the app); Backoff with jitter on transient errors instead of tight spin loops
 - Avoid: A single key as the only place for high-QPS writes (global sequence, one shared counter with no sharding); Blind retries without backoff when you see hot-key / busy errors
+
+### Draw namespace and set boundaries for retention, security, and operations [HIGH]
+- Use one namespace when a single set of cluster-scoped options (replication, strong consistency vs AP mode where applicable, default TTL, NSUP behavior) and one operational “slice” of data fits the workload. Split into multiple namespaces when you need different retention/expiration policy, different consistency or replication expectations that the product exposes at namespace level, or isolation for security, chargeback, or operational boundaries (for example different backup/restore or admin concerns). Sets group records within a namespace: treat them like logical tables or type groupings, not a substitute for key design. Do not use sets to solve cross-key transactions, joins, or independent tuning knobs that are actually namespace- or cluster-level; those belong in the model, operations hand-off, and official Operations docs.
+- Prefer: One namespace for one product domain when options and ops model align; Clear set names aligned with access paths and primary-key design; Explicit TTL, default TTL, and NSUP alignment with the client; see single-ttl-nsup-default-ttl.md and single-ttl-expiration-retention.md; Asking Operations for cluster- and node-level placement, replication, and security when the split is for infra—not modeling it only in the app
+- Avoid: Many namespaces “because we have many services” when a single namespace with sets and a consistent policy would suffice—each extra namespace adds operational surface; Treating a set as a shard or partitioning mechanism; user key and partition distribution drive that, not the set name alone; Expecting namespace or set to enforce row-level app security without access control and TLS configuration; see sec-client-tls-auth.md and official Operations documentation for the deployment
 
 ### Size records for primary-index overhead and disk bandwidth [HIGH]
 - In hybrid memory architecture (HMA) and All Flash deployments, record data lives on device and reads generally come from the storage path—plan I/O accordingly. Aerospike does not keep an application-style DRAM cache of arbitrary records keyed by digest, so you cannot assume a hot record is free to re-read.
@@ -181,6 +196,11 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 - Use secondary indexes for predicates that match a planned query path at sensible cardinality. Do not index high-cardinality values (for example unique UUIDs per row) as a substitute for a primary key redesign. Prefer primary-key access when the key is known.
 - Prefer: Modeling that answers “how do I look this up?” with PK when possible; Indexes on fields that partition the key space usefully for queries
 - Avoid: “Index everything” patterns carried over from relational databases
+
+### Derive secondary index needs from read and write access paths [HIGH]
+- Before adding a secondary index, list access paths (one line each: who reads, predicate, key known or not, latency budget). For each path: (1) If the primary key is knowable, use PK get/operate/batch first. (2) If the path needs a duplicate of data already stored elsewhere, denormalize to a key that already exists; see model-access-paths-denormalization.md. (3) Add a secondary index only for predicates with viable cardinality and a true query path, per query-secondary-index-discipline.md. (4) Narrow the candidate set with the index predicate; use query + filter for stricter server-side checks when the doc pattern fits. (5) Re-fetch by PK when the query should return or drive updates for specific keys—sendKey if stored keys are required in results.
+- Prefer: A short ordered checklist in design reviews: path → PK/denorm → sindex only if needed; Batch get to hydrate rows after a query that returns key material you can use; policy-send-key.md when query APIs must return user keys that are not in bin values
+- Avoid: An index per field that appears in WHERE in a relational dump without cardinality analysis; Query as a substitute for a known key; redesign keys first
 
 ### Terminate TLS and apply access credentials in the client [MEDIUM]
 - When the cluster requires TLS or access control, configure the client with the correct TLS context and credentials per official security guides—not custom shortcuts. Treat credentials as secrets; never embed them in repos.

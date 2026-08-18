@@ -1,6 +1,6 @@
 # Published Aerospike skills
 
-This directory holds the **published** Aerospike agent rules — one file you can add to any AI assistant. Content is built automatically from [`skills/`](../skills/) when changes merge to `init`.
+This directory holds the **published** Aerospike agent rules — one file you can add to any AI assistant. Content is built from [`skills/`](../skills/); CI fails any pull request whose compiled output is stale, so this file always matches the source skills on `main`.
 
 | File | Purpose |
 |------|---------|
@@ -8,10 +8,10 @@ This directory holds the **published** Aerospike agent rules — one file you ca
 
 ## Quick install
 
-**Raw file URL (use `init` or a release tag):**
+**Raw file URL (use `main` or a release tag):**
 
 ```
-https://raw.githubusercontent.com/aerospike/agent-skills/init/compiled-skills/SKILLS.md
+https://raw.githubusercontent.com/aerospike/agent-skills/main/compiled-skills/SKILLS.md
 ```
 
 1. Download [`SKILLS.md`](SKILLS.md) (or use the raw URL above).
