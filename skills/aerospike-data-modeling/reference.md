@@ -14,7 +14,7 @@ model, see the `aerospike-development` skill.
 
 ## Primary source
 
-- **`aerospike/data-modeling-guide`** (internal) — the full design-time process: checklist, decision packs, sizing worksheets, workload archetypes, and the CDT/expression reference material that modeling decisions depend on. Start at its `AGENTS.md`.
+- [**aerospike/data-modeling-guide**](https://github.com/aerospike/data-modeling-guide) — the full design-time process: checklist, decision packs, sizing worksheets, workload archetypes, and the CDT/expression reference material that modeling decisions depend on. Start at its `AGENTS.md`.
 
 ## Aerospike documentation
 
