@@ -1,0 +1,4 @@
+
+# Trunk CLI writes action logs here if the tool is installed; this repo
+# uses pre-commit (.pre-commit-config.yaml), not Trunk.
+.trunk/

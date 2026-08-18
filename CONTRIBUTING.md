@@ -4,7 +4,7 @@ Thanks for helping improve this repository. It holds **Agent Skills** under [`sk
 
 ## What belongs here
 
-- **Repository:** Skill trees under `skills/<skill-name>/`, shared entrypoints ([`AGENTS.md`](AGENTS.md), [`README.md`](README.md)), Copilot instructions, CI validation, and helper scripts.
+- **Repository:** Skill trees under `skills/<skill-name>/`, curated entrypoints ([`AGENTS.md`](AGENTS.md), [`README.md`](README.md)), compiled artifacts ([`compiled-skills/`](compiled-skills/)), Copilot instructions, CI validation, and helper scripts.
 - **Each skill:** One folder per skill, with `SKILL.md` (required) and optional companion files per the [Agent Skills](https://agentskills.io/) conventions your target platforms expect. Scope and focus are **per skill**—see the skill’s own `SKILL.md` and any `references/` / flat companion files.
 
 ### Current skills (examples)
@@ -35,6 +35,7 @@ Thanks for helping improve this repository. It holds **Agent Skills** under [`sk
 | Aerospike Compose, custom config, editions, platform notes | [skills/aerospike-getting-started/reference.md](skills/aerospike-getting-started/reference.md) |
 | Aerospike app development rules, examples TOC | [skills/aerospike-development/references/README.md](skills/aerospike-development/references/README.md), [skills/aerospike-development/examples.md](skills/aerospike-development/examples.md) |
 | Tool-agnostic AI entry (read order, scope) | [AGENTS.md](AGENTS.md) |
+| Compiled published rules (auto-generated from skills) | [compiled-skills/SKILLS.md](compiled-skills/SKILLS.md) |
 | GitHub Copilot repo instructions | [.github/copilot-instructions.md](.github/copilot-instructions.md) |
 | Human install path, checklist | [README.md](README.md) |
 
@@ -84,9 +85,35 @@ CI runs [agent-ecosystem/skill-validator](https://github.com/agent-ecosystem/ski
 1. **Fact-check** any product behavior you document against current **official** docs or release notes for that product—not only blog posts or old threads.
 2. **Run** `./scripts/validate-skill.sh` (see above).
 3. **Exercise the skill** you changed: follow the happy path in `SKILL.md` (e.g. commands, containers, client smoke test) when the skill includes procedural steps.
-4. **Keep diffs focused**—one logical change per PR when possible (e.g. “fix port wording in Aerospike skill” vs mixing unrelated skills or refactors).
+4. **If you changed `skills/`**, regenerate compiled output: `python scripts/compile-agents.py --write` (or let CI on `main` do it). PRs run a drift check — stale `compiled-skills/` fails CI.
+5. **Keep diffs focused**—one logical change per PR when possible (e.g. “fix port wording in Aerospike skill” vs mixing unrelated skills or refactors).
 
 For **Aerospike** changes specifically: verify ports, namespaces, TTL/NSUP, and image names against [Aerospike documentation](https://aerospike.com/docs/); run the Docker flow and at least **one** client example from [`examples.md`](skills/aerospike-getting-started/examples.md) for a stack you have installed. Avoid duplicating the full `aerospike.conf` in multiple files—keep one canonical copy in [`SKILL.md`](skills/aerospike-getting-started/SKILL.md) unless you have a strong reason.
+
+### Commit messages
+
+Commits follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```text
+type(scope): description
+```
+
+Common types here are `docs` (skill content), `feat` (a new skill or capability), `fix`, and `chore` (tooling and repo plumbing). The rules come from `@commitlint/config-conventional` via [`commitlint.config.mjs`](commitlint.config.mjs), matching [aerospike/data-modeling-guide](https://github.com/aerospike/data-modeling-guide).
+
+### Local hooks
+
+Hooks live in [`.pre-commit-config.yaml`](.pre-commit-config.yaml): secret scanning (gitleaks), shellcheck, whitespace fixes, and commitlint. They are **not** active until you install them:
+
+```bash
+pip install pre-commit          # or: brew install pre-commit
+pre-commit install --hook-type pre-commit --hook-type commit-msg
+```
+
+The `--hook-type commit-msg` part is required for commitlint — without it, the message check never runs.
+
+### Reviews
+
+The default branch requires a pull request with one approving review from a [code owner](.github/CODEOWNERS). Any one owner satisfies it, and GitHub does not let a pull request author approve their own.
 
 ## Style
 

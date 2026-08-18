@@ -1,0 +1,12 @@
+{
+  "shape": "stripped",
+  "layout": "single",
+  "sources": [
+    "skills/aerospike-getting-started",
+    "skills/aerospike-development",
+    "skills/aerospike-data-modeling"
+  ],
+  "files": {
+    "compiled-skills/SKILLS.md": 37433
+  }
+}
