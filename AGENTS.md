@@ -8,7 +8,7 @@ Apply when the user (or task) involves **Aerospike**, **Docker-based Aerospike**
 
 ## Read order
 
-**Fast path:** [`compiled-skills/SKILLS.md`](compiled-skills/SKILLS.md) — published rules for both skills, updated on every merge to `init`. [Install guide](compiled-skills/README.md).
+**Fast path:** [`compiled-skills/SKILLS.md`](compiled-skills/SKILLS.md) — published rules for getting-started, development, and data-modeling skills, updated on every merge to `init`. [Install guide](compiled-skills/README.md).
 
 **More detail** (optional, under `skills/`):
 

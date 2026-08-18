@@ -142,7 +142,7 @@ Each has a detection test in
 
 This skill covers the decision layer. The full workflow — the clarification
 gates, the per-relationship decision packs, the sizing worksheets, the
-stakeholder checkpoints — lives in the internal **`aerospike/data-modeling-guide`**
+stakeholder checkpoints — lives in the **`https://github.com/aerospike/data-modeling-guide`**
 repository.
 
 **For a new application, fetch the guide and follow its checklist. Do not design

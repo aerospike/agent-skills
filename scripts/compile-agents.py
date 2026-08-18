@@ -28,6 +28,7 @@ from scripts.skills_compile.render import render_monolith, render_stripped  # no
 DEFAULT_SKILLS = [
     "skills/aerospike-getting-started",
     "skills/aerospike-development",
+    "skills/aerospike-data-modeling",
 ]
 
 RENDERERS = {

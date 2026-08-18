@@ -4,7 +4,7 @@ This directory holds the **published** Aerospike agent rules — one file you ca
 
 | File | Purpose |
 |------|---------|
-| [`SKILLS.md`](SKILLS.md) | **Download this** — getting-started + application development rules in one file |
+| [`SKILLS.md`](SKILLS.md) | **Download this** — getting-started, application development, and data-modeling rules in one file |
 
 ## Quick install
 

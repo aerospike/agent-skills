@@ -3,9 +3,10 @@
   "layout": "single",
   "sources": [
     "skills/aerospike-getting-started",
-    "skills/aerospike-development"
+    "skills/aerospike-development",
+    "skills/aerospike-data-modeling"
   ],
   "files": {
-    "compiled-skills/SKILLS.md": 33472
+    "compiled-skills/SKILLS.md": 37433
   }
 }

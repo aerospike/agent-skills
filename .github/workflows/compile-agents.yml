@@ -1,12 +1,13 @@
-# Phase 2 automation: compile skills/ into compiled-skills/.
-#   - On pull requests: drift-check (fail if compiled-skills/ is stale).
-#   - On push to init: regenerate and commit back if anything changed.
+# Compile skills/ into compiled-skills/.
+# Fails if compiled-skills/ is stale — on pull requests and on push to init/main.
+# Maintainers: run `python3 scripts/compile-agents.py --write` locally when skills change.
 name: compile-agents
 
 on:
   pull_request:
     paths:
       - "skills/**"
+      - "compiled-skills/**"
       - "scripts/compile-agents.py"
       - "scripts/skills_compile/**"
       - ".github/workflows/compile-agents.yml"
@@ -14,6 +15,7 @@ on:
     branches: [init, main, master]
     paths:
       - "skills/**"
+      - "compiled-skills/**"
       - "scripts/compile-agents.py"
       - "scripts/skills_compile/**"
       - ".github/workflows/compile-agents.yml"
@@ -23,7 +25,6 @@ permissions:
 
 jobs:
   drift-check:
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -36,36 +37,4 @@ jobs:
           python-version: "3.12"
       - run: pip install -r scripts/requirements-compile.txt
       - name: Check compiled-skills/ is up to date
-        run: python scripts/compile-agents.py --shape stripped --check
-
-  regenerate:
-    if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    concurrency:
-      group: compile-agents-${{ github.ref }}
-      cancel-in-progress: true
-    steps:
-      - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
-        with:
-          egress-policy: audit
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - run: pip install -r scripts/requirements-compile.txt
-      - name: Recompile compiled-skills/
-        run: python scripts/compile-agents.py --shape stripped --write
-      - name: Commit if changed
-        run: |
-          if [[ -n "$(git status --porcelain compiled-skills/)" ]]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add compiled-skills/
-            git commit -m "chore: recompile compiled-skills from skills [skip ci]"
-            git push
-          else
-            echo "compiled-skills/ already up to date."
-          fi
+        run: python3 scripts/compile-agents.py --shape stripped --check
