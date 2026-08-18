@@ -140,10 +140,16 @@ Each has a detection test in
 
 ## Escalation: use the data modeling guide
 
-The full design-time process lives in https://github.com/aerospike/data-modeling-guide.
+This skill covers the decision layer. The full workflow — the clarification
+gates, the per-relationship decision packs, the sizing worksheets, the
+stakeholder checkpoints — lives in the internal **`https://github.com/aerospike/data-modeling-guide`**
+repository.
+
+**For a new application, fetch the guide and follow its checklist. Do not design
+a complete model from this skill alone.**
 
 ```bash
-gh repo clone https://github.com/aerospike/data-modeling-guide
+gh repo clone aerospike/data-modeling-guide
 ```
 
 Then read its `AGENTS.md` first — it carries the routing table and the hard

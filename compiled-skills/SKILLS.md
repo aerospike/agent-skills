@@ -211,7 +211,7 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 
 
 ### Fetch the data modeling guide before designing a full model [HIGH]
-- The full design-time process lives in https://github.com/aerospike/data-modeling-guide.
+- This skill carries the decision layer. The full design-time process lives in the internal https://github.com/aerospike/data-modeling-guide repository. For a new application or a redesign, fetch it and follow its checklist — do not produce a complete model from this skill alone.
 - Prefer: Reading current values (version minimums, size limits, complexity) from the guide rather than recalling them; Naming the specific guide file you used, so a reviewer can retrace the decision
 - Avoid: Presenting a model as complete when the guide's checklist and sizing worksheets were never applied; Quoting a version gate or size limit from memory
 

@@ -12,10 +12,13 @@ last_verified: 2026-08-06
 
 **Rule**
 
-The full design-time process lives in https://github.com/aerospike/data-modeling-guide.
+This skill carries the decision layer. The full design-time process lives in the
+internal **`https://github.com/aerospike/data-modeling-guide`**
+repository. For a new application or a redesign, fetch it and follow its
+checklist — do not produce a complete model from this skill alone.
 
 ```bash
-gh repo clone https://github.com/aerospike/data-modeling-guide
+gh repo clone aerospike/data-modeling-guide
 ```
 
 Read `AGENTS.md` first: it carries the hard rules, the routing table, and the
@@ -44,6 +47,9 @@ operation complexity tables, configuration limits and their current defaults.
 Copying those values into a skill guarantees they go stale, and a stale copy is
 worse than a pointer because nothing signals that it is wrong. Read them from
 the guide at the time you need them.
+
+Both repositories are Aerospike-internal, so access depends on the user's GitHub
+authorization.
 
 **Prefer**
 
