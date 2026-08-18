@@ -140,13 +140,7 @@ Each has a detection test in
 
 ## Escalation: use the data modeling guide
 
-This skill covers the decision layer. The full workflow — the clarification
-gates, the per-relationship decision packs, the sizing worksheets, the
-stakeholder checkpoints — lives in **aerospike/data-modeling-guide** at
-https://github.com/aerospike/data-modeling-guide.
-
-**For a new application, fetch the guide and follow its checklist. Do not design
-a complete model from this skill alone.**
+The full design-time process lives in https://github.com/aerospike/data-modeling-guide.
 
 ```bash
 gh repo clone https://github.com/aerospike/data-modeling-guide

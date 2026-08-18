@@ -12,10 +12,7 @@ last_verified: 2026-08-06
 
 **Rule**
 
-This skill carries the decision layer. The full design-time process lives in
-**aerospike/data-modeling-guide** at https://github.com/aerospike/data-modeling-guide.
-For a new application or a redesign, fetch it and follow its checklist — do not
-produce a complete model from this skill alone.
+The full design-time process lives in https://github.com/aerospike/data-modeling-guide.
 
 ```bash
 gh repo clone https://github.com/aerospike/data-modeling-guide
