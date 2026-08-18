@@ -1,4 +1,4 @@
-_Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-development`. Edit the skills under `skills/`, not this file._
+_Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-development`, `skills/aerospike-data-modeling`. Edit the skills under `skills/`, not this file._
 
 # Aerospike agent rules
 
@@ -206,3 +206,26 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 - Namespace Supervisor (NSUP) must be configured consistently with how the app sends TTL on writes. When NSUP is enabled and the namespace allows TTL-backed writes, a write or Touch (or equivalent) that uses client TTL 0 tells the server to set void-time from default-ttl, with set-level default-ttl overriding namespace when both exist. Each such call can re-apply that horizon to the record; to change bins only without resetting void-time, use -2 or an explicit TTL. Reads that extend TTL via read-touch use default-read-touch-ttl-pct and client read policies—that is separate from default-ttl on writes.
 - Prefer: nsup-period > 0 when using positive integer TTLs on writes, unless operations explicitly align with the doc’s exceptions; Knowing whether every write with TTL 0 re-bases the record to default-ttl (set vs namespace) before relying on “refresh” behavior; Checking nsup-period when you see error 22 on TTL writes before blaming application logic; Using -2 on updates when only bin data should change and void-time must stay as-is
 - Avoid: Assuming unspecified client TTL behaves the same across SDKs—confirm whether the default maps to 0 (server default-ttl) or something else; Conflating read-touch TTL extension with default-ttl on writes; Using allow-ttl-without-nsup outside the doc’s intended testing-only scope
+
+## aerospike-data-modeling
+
+
+### Fetch the data modeling guide before designing a full model [HIGH]
+- This skill carries the decision layer. The full design-time process lives in the internal aerospike/data-modeling-guide repository. For a new application or a redesign, fetch it and follow its checklist — do not produce a complete model from this skill alone.
+- Prefer: Reading current values (version minimums, size limits, complexity) from the guide rather than recalling them; Naming the specific guide file you used, so a reviewer can retrace the decision
+- Avoid: Presenting a model as complete when the guide's checklist and sizing worksheets were never applied; Quoting a version gate or size limit from memory
+
+### Produce a schema guide and a derived schema summary [MEDIUM]
+- Design work produces two documents, written to files. Know which one you are writing at any moment, and never author the second independently of the first.
+- Prefer: Writing both to files, not pasting a schema into chat; Building the guide incrementally, one entity group at a time, and generating the summary only once every group is done; Regenerating the summary from the guide whenever the model changes; Stating explicitly, in the guide, which decisions were assumptions rather than confirmed inputs
+- Avoid: Editing the schema summary directly when the model changes — update the guide, regenerate the summary; Omitting the assumptions log because the model "seems obvious"; Treating a chat-delivered schema as a deliverable
+
+### Work the design-time loop one entity group at a time [HIGH]
+- Data model design is an interactive process with mandatory stop points, not a document you fill in. Produce a written clarification document first, partition the domain into entity groups, then design each group and pass its review before starting the next.
+- Prefer: A written clarification document as the first artifact, before any schema; Requirements-gap questions ("what is the p95 fan-out?") over mechanism-preference questions ("which pattern do you prefer?"); The baseline shape by default — introduce a new set, split record, extra index, or materialized view only when a requirement cannot be met otherwise, or measurement shows the baseline misses an SLO; Explicit assumptions with reconsider triggers when an input cannot be obtained; A developer walkthrough per group: trace a create-and-read flow, a multi-record mutation, and a cleanup/cascade through the drafted schema
+- Avoid: Producing a complete schema for every entity group with no clarifying question asked and no checkpoint held; Pre-filling pattern choices into the entity-group plan — those are outputs of per-group design, not routing decisions; Treating "we discussed the data model" as equivalent to having a schema guide
+
+### Run the seven failure-mode detection tests against a drafted model [HIGH]
+- Each failure mode below has a detection test — something you can run against a draft and get a yes/no answer. Use them twice: as priming before designing, and as a review rubric against a drafted schema. These are not LLM-specific; they are relational and document-database habits applied to an architecture that rewards neither.
+- Prefer: Running all seven against the drafted schema before the stakeholder review; Treating an unanswerable growth question as a blocker, not a footnote
+- Avoid: Running these only at the end — most are cheaper to fix during design than after
