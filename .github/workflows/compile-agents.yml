@@ -1,0 +1,40 @@
+# Compile skills/ into compiled-skills/.
+# Fails if compiled-skills/ is stale — on pull requests and on push to init/main.
+# Maintainers: run `python3 scripts/compile-agents.py --write` locally when skills change.
+name: compile-agents
+
+on:
+  pull_request:
+    paths:
+      - "skills/**"
+      - "compiled-skills/**"
+      - "scripts/compile-agents.py"
+      - "scripts/skills_compile/**"
+      - ".github/workflows/compile-agents.yml"
+  push:
+    branches: [init, main, master]
+    paths:
+      - "skills/**"
+      - "compiled-skills/**"
+      - "scripts/compile-agents.py"
+      - "scripts/skills_compile/**"
+      - ".github/workflows/compile-agents.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  drift-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r scripts/requirements-compile.txt
+      - name: Check compiled-skills/ is up to date
+        run: python3 scripts/compile-agents.py --shape stripped --check

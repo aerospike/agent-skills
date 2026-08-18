@@ -13,9 +13,10 @@ The **canonical list of skills** (and what to copy) is [`skills/README.md`](skil
 | Skill folder | Purpose | Entry |
 |--------------|---------|--------|
 | `aerospike-getting-started` | Local Docker, namespaces/ports/TTL, first put/get, official client snippets, Community vs Enterprise, troubleshooting for new users | [`skills/aerospike-getting-started/SKILL.md`](skills/aerospike-getting-started/SKILL.md) |
-| `aerospike-development` | Application development: modeling, CDTs, expressions, indexes, batch/scan, policies, modular rules under `references/` | [`skills/aerospike-development/SKILL.md`](skills/aerospike-development/SKILL.md) |
+| `aerospike-development` | Application development: CDTs, expressions, indexes, batch/scan, policies, modeling against an existing schema, modular rules under `references/` | [`skills/aerospike-development/SKILL.md`](skills/aerospike-development/SKILL.md) |
+| `aerospike-data-modeling` | Design-time data modeling: deriving a schema from requirements when none exists yet, or redesigning one | [`skills/aerospike-data-modeling/SKILL.md`](skills/aerospike-data-modeling/SKILL.md) |
 
-**Choosing a skill:** Use **getting-started** when you need a dev instance, correct defaults, or a first verified read/write. Use **development** when you are designing access patterns, tuning client code, or working through CDTs/policies/expressions. You can install **both**; they complement each other.
+**Choosing a skill:** Use **getting-started** when you need a dev instance, correct defaults, or a first verified read/write. Use **development** when you are writing or reviewing client code against a model that already exists. Use **data-modeling** when the schema itself is the deliverable. You can install **all**; they complement each other.
 
 **Out of scope for these skills:** production cluster topology, full operations runbooks, Kubernetes/Helm, or cloud-specific deployment—for that, use [Aerospike documentation](https://aerospike.com/docs/) (links also appear in the getting-started skill).
 
@@ -37,8 +38,12 @@ The **canonical list of skills** (and what to copy) is [`skills/README.md`](skil
 | [skills/aerospike-development/references/README.md](skills/aerospike-development/references/README.md) | TOC of modular rules and thin `ex-*` example tables |
 | [skills/aerospike-development/reference.md](skills/aerospike-development/reference.md) | Doc map and deeper pointers for client work |
 | [skills/aerospike-development/examples.md](skills/aerospike-development/examples.md) | Additional examples for the development skill |
+| [skills/aerospike-data-modeling/SKILL.md](skills/aerospike-data-modeling/SKILL.md) | Data modeling skill: design-time workflow, mental model, pointers into references |
 | [AGENTS.md](AGENTS.md) | Short read order and routing for any AI assistant |
+| [compiled-skills/SKILLS.md](compiled-skills/SKILLS.md) | Published agent rules, compiled from `skills/` into one file |
 | [.github/copilot-instructions.md](.github/copilot-instructions.md) | GitHub Copilot repository instructions |
+
+Skill packaging evaluation (structure A/B tests, coverage gates) lives in the separate [agent-skills-eval](https://github.com/citrusleaf/agent-skills-eval) repository.
 
 The **canonical** `aerospike.conf` and commands for local setup live in [`skills/aerospike-getting-started/SKILL.md`](skills/aerospike-getting-started/SKILL.md) (not duplicated here).
 
@@ -48,10 +53,11 @@ Copy **one or more** folders from `skills/<skill-name>/` into your tool’s skil
 
 | Tool | What to do |
 |------|----------------|
-| **Cursor** | Copy `skills/aerospike-getting-started` and/or `skills/aerospike-development` to `<project>/.cursor/skills/<same-folder-name>/` (or `~/.cursor/skills/` for all projects). Restart Cursor. Each skill is discovered via its YAML `description` in `SKILL.md`. |
+| **Any agent (recommended)** | Add [`compiled-skills/SKILLS.md`](compiled-skills/SKILLS.md) to always-on context. [Install guide](compiled-skills/README.md). Raw URL: `https://raw.githubusercontent.com/aerospike/agent-skills/main/compiled-skills/SKILLS.md` |
+| **Cursor (skill folders)** | Copy `skills/aerospike-getting-started`, `skills/aerospike-development`, and/or `skills/aerospike-data-modeling` to `<project>/.cursor/skills/<same-folder-name>/` (or `~/.cursor/skills/` for all projects). Restart Cursor. Each skill is discovered via its YAML `description` in `SKILL.md`. |
 | **GitHub Copilot** | Uses [`.github/copilot-instructions.md`](.github/copilot-instructions.md) in supported clients; see also [AGENTS.md](AGENTS.md). |
-| **Claude Code / similar** | Open [CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md); skill bodies live under `skills/*/`. |
-| **Other chats (Claude, ChatGPT, etc.)** | Add the skill folder(s) or this whole repo to a **project** / **knowledge** set, or paste the path to the relevant `SKILL.md` when asking questions. |
+| **Claude Code / similar** | Open [CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md); for one file, use [`compiled-skills/SKILLS.md`](compiled-skills/SKILLS.md), or read skill bodies under `skills/*/`. |
+| **Other chats (Claude, ChatGPT, etc.)** | Upload or link [`compiled-skills/SKILLS.md`](compiled-skills/SKILLS.md), or add the skill folder(s) to a **project** / **knowledge** set. |
 
 ## Install for Cursor (optional)
 
@@ -91,8 +97,9 @@ Use this when your goal is a **running local database** and a **verified first c
 
 - **`last_verified`:** Each skill’s `SKILL.md` may include `last_verified`. When you change Docker images, client commands, or major facts for **that** skill, re-check the documented flow and update the date.
 - **Linting skills:** Run `./scripts/validate-skill.sh` (see [CONTRIBUTING.md](CONTRIBUTING.md#validate-the-skill-package-skill-validator)); CI runs the same check via [`.github/workflows/skill-validator.yml`](.github/workflows/skill-validator.yml).
+- **Compiled skills:** `compiled-skills/` is generated from `skills/`. After editing any skill, run `python3 scripts/compile-agents.py --write`; CI fails the PR if the compiled output is stale.
 - **Contributing:** See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add or edit skills and keep root docs in sync.
-- **Redistribution:** Add a `LICENSE` file to the repository if you want explicit terms for copying this package; this README does not impose a license by itself.
+- **Redistribution:** This repository is licensed under the [Apache License 2.0](LICENSE), matching [aerospike/data-modeling-guide](https://github.com/aerospike/data-modeling-guide).
 
 ## Official documentation
 
