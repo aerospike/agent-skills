@@ -6,7 +6,7 @@ This repository holds **Aerospike-related Agent Skills** under [`skills/`](skill
 
 The **canonical list of skills** (and what to copy) is [`skills/README.md`](skills/README.md). More Aerospike skills may appear there over time.
 
-**Layout note:** If you previously used `aerospike-getting-started/` at the **repository root**, it now lives at **`skills/aerospike-getting-started/`**. Copy from `skills/<skill-name>/` when installing into an agent.
+**Layout note:** If you previously used `aerospike-getting-started/` at the **repository root**, it now lives at **`skills/aerospike-getting-started/`**. That folder is for **contributors** who edit the skill sources; users install the compiled skill from [`compiled-skills/`](compiled-skills/README.md).
 
 ## Skills in this repository
 
@@ -49,27 +49,16 @@ The **canonical** `aerospike.conf` and commands for local setup live in [`skills
 
 ## Using with AI assistants
 
-Copy **one or more** folders from `skills/<skill-name>/` into your tool’s skills location. The directory name on disk must match the YAML `name` in that skill’s `SKILL.md` (for example `aerospike-getting-started` or `aerospike-development`).
+We publish **one** skill: [`compiled-skills/aerospike/SKILL.md`](compiled-skills/aerospike/SKILL.md), compiled from the three authoring folders under [`skills/`](skills/). Registries list that artifact only. The folders under `skills/` are maintained for editing and compilation, not as separate install targets.
 
 | Tool | What to do |
 |------|----------------|
 | **Any agent (recommended)** | Add [`compiled-skills/aerospike/SKILL.md`](compiled-skills/aerospike/SKILL.md) to always-on context. [Install guide](compiled-skills/README.md). Raw URL: `https://raw.githubusercontent.com/aerospike/agent-skills/main/compiled-skills/aerospike/SKILL.md` |
-| **`skills` CLI (any supported agent)** | `npx skills add https://github.com/aerospike/agent-skills/tree/main/compiled-skills/aerospike` installs the published skill for you. |
-| **Cursor (skill folders)** | Copy `skills/aerospike-getting-started`, `skills/aerospike-development`, and/or `skills/aerospike-data-modeling` to `<project>/.cursor/skills/<same-folder-name>/` (or `~/.cursor/skills/` for all projects). Restart Cursor. Each skill is discovered via its YAML `description` in `SKILL.md`. |
+| **`skills` CLI (any supported agent)** | `npx skills add https://github.com/aerospike/agent-skills/tree/main/compiled-skills/aerospike` installs the published skill. Do not use the repository root URL — the CLI discovers `skills/` first and would install the uncompiled authoring folders. |
 | **Gemini CLI** | `npx skills add https://github.com/aerospike/agent-skills/tree/main/compiled-skills/aerospike -a gemini-cli` installs to `.agents/skills/aerospike/` (globally `~/.gemini/skills/`). |
 | **GitHub Copilot** | Uses [`.github/copilot-instructions.md`](.github/copilot-instructions.md) in supported clients; see also [AGENTS.md](AGENTS.md). |
-| **Claude Code / similar** | Open [CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md); for one file, use [`compiled-skills/aerospike/SKILL.md`](compiled-skills/aerospike/SKILL.md), or read skill bodies under `skills/*/`. |
-| **Other chats (Claude, ChatGPT, etc.)** | Upload or link [`compiled-skills/aerospike/SKILL.md`](compiled-skills/aerospike/SKILL.md), or add the skill folder(s) to a **project** / **knowledge** set. |
-
-## Install for Cursor (optional)
-
-1. Copy the entire folder for each skill you want—for example `skills/aerospike-getting-started` and/or `skills/aerospike-development`—into either location:
-   - **Project skills (recommended for sharing with a repo):**  
-     `<your-project>/.cursor/skills/<skill-folder-name>/`
-   - **Personal skills (all projects on this machine):**  
-     `~/.cursor/skills/<skill-folder-name>/`
-2. Restart Cursor or reload the window if a skill does not appear.
-3. In chat, describe your task (local Docker vs client modeling); the agent can match skills using each `SKILL.md` YAML `description`.
+| **Claude Code / similar** | Open [CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md); add [`compiled-skills/aerospike/SKILL.md`](compiled-skills/aerospike/SKILL.md) to project instructions or skills. |
+| **Other chats (Claude, ChatGPT, etc.)** | Upload or link [`compiled-skills/aerospike/SKILL.md`](compiled-skills/aerospike/SKILL.md). |
 
 ## Use without AI tools (any editor)
 

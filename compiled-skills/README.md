@@ -34,6 +34,6 @@ https://raw.githubusercontent.com/aerospike/agent-skills/main/compiled-skills/ae
 | **GitHub Copilot** | This repo's [`.github/copilot-instructions.md`](../.github/copilot-instructions.md) already points at the compiled skill. |
 | **ChatGPT / other chats** | Upload `aerospike/SKILL.md` to a project knowledge set, or paste the raw URL when working on Aerospike. |
 
-**Prefer the modular sources?** The three authoring folders under [`skills/`](../skills/) stay maintained and installable by copying a folder; the compiled skill is what registries list.
+The three folders under [`skills/`](../skills/) are the authoring source for this file. They are not published or installed separately — edit there, then recompile. See [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 For more install options, see the [repository README](../README.md#using-with-ai-assistants).

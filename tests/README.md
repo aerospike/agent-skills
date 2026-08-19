@@ -16,9 +16,6 @@ Aerospike already holding them first. Not every published tag ships `asinfo` —
 simultaneous failures mean the tool is missing from the image, not that eight claims drifted
 at once.
 
-Why these checks exist, and what else was considered, is in
-[`docs/superpowers/specs/2026-08-19-skill-testing-and-publish-shape-design.md`](../docs/superpowers/specs/2026-08-19-skill-testing-and-publish-shape-design.md).
-
 ## Before publishing
 
 ```bash

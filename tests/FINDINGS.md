@@ -1,8 +1,7 @@
 # Findings ledger
 
 Every finding from testing the skills before publication, with the decision taken.
-Opened for [AIE-16](https://aerospike.atlassian.net/browse/AIE-16). Design:
-[`docs/superpowers/specs/2026-08-19-skill-testing-and-publish-shape-design.md`](../docs/superpowers/specs/2026-08-19-skill-testing-and-publish-shape-design.md).
+Opened for [AIE-16](https://aerospike.atlassian.net/browse/AIE-16).
 
 | # | Finding | Decision | Status |
 |---|---------|----------|--------|

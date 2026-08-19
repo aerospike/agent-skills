@@ -6,7 +6,7 @@ import pathlib
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 TRACKED_SUFFIXES = {".md", ".json", ".yml", ".sh", ".py"}
-SKIP_DIRS = {".git", "eval", "results", "docs/superpowers", ".venv", ".superpowers"}
+SKIP_DIRS = {".git", "eval", "results", ".venv", ".superpowers"}
 
 # These name the retired path on purpose: one asserts the compiler no longer
 # emits it, and the other is this guard's own search string.
@@ -49,3 +49,15 @@ def test_registry_manifest_lists_the_single_published_skill():
     manifest = json.loads((REPO_ROOT / "skills.sh.json").read_text(encoding="utf-8"))
     skills = [s for g in manifest["groupings"] for s in g["skills"]]
     assert skills == ["aerospike"]
+
+
+def test_install_docs_point_users_at_the_compiled_skill_only():
+    """Registries and install docs must not treat the authoring folders as products."""
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    compiled = (REPO_ROOT / "compiled-skills" / "README.md").read_text(encoding="utf-8")
+
+    for text in (readme, compiled):
+        assert "compiled-skills/aerospike" in text
+        assert "npx skills add aerospike/agent-skills" not in text
+        assert "Copy `skills/aerospike" not in text
+        assert ".cursor/skills/<skill-folder-name>" not in text
