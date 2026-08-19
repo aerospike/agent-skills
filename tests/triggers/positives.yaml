@@ -1,0 +1,99 @@
+# Prompts the published skill must fire on. `domain` records which authoring
+# folder under skills/ would have served the prompt, so cross-triggering can be
+# re-measured if those folders are ever published separately.
+- id: pos-gs-docker-local
+  prompt: >-
+    I'm new to Aerospike. How do I get a single node running locally with Docker
+    and check that it actually started?
+  expect: aerospike
+  domain: aerospike-getting-started
+  why: Local setup is the getting-started core.
+
+- id: pos-gs-default-namespace
+  prompt: >-
+    My Aerospike client keeps failing with a namespace error. What namespace does
+    a fresh install actually have?
+  expect: aerospike
+  domain: aerospike-getting-started
+  why: Namespace defaults are a named anti-hallucination rule.
+
+- id: pos-gs-redis-replacement
+  prompt: >-
+    We're outgrowing Redis for our session store and need something that persists
+    to disk at the same latency. Is Aerospike a fit, and how do I try it?
+  expect: aerospike
+  domain: aerospike-getting-started
+  why: The Redis-replacement path is an explicit trigger in the description.
+
+- id: pos-gs-first-put-get
+  prompt: >-
+    Write me the smallest possible Python program that connects to my local
+    Aerospike and does one write and one read.
+  expect: aerospike
+  domain: aerospike-getting-started
+  why: First put/get with an official SDK.
+
+- id: pos-dev-cdt-map-update
+  prompt: >-
+    I have an Aerospike bin holding a map of vehicle IDs to their last known
+    positions. How do I update one entry without reading and rewriting the whole
+    map?
+  expect: aerospike
+  domain: aerospike-development
+  why: Server-side collection operations are the development core.
+
+- id: pos-dev-batch-reads
+  prompt: >-
+    What's the right way to read four hundred Aerospike records by key in one go
+    from the Go client?
+  expect: aerospike
+  domain: aerospike-development
+  why: Batch workflows and client policy.
+
+- id: pos-dev-policy-timeouts
+  prompt: >-
+    Our Aerospike writes intermittently time out under load. Which client policy
+    settings should I be looking at?
+  expect: aerospike
+  domain: aerospike-development
+  why: Client policies and retry behavior.
+
+- id: pos-dev-secondary-index
+  prompt: >-
+    Should I add a secondary index on the email bin so I can look users up by
+    email in Aerospike?
+  expect: aerospike
+  domain: aerospike-development
+  why: Index discipline, a rule with a strong opinion.
+
+- id: pos-dm-greenfield-schema
+  prompt: >-
+    We're building a social feed on Aerospike and haven't designed the data model
+    yet. Users, posts, follows, likes. Where do I start?
+  expect: aerospike
+  domain: aerospike-data-modeling
+  why: Design-time modeling from requirements.
+
+- id: pos-dm-key-design
+  prompt: >-
+    How should I choose primary keys for an Aerospike set that stores one record
+    per user per day?
+  expect: aerospike
+  domain: aerospike-data-modeling
+  why: Key design is a design-time decision.
+
+- id: pos-dm-unbounded-collection
+  prompt: >-
+    My Aerospike record has a list bin of every event a user has ever fired and
+    it keeps growing. Is that a problem?
+  expect: aerospike
+  domain: aerospike-data-modeling
+  why: Unbounded collection growth is one of the seven failure modes.
+
+- id: pos-dm-schema-review
+  prompt: >-
+    Here's the Aerospike schema we drafted: one set per entity, six secondary
+    indexes, a bin per tag. Can you review it before we build?
+  expect: aerospike
+  domain: aerospike-data-modeling
+  why: Schema review against the failure-mode checklist.

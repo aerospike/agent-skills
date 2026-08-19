@@ -1,0 +1,40 @@
+# Prompts that name Aerospike, or sit next to it, without needing the skill.
+# These are where a broad description over-fires, so they carry the most signal.
+- id: near-invoice-mentions-aerospike
+  prompt: >-
+    Draft an email to our vendor asking why the Aerospike licence invoice went up
+    forty percent this year.
+  expect: none
+  domain: null
+  why: Names Aerospike, needs no technical guidance.
+
+- id: near-resume-bullet
+  prompt: >-
+    Rewrite this resume bullet to sound stronger: "Used Aerospike and Kafka to
+    build a real-time pipeline."
+  expect: none
+  domain: null
+  why: Copywriting that happens to name the product.
+
+- id: near-generic-latency
+  prompt: >-
+    What does p99 latency actually mean and why is it more useful than an
+    average?
+  expect: none
+  domain: null
+  why: Adjacent vocabulary, no Aerospike content.
+
+- id: near-cassandra-modeling
+  prompt: >-
+    How should I model a time series in Cassandra so partitions stay a reasonable
+    size?
+  expect: none
+  domain: null
+  why: Data modeling for a different database.
+
+- id: near-dockerfile-generic
+  prompt: >-
+    How do I make my Dockerfile build faster by ordering layers better?
+  expect: none
+  domain: null
+  why: Docker without Aerospike.

@@ -3,11 +3,8 @@
 | Path | What it covers | How to run |
 |------|----------------|------------|
 | `unit/` | The compiler, the publish scripts, and documentation references | `python3 -m pytest tests/unit -v` |
+| `triggers/` | Whether the published description fires on the right prompts | `python3 tests/run_triggers.py` — see [`triggers/README.md`](triggers/README.md) |
 | `FINDINGS.md` | Ledger of findings from pre-publication testing, with decisions | — |
-
-Trigger-accuracy prompts, end-to-end task files, and the server-claim verification
-script arrive with the testing plan; see
-[`docs/superpowers/specs/2026-08-19-skill-testing-and-publish-shape-design.md`](../docs/superpowers/specs/2026-08-19-skill-testing-and-publish-shape-design.md).
 
 ## Before publishing
 

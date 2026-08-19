@@ -1,0 +1,64 @@
+# Prompts the published skill must stay quiet on. The first four are Aerospike
+# topics the skill explicitly excludes; the rest are unrelated technology.
+- id: neg-graph
+  prompt: >-
+    How do I write a Gremlin traversal against Aerospike Graph to find
+    second-degree connections?
+  expect: none
+  domain: null
+  why: Aerospike Graph is excluded by name.
+
+- id: neg-xdr
+  prompt: >-
+    Configure XDR shipping from our Aerospike cluster in us-east to the new
+    cluster in eu-west.
+  expect: none
+  domain: null
+  why: XDR belongs to Aerospike Operations.
+
+- id: neg-cluster-sizing
+  prompt: >-
+    How many nodes and how much RAM do we need for an Aerospike cluster holding
+    twelve billion records?
+  expect: none
+  domain: null
+  why: Cluster sizing belongs to Aerospike Operations.
+
+- id: neg-backup-restore
+  prompt: >-
+    What's the procedure for restoring an Aerospike namespace from an asbackup
+    archive taken last week?
+  expect: none
+  domain: null
+  why: Backup and restore belongs to Aerospike Operations.
+
+- id: neg-postgres-index
+  prompt: >-
+    My Postgres query does a sequential scan on a ten million row table. How do I
+    get it to use the index?
+  expect: none
+  domain: null
+  why: Unrelated database.
+
+- id: neg-react-hooks
+  prompt: >-
+    Why does my React component re-render every time the parent state changes,
+    even though I wrapped it in memo?
+  expect: none
+  domain: null
+  why: Unrelated technology.
+
+- id: neg-k8s-crashloop
+  prompt: >-
+    My pod is in CrashLoopBackOff and the logs are empty. How do I debug it?
+  expect: none
+  domain: null
+  why: Unrelated infrastructure.
+
+- id: neg-git-rebase
+  prompt: >-
+    I rebased onto main and now I have forty conflicts. What's the fastest way
+    out of this?
+  expect: none
+  domain: null
+  why: Unrelated tooling.
