@@ -12,6 +12,7 @@ description: >-
 license: Apache-2.0
 metadata:
   last_verified: "2026-08-06"
+  server_versions: "7.0+"
 ---
 
 # Aerospike: data model design

@@ -12,6 +12,7 @@ description: >-
 license: Apache-2.0
 metadata:
   last_verified: "2026-04-21"
+  server_versions: "7.0+"
 ---
 
 # Aerospike Database: getting started
