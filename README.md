@@ -54,6 +54,7 @@ Copy **one or more** folders from `skills/<skill-name>/` into your tool’s skil
 | Tool | What to do |
 |------|----------------|
 | **Any agent (recommended)** | Add [`compiled-skills/SKILLS.md`](compiled-skills/SKILLS.md) to always-on context. [Install guide](compiled-skills/README.md). Raw URL: `https://raw.githubusercontent.com/aerospike/agent-skills/main/compiled-skills/SKILLS.md` |
+| **`skills` CLI (any supported agent)** | `npx skills add aerospike/agent-skills` installs the skill folders for you. |
 | **Cursor (skill folders)** | Copy `skills/aerospike-getting-started`, `skills/aerospike-development`, and/or `skills/aerospike-data-modeling` to `<project>/.cursor/skills/<same-folder-name>/` (or `~/.cursor/skills/` for all projects). Restart Cursor. Each skill is discovered via its YAML `description` in `SKILL.md`. |
 | **GitHub Copilot** | Uses [`.github/copilot-instructions.md`](.github/copilot-instructions.md) in supported clients; see also [AGENTS.md](AGENTS.md). |
 | **Claude Code / similar** | Open [CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md); for one file, use [`compiled-skills/SKILLS.md`](compiled-skills/SKILLS.md), or read skill bodies under `skills/*/`. |
@@ -95,8 +96,10 @@ Use this when your goal is a **running local database** and a **verified first c
 
 ## Maintenance and distribution
 
-- **`last_verified`:** Each skill’s `SKILL.md` may include `last_verified`. When you change Docker images, client commands, or major facts for **that** skill, re-check the documented flow and update the date.
+- **`metadata.last_verified`:** Each skill’s `SKILL.md` may carry `last_verified` under `metadata`. When you change Docker images, client commands, or major facts for **that** skill, re-check the documented flow and update the date.
 - **Linting skills:** Run `./scripts/validate-skill.sh` (see [CONTRIBUTING.md](CONTRIBUTING.md#validate-the-skill-package-skill-validator)); CI runs the same check via [`.github/workflows/skill-validator.yml`](.github/workflows/skill-validator.yml).
+- **Spec conformance:** Run `./scripts/validate-spec.sh` to check `SKILL.md` frontmatter against the [Agent Skills specification](https://agentskills.io/specification); CI runs it via [`.github/workflows/spec-conformance.yml`](.github/workflows/spec-conformance.yml).
+- **Publishing:** Registry submission is automated on release—see [`docs/PUBLISHING.md`](docs/PUBLISHING.md).
 - **Compiled skills:** `compiled-skills/` is generated from `skills/`. After editing any skill, run `python3 scripts/compile-agents.py --write`; CI fails the PR if the compiled output is stale.
 - **Contributing:** See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add or edit skills and keep root docs in sync.
 - **Redistribution:** This repository is licensed under the [Apache License 2.0](LICENSE), matching [aerospike/data-modeling-guide](https://github.com/aerospike/data-modeling-guide).

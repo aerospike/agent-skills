@@ -17,6 +17,9 @@ on:
       - "skills/**"
       - ".github/workflows/skill-validator.yml"
       - "scripts/validate-skill.sh"
+  # Called by publish-registries.yml so a release cannot publish a tree with
+  # broken links or oversized references.
+  workflow_call:
 
 env:
   SKILL_VALIDATOR_VERSION: v1.5.5
@@ -60,7 +63,7 @@ jobs:
             echo "## skill-validator"
             set +e
             skill-validator check \
-              --allow-flat-layouts --allow-extra-frontmatter \
+              --allow-flat-layouts \
               -o markdown skills/
             sum=$?
             set -e

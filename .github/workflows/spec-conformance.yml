@@ -1,0 +1,73 @@
+# Validates skills/ against the Agent Skills specification with the official
+# reference validator (agentskills/agentskills, skills-ref).
+#
+# This runs alongside skill-validator.yml on purpose. That workflow is a third-party
+# linter whose checks exceed the spec (links, token counts, layout); this one measures
+# conformance to the standard itself, which is what registries validate against.
+# Registry publishing (publish-registries.yml) gates on this job.
+#
+# Keep SKILLS_REF_REF in sync with scripts/validate-spec.sh.
+name: spec-conformance
+
+on:
+  pull_request:
+    paths:
+      - "skills/**"
+      - "scripts/validate-spec.sh"
+      - ".github/workflows/spec-conformance.yml"
+  push:
+    branches: [main, master, init]
+    paths:
+      - "skills/**"
+      - "scripts/validate-spec.sh"
+      - ".github/workflows/spec-conformance.yml"
+  # Called by publish-registries.yml so a release cannot publish a nonconformant tree.
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  conformance:
+    runs-on: ubuntu-latest
+    env:
+      # skills-ref has no PyPI release, so it is installed from a pinned commit.
+      SKILLS_REF_REF: 69ef37e9424c0a7ea9dd2293b559e43ec8176379
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          # skills-ref requires >=3.11.
+          python-version: "3.12"
+
+      - name: Install skills-ref (official reference validator)
+        run: |
+          pip install \
+            "git+https://github.com/agentskills/agentskills.git@${SKILLS_REF_REF}#subdirectory=skills-ref"
+
+      - name: Validate skills against the spec
+        run: ./scripts/validate-spec.sh
+
+      - name: Append skill properties to job summary
+        if: always()
+        run: |
+          {
+            echo "## Agent Skills spec conformance"
+            echo
+            echo "Validator: \`skills-ref\` @ \`${SKILLS_REF_REF}\`"
+            echo
+            for skill_dir in skills/*/; do
+              [ -f "${skill_dir}SKILL.md" ] || continue
+              echo "### ${skill_dir%/}"
+              echo '```json'
+              skills-ref read-properties "${skill_dir%/}" || echo '{"error": "could not read properties"}'
+              echo '```'
+              echo
+            done
+          } >> "$GITHUB_STEP_SUMMARY"

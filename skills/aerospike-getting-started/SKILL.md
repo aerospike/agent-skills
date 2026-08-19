@@ -9,7 +9,9 @@ description: >-
   Aerospike, replaces Redis or Memcached, builds feature stores or user-profile
   caches, or needs Aerospike client connectivity and correct defaults. Core
   database only (not Aerospike Graph).
-last_verified: 2026-04-21
+license: Apache-2.0
+metadata:
+  last_verified: "2026-04-21"
 ---
 
 # Aerospike Database: getting started

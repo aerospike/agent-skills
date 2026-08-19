@@ -35,8 +35,10 @@ if ! command -v skill-validator >/dev/null 2>&1; then
   exit 3
 fi
 
+# No --allow-extra-frontmatter: the Agent Skills spec allows only six frontmatter
+# keys, so an unexpected key must surface here rather than being waived.
 exec skill-validator check \
   "${strict_flag[@]}" \
-  --allow-flat-layouts --allow-extra-frontmatter \
+  --allow-flat-layouts \
   "${extra_args[@]}" \
   "${SKILL_DIR}/"
