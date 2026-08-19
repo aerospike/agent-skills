@@ -11,9 +11,14 @@ Related rules: [batch-parallel-key-operations.md](batch-parallel-key-operations.
 Use your SDK’s batch API with a **list of keys** built from known identifiers—**each key at most once** per batch; dedupe or coalesce on the client, and use batch **`operate`** when one key needs multiple operations (see [batch-parallel-key-operations.md](batch-parallel-key-operations.md)). Pseudocode:
 
 ```
-keys = [ Key(ns, set, id1), Key(ns, set, id2), ... ]
-records = client.batch_get(policy, keys)
+keys    = [ Key(ns, set, id1), Key(ns, set, id2), ... ]
+records = <your SDK's batch read>(keys)
 ```
+
+Method names and argument order differ by language—Python is `client.batch_read(keys)`
+returning a `BatchRecords`, Java is `client.get(batchPolicy, keys)` returning `Record[]`.
+Take the real signature from [ex-official-batch.md](ex-official-batch.md) rather than this
+sketch.
 
 Handle **per-key errors** in the result structure your client returns (not all languages surface failures the same way).
 
