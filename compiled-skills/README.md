@@ -11,7 +11,7 @@ This directory holds the **published** Aerospike agent skill — one file compil
 **With the [`skills` CLI](https://skills.sh):**
 
 ```bash
-npx skills add aerospike/agent-skills
+npx skills add https://github.com/aerospike/agent-skills/tree/main/compiled-skills/aerospike
 ```
 
 **Raw file URL (use `main` or a release tag):**
@@ -28,9 +28,9 @@ https://raw.githubusercontent.com/aerospike/agent-skills/main/compiled-skills/ae
 
 | Tool | What to do |
 |------|------------|
-| **Claude Code** | `npx skills add aerospike/agent-skills -a claude-code`, which installs to `.claude/skills/aerospike/`. Or add the file to project instructions. |
-| **Cursor** | `npx skills add aerospike/agent-skills -a cursor`, which installs to `.agents/skills/aerospike/` (globally, `~/.cursor/skills/`). Or copy the file into a project rule such as `.cursor/rules/aerospike.mdc`. |
-| **Gemini CLI** | `npx skills add aerospike/agent-skills -a gemini-cli`, which installs to `.agents/skills/aerospike/` (globally, `~/.gemini/skills/`). |
+| **Claude Code** | `npx skills add https://github.com/aerospike/agent-skills/tree/main/compiled-skills/aerospike -a claude-code`, which installs to `.claude/skills/aerospike/`. Or add the file to project instructions. |
+| **Cursor** | `npx skills add https://github.com/aerospike/agent-skills/tree/main/compiled-skills/aerospike -a cursor`, which installs to `.agents/skills/aerospike/` (globally, `~/.cursor/skills/`). Or copy the file into a project rule such as `.cursor/rules/aerospike.mdc`. |
+| **Gemini CLI** | `npx skills add https://github.com/aerospike/agent-skills/tree/main/compiled-skills/aerospike -a gemini-cli`, which installs to `.agents/skills/aerospike/` (globally, `~/.gemini/skills/`). |
 | **GitHub Copilot** | This repo's [`.github/copilot-instructions.md`](../.github/copilot-instructions.md) already points at the compiled skill. |
 | **ChatGPT / other chats** | Upload `aerospike/SKILL.md` to a project knowledge set, or paste the raw URL when working on Aerospike. |
 

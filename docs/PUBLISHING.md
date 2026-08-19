@@ -93,7 +93,7 @@ skills.sh indexes only what arrives through anonymous install telemetry from the
 
 What we can do, and have done:
 
-- Publish `npx skills add aerospike/agent-skills` in [`README.md`](../README.md) and [`compiled-skills/README.md`](../compiled-skills/README.md), because real installs are the only input to their index.
+- Publish `npx skills add https://github.com/aerospike/agent-skills/tree/main/compiled-skills/aerospike` in [`README.md`](../README.md) and [`compiled-skills/README.md`](../compiled-skills/README.md), because real installs are the only input to their index. The CLI discovers `skills/` first and would otherwise install the three authoring folders rather than the compiled skill.
 - Ship [`skills.sh.json`](../skills.sh.json) so the repository page presents our published skill sensibly once it appears. This is display-only and does not affect whether we are listed.
 
 Note the known gap where install telemetry registers but the detail page still 404s ([#1610](https://github.com/vercel-labs/skills/issues/1610)). This is why skills.sh cannot be one of the committed listings for [AIE-13](https://aerospike.atlassian.net/browse/AIE-13).

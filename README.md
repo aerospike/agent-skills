@@ -54,9 +54,9 @@ Copy **one or more** folders from `skills/<skill-name>/` into your tool’s skil
 | Tool | What to do |
 |------|----------------|
 | **Any agent (recommended)** | Add [`compiled-skills/aerospike/SKILL.md`](compiled-skills/aerospike/SKILL.md) to always-on context. [Install guide](compiled-skills/README.md). Raw URL: `https://raw.githubusercontent.com/aerospike/agent-skills/main/compiled-skills/aerospike/SKILL.md` |
-| **`skills` CLI (any supported agent)** | `npx skills add aerospike/agent-skills` installs the published skill for you. |
+| **`skills` CLI (any supported agent)** | `npx skills add https://github.com/aerospike/agent-skills/tree/main/compiled-skills/aerospike` installs the published skill for you. |
 | **Cursor (skill folders)** | Copy `skills/aerospike-getting-started`, `skills/aerospike-development`, and/or `skills/aerospike-data-modeling` to `<project>/.cursor/skills/<same-folder-name>/` (or `~/.cursor/skills/` for all projects). Restart Cursor. Each skill is discovered via its YAML `description` in `SKILL.md`. |
-| **Gemini CLI** | `npx skills add aerospike/agent-skills -a gemini-cli` installs to `.agents/skills/aerospike/` (globally `~/.gemini/skills/`). |
+| **Gemini CLI** | `npx skills add https://github.com/aerospike/agent-skills/tree/main/compiled-skills/aerospike -a gemini-cli` installs to `.agents/skills/aerospike/` (globally `~/.gemini/skills/`). |
 | **GitHub Copilot** | Uses [`.github/copilot-instructions.md`](.github/copilot-instructions.md) in supported clients; see also [AGENTS.md](AGENTS.md). |
 | **Claude Code / similar** | Open [CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md); for one file, use [`compiled-skills/aerospike/SKILL.md`](compiled-skills/aerospike/SKILL.md), or read skill bodies under `skills/*/`. |
 | **Other chats (Claude, ChatGPT, etc.)** | Upload or link [`compiled-skills/aerospike/SKILL.md`](compiled-skills/aerospike/SKILL.md), or add the skill folder(s) to a **project** / **knowledge** set. |
