@@ -102,11 +102,12 @@ Then add the same `server_versions` line to the `metadata` block in
 Quote the value. Unquoted, `7.0+` is still a string in YAML, but quoting keeps it consistent
 with `last_verified`, which must be quoted, and states the intent.
 
-- [ ] **Step 4: Run the test and verify it passes**
+- [ ] **Step 4: Confirm the three source skills pass**
 
 Run: `python3 -m pytest tests/unit/test_skill_metadata.py -v`
 
-Expected: 5 passed.
+Expected: 4 passed, 1 failed. The compiled-artifact case still raises `KeyError` — it is
+generated, and regenerating is the next step.
 
 - [ ] **Step 5: Regenerate and confirm the only compiled change is the frontmatter**
 
@@ -120,6 +121,8 @@ git diff compiled-skills/aerospike/SKILL.md
 
 Expected: `SKILL.md` gains exactly the one `server_versions` line inside its frontmatter, and
 the rule body below the header is untouched. `manifest.json` byte count changes.
+
+Re-run `python3 -m pytest tests/unit/test_skill_metadata.py -v`; all 5 now pass.
 
 - [ ] **Step 6: Run the full suite and commit**
 
