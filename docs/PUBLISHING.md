@@ -28,7 +28,7 @@ flowchart TD
 
 | Gate | Mechanism | Why |
 |------|-----------|-----|
-| 1. Conformance | `needs:` on [`spec-conformance.yml`](../.github/workflows/spec-conformance.yml) and [`skill-validator.yml`](../.github/workflows/skill-validator.yml) | Never publish a tree that fails the standard. The pull request run does not prove the tag is clean. |
+| 1. Conformance | `needs:` on [`spec-conformance.yml`](../.github/workflows/spec-conformance.yml), [`skill-validator.yml`](../.github/workflows/skill-validator.yml), and [`compile-agents.yml`](../.github/workflows/compile-agents.yml) | Never publish a tree that fails the standard, or an artifact that lags the sources it was compiled from. The pull request run does not prove the tag is clean. |
 | 2. Visibility | `gh api repos/... --jq .visibility` must be `public` | Every registry validates a public URL. Submitting a link that 404s wastes our one credible shot with that registry. |
 | 3. Kill switch | Repository variable `REGISTRY_PUBLISH_ENABLED` must be exactly `true` | The deliberate hold, and the rollback. Setting it back to `false` stops all publishing without reverting code. |
 | 4. Approval | The publish job runs in the `registries` environment | Neither registry documents a way to delete a submission, so a human confirms every one. **Permanent, not just for the initial rollout.** |

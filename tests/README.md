@@ -3,6 +3,7 @@
 | Path | What it covers | How to run |
 |------|----------------|------------|
 | `unit/` | The compiler, the publish scripts, and documentation references | `python3 -m pytest tests/unit -v` |
+| `unit/test_payload_integrity.py` | That every skill folder is self-contained — no link leaves its own folder, and every relative link resolves | `python3 -m pytest tests/unit/test_payload_integrity.py -v` |
 | `triggers/` | Whether the published description fires on the right prompts | `python3 tests/run_triggers.py` — see [`triggers/README.md`](triggers/README.md) |
 | `FINDINGS.md` | Ledger of findings from pre-publication testing, with decisions | — |
 

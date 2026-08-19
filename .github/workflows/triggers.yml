@@ -1,0 +1,70 @@
+# Measures whether the published skill's description fires on the prompts it should.
+#
+# This is the only workflow that spends money, so it runs just where the answer can
+# change: the description, the compiled artifact, or the corpus. The threshold lives in
+# tests/triggers/README.md and is set from a measured run, not chosen in advance.
+name: triggers
+
+on:
+  pull_request:
+    paths:
+      - "skills/**"
+      - "compiled-skills/**"
+      - "scripts/skills_compile/published_skill.yaml"
+      - "tests/triggers/**"
+      - "tests/run_triggers.py"
+      - ".github/workflows/triggers.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  triggers:
+    runs-on: ubuntu-latest
+    # Without a key the run cannot happen; skip rather than fail, so a fork PR
+    # does not report a broken build for a secret it was never going to have.
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    env:
+      TRIGGER_MODEL: composer-2.5
+      MIN_ACCURACY: "0.88"
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -r scripts/requirements-compile.txt cursor-sdk
+
+      - name: Score the published description
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+        run: |
+          python3 tests/run_triggers.py \
+            --model "${TRIGGER_MODEL}" \
+            --min-accuracy "${MIN_ACCURACY}" \
+            --json triggers.json
+
+      - name: Append the score to the job summary
+        if: always()
+        run: |
+          {
+            echo "## Trigger accuracy"
+            echo
+            if [[ -f triggers.json ]]; then
+              jq -r '"Model: `" + .model + "`  \nAccuracy: **" + (.accuracy|tostring) + "**  \nPrecision: " + (.precision|tostring) + "  \nRecall: " + (.recall|tostring)' triggers.json
+              echo
+              if [[ "$(jq '.failures | length' triggers.json)" != "0" ]]; then
+                echo "| Case | Expected | Got |"
+                echo "|---|---|---|"
+                jq -r '.failures[] | "| " + .[0] + " | " + .[1] + " | " + .[2] + " |"' triggers.json
+              fi
+            else
+              echo "No score was produced."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

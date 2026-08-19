@@ -5,7 +5,9 @@
 # later refresh run the same reviewed code. It is merged inert and held behind four
 # independent gates; see docs/PUBLISHING.md for the operator's view.
 #
-#   1. Conformance  - the spec-conformance and skill-validator workflows must pass.
+#   1. Conformance  - the spec-conformance, skill-validator, and compile-agents
+#                     workflows must pass. The last one fails on a stale artifact,
+#                     so a release cannot submit output that lags its sources.
 #   2. Visibility   - the repository must be public, or a submitted URL would 404.
 #   3. Kill switch  - repository variable REGISTRY_PUBLISH_ENABLED must be "true".
 #   4. Approval     - the publish job runs in the "registries" environment, which
@@ -43,8 +45,11 @@ jobs:
   gate-lint:
     uses: ./.github/workflows/skill-validator.yml
 
+  gate-compiled:
+    uses: ./.github/workflows/compile-agents.yml
+
   preflight:
-    needs: [gate-spec, gate-lint]
+    needs: [gate-spec, gate-lint, gate-compiled]
     runs-on: ubuntu-latest
     outputs:
       mode: ${{ steps.decide.outputs.mode }}

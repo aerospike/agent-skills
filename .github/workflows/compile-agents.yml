@@ -19,6 +19,8 @@ on:
       - "scripts/compile-agents.py"
       - "scripts/skills_compile/**"
       - ".github/workflows/compile-agents.yml"
+  # Called by publish-registries.yml so a release cannot publish a stale artifact.
+  workflow_call:
 
 permissions:
   contents: read
