@@ -19,3 +19,4 @@ results/
 
 # Agent scratch space (briefs, reports, session notes).
 .superpowers/
+agent_api_key.env
