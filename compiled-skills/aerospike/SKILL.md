@@ -14,10 +14,10 @@ description: >-
   and restore, which belong to Aerospike Operations documentation.
 license: Apache-2.0
 metadata:
-  last_verified: "2026-08-19"
+  last_verified: "2026-04-21"
 ---
 
-_Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-development`, `skills/aerospike-data-modeling` in https://github.com/aerospike/agent-skills. Rule files cited below by bare filename live under `skills/<skill>/references/` in that repository. Edit the skills under `skills/`, not this file._
+_Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-development`, `skills/aerospike-data-modeling` in https://github.com/aerospike/agent-skills. Rule files cited below by bare filename live under `skills/<skill>/` or its `references/` folder in that repository. Edit the skills under `skills/`, not this file._
 
 # Aerospike agent rules
 

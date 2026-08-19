@@ -73,10 +73,19 @@ def test_description_covers_all_three_source_domains(published):
 def test_header_carries_the_repository_url_for_cited_rule_files(compiler, published):
     _, text = published
     assert compiler.REPO_URL in text
-    assert "skills/<skill>/references/" in text
+    assert "`skills/<skill>/` or its `references/` folder" in text
 
 
-def test_body_is_the_stripped_render(published):
+def test_body_is_the_stripped_render(compiler, published):
     _, text = published
-    assert "# Aerospike agent rules" in text
-    assert "## aerospike-data-modeling" in text
+    skills = [
+        compiler.skillsrc.load_skill(compiler.REPO_ROOT / src)
+        for src in compiler.DEFAULT_SKILLS
+    ]
+    expected_body = compiler.RENDERERS["stripped"](skills).strip()
+    expected = (
+        f"{compiler._frontmatter()}\n"
+        f"{compiler._header(compiler.DEFAULT_SKILLS)}\n"
+        f"{expected_body}\n"
+    )
+    assert text == expected

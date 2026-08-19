@@ -16,3 +16,6 @@ results/
 
 # Local virtualenv for skills-ref, which has no PyPI release.
 .venv/
+
+# Agent scratch space (briefs, reports, session notes).
+.superpowers/

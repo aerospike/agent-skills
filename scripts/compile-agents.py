@@ -86,7 +86,7 @@ def _header(skill_dirs: list[str]) -> str:
     return (
         f"_Auto-generated from `{'`, `'.join(skill_dirs)}` in {REPO_URL}. "
         f"Rule files cited below by bare filename live under "
-        f"`skills/<skill>/references/` in that repository. "
+        f"`skills/<skill>/` or its `references/` folder in that repository. "
         f"Edit the skills under `skills/`, not this file._\n"
     )
 

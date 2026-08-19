@@ -37,10 +37,12 @@ def test_nothing_references_the_retired_compiled_file():
     assert offenders == []
 
 
-def test_readme_install_table_covers_all_three_platforms():
+def test_install_docs_cover_claude_cursor_and_gemini_cli():
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
-    for platform in ("Claude", "Cursor", "Gemini"):
-        assert platform in readme, f"README must document installing for {platform}"
+    compiled = (REPO_ROOT / "compiled-skills" / "README.md").read_text(encoding="utf-8")
+    assert "-a gemini-cli" in readme, "README must document the Gemini CLI install"
+    for flag in ("-a claude-code", "-a cursor", "-a gemini-cli"):
+        assert flag in compiled, f"compiled-skills README must document {flag}"
 
 
 def test_registry_manifest_lists_the_single_published_skill():
