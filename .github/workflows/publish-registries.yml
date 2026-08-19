@@ -1,6 +1,7 @@
-# Publish skills/ to agent-skill registries on release.
+# Publish the compiled skill (compiled-skills/aerospike) to agent-skill registries on release.
 #
-# This is the only path that contacts a registry, so the first listing and every
+# This is the only path that contacts a registry. One skill is submitted: the artifact
+# compiled from the three authoring folders under skills/. The first listing and every
 # later refresh run the same reviewed code. It is merged inert and held behind four
 # independent gates; see docs/PUBLISHING.md for the operator's view.
 #

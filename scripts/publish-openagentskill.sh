@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Submit every skill under skills/ to openagentskill.com.
+# Submit the compiled skill (compiled-skills/aerospike) to openagentskill.com.
 #
 # Called by .github/workflows/publish-registries.yml, and runnable by hand for
 # debugging. Submission is idempotent: a duplicate response counts as success, so
@@ -43,8 +43,14 @@ for tool in curl jq; do
   command -v "${tool}" >/dev/null 2>&1 || { echo "${tool} is required." >&2; exit 3; }
 done
 
-mapfile -t skill_dirs < <(find "${ROOT}/skills" -mindepth 1 -maxdepth 1 -type d | sort)
-[[ "${#skill_dirs[@]}" -gt 0 ]] || { echo "No skills found under skills/." >&2; exit 1; }
+# One published artifact, compiled from the three skills under skills/. The
+# authoring folders are the source of truth, not what registries list.
+SKILL_NAME="aerospike"
+SKILL_PATH="compiled-skills/${SKILL_NAME}/SKILL.md"
+[[ -f "${ROOT}/${SKILL_PATH}" ]] || {
+  echo "${SKILL_PATH} not found. Run: python3 scripts/compile-agents.py --write" >&2
+  exit 1
+}
 
 # The /validate endpoint fetches SKILL.md over the public URL, so it cannot succeed
 # while the repository is private or internal. Skipped in dry-run for that reason:
@@ -66,11 +72,8 @@ if [[ "${DRY_RUN}" -eq 0 ]]; then
 fi
 
 failures=0
-for skill_dir in "${skill_dirs[@]}"; do
-  skill_md="${skill_dir}/SKILL.md"
-  [[ -f "${skill_md}" ]] || continue
-  name="$(basename "${skill_dir}")"
-  skill_path="skills/${name}/SKILL.md"
+for name in "${SKILL_NAME}"; do
+  skill_path="${SKILL_PATH}"
 
   payload="$(jq -cn \
     --arg repository "${REPO_URL}" \

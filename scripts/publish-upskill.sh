@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Submit every skill under skills/ to upskill (Autoloops).
+# Submit the compiled skill (compiled-skills/aerospike) to upskill (Autoloops).
 #
 # Called by .github/workflows/publish-registries.yml, and runnable by hand for
 # debugging.
@@ -40,8 +40,13 @@ done
 [[ -n "${REPO_URL}" ]] || { echo "--repo-url is required." >&2; usage; }
 command -v jq >/dev/null 2>&1 || { echo "jq is required." >&2; exit 3; }
 
-mapfile -t skill_dirs < <(find "${ROOT}/skills" -mindepth 1 -maxdepth 1 -type d | sort)
-[[ "${#skill_dirs[@]}" -gt 0 ]] || { echo "No skills found under skills/." >&2; exit 1; }
+# One published artifact, compiled from the three skills under skills/.
+SKILL_NAME="aerospike"
+SKILL_DIR_REL="compiled-skills/${SKILL_NAME}"
+[[ -f "${ROOT}/${SKILL_DIR_REL}/SKILL.md" ]] || {
+  echo "${SKILL_DIR_REL}/SKILL.md not found. Run: python3 scripts/compile-agents.py --write" >&2
+  exit 1
+}
 
 if [[ "${DRY_RUN}" -eq 0 ]]; then
   command -v upskill >/dev/null 2>&1 || {
@@ -69,12 +74,10 @@ if [[ "${DRY_RUN}" -eq 0 ]]; then
 fi
 
 failures=0
-for skill_dir in "${skill_dirs[@]}"; do
-  [[ -f "${skill_dir}/SKILL.md" ]] || continue
-  name="$(basename "${skill_dir}")"
+for name in "${SKILL_NAME}"; do
   # Submit a branch URL rather than the release tag so the listing tracks later
   # updates instead of pinning to one release.
-  target="${REPO_URL}/tree/${REF}/skills/${name}"
+  target="${REPO_URL}/tree/${REF}/${SKILL_DIR_REL}"
 
   if [[ "${DRY_RUN}" -eq 1 ]]; then
     echo "DRY RUN ${name}: upskill submit ${target}"
