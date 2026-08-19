@@ -5,7 +5,16 @@
 | `unit/` | The compiler, the publish scripts, and documentation references | `python3 -m pytest tests/unit -v` |
 | `unit/test_payload_integrity.py` | That every skill folder is self-contained — no link leaves its own folder, and every relative link resolves | `python3 -m pytest tests/unit/test_payload_integrity.py -v` |
 | `triggers/` | Whether the published description fires on the right prompts | `python3 tests/run_triggers.py` — see [`triggers/README.md`](triggers/README.md) |
+| `content/verify-server-claims.sh` | The getting-started skill's claims against a real server | `./tests/content/verify-server-claims.sh` (needs Docker) |
 | `FINDINGS.md` | Ledger of findings from pre-publication testing, with decisions | — |
+
+`verify-server-claims.sh` boots `aerospike/aerospike-server:latest`, the Community image the
+skill tells a new user to run, and removes the container when it exits. Pass `--tag` to check
+the claims against a specific release instead. It binds host ports 3000-3002, so stop any
+Aerospike already holding them first.
+
+Why these checks exist, and what else was considered, is in
+[`docs/superpowers/specs/2026-08-19-skill-testing-and-publish-shape-design.md`](../docs/superpowers/specs/2026-08-19-skill-testing-and-publish-shape-design.md).
 
 ## Before publishing
 
