@@ -54,12 +54,12 @@ Prerequisites: the repository is public, and open-source sign-off is recorded on
 - **Mechanism:** public `POST /api/skills/submit`. No account, free, and zero-star repositories are explicitly accepted.
 - **Script:** [`scripts/publish-openagentskill.sh`](../scripts/publish-openagentskill.sh)
 
-The script resolves the repository through `POST /api/skills/validate` first, then submits one payload per skill:
+The script resolves the repository through `POST /api/skills/validate` first, then submits one payload for the compiled skill:
 
 ```json
 {
   "repository": "https://github.com/aerospike/agent-skills",
-  "skillPath": "skills/aerospike-development/SKILL.md",
+  "skillPath": "compiled-skills/aerospike/SKILL.md",
   "submissionSource": "agent",
   "submittedByAgent": "aerospike-agent-skills-ci"
 }
@@ -94,7 +94,7 @@ skills.sh indexes only what arrives through anonymous install telemetry from the
 What we can do, and have done:
 
 - Publish `npx skills add aerospike/agent-skills` in [`README.md`](../README.md) and [`compiled-skills/README.md`](../compiled-skills/README.md), because real installs are the only input to their index.
-- Ship [`skills.sh.json`](../skills.sh.json) so the repository page groups our three skills sensibly once it appears. This is display-only and does not affect whether we are listed.
+- Ship [`skills.sh.json`](../skills.sh.json) so the repository page presents our published skill sensibly once it appears. This is display-only and does not affect whether we are listed.
 
 Note the known gap where install telemetry registers but the detail page still 404s ([#1610](https://github.com/vercel-labs/skills/issues/1610)). This is why skills.sh cannot be one of the committed listings for [AIE-13](https://aerospike.atlassian.net/browse/AIE-13).
 
@@ -119,7 +119,7 @@ Registries validate against the [Agent Skills specification](https://agentskills
 ./scripts/validate-skill.sh  # third-party linter: links, token counts, layout
 ```
 
-Both run in CI on every pull request that touches `skills/`. The spec allows only six frontmatter keys — `name`, `description`, `license`, `compatibility`, `metadata`, `allowed-tools` — and anything else, including our `last_verified`, belongs under `metadata`. See [CONTRIBUTING.md](../CONTRIBUTING.md#skill-frontmatter-skillmd).
+Both run in CI on every pull request that touches `skills/`. Both also cover `compiled-skills/aerospike/`, the artifact registries actually fetch. The spec allows only six frontmatter keys — `name`, `description`, `license`, `compatibility`, `metadata`, `allowed-tools` — and anything else, including our `last_verified`, belongs under `metadata`. See [CONTRIBUTING.md](../CONTRIBUTING.md#skill-frontmatter-skillmd).
 
 `skills-ref` has no PyPI release and describes itself as a demonstration library, so it is installed from a pinned commit recorded in both [`scripts/validate-spec.sh`](../scripts/validate-spec.sh) and [`spec-conformance.yml`](../.github/workflows/spec-conformance.yml). Keep the two in sync.
 

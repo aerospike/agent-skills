@@ -40,7 +40,7 @@ The **canonical list of skills** (and what to copy) is [`skills/README.md`](skil
 | [skills/aerospike-development/examples.md](skills/aerospike-development/examples.md) | Additional examples for the development skill |
 | [skills/aerospike-data-modeling/SKILL.md](skills/aerospike-data-modeling/SKILL.md) | Data modeling skill: design-time workflow, mental model, pointers into references |
 | [AGENTS.md](AGENTS.md) | Short read order and routing for any AI assistant |
-| [compiled-skills/SKILLS.md](compiled-skills/SKILLS.md) | Published agent rules, compiled from `skills/` into one file |
+| [compiled-skills/aerospike/SKILL.md](compiled-skills/aerospike/SKILL.md) | Published agent skill, compiled from `skills/` into one file |
 | [.github/copilot-instructions.md](.github/copilot-instructions.md) | GitHub Copilot repository instructions |
 
 Skill packaging evaluation (structure A/B tests, coverage gates) lives in the separate [agent-skills-eval](https://github.com/citrusleaf/agent-skills-eval) repository.
@@ -53,12 +53,13 @@ Copy **one or more** folders from `skills/<skill-name>/` into your tool’s skil
 
 | Tool | What to do |
 |------|----------------|
-| **Any agent (recommended)** | Add [`compiled-skills/SKILLS.md`](compiled-skills/SKILLS.md) to always-on context. [Install guide](compiled-skills/README.md). Raw URL: `https://raw.githubusercontent.com/aerospike/agent-skills/main/compiled-skills/SKILLS.md` |
-| **`skills` CLI (any supported agent)** | `npx skills add aerospike/agent-skills` installs the skill folders for you. |
+| **Any agent (recommended)** | Add [`compiled-skills/aerospike/SKILL.md`](compiled-skills/aerospike/SKILL.md) to always-on context. [Install guide](compiled-skills/README.md). Raw URL: `https://raw.githubusercontent.com/aerospike/agent-skills/main/compiled-skills/aerospike/SKILL.md` |
+| **`skills` CLI (any supported agent)** | `npx skills add aerospike/agent-skills` installs the published skill for you. |
 | **Cursor (skill folders)** | Copy `skills/aerospike-getting-started`, `skills/aerospike-development`, and/or `skills/aerospike-data-modeling` to `<project>/.cursor/skills/<same-folder-name>/` (or `~/.cursor/skills/` for all projects). Restart Cursor. Each skill is discovered via its YAML `description` in `SKILL.md`. |
+| **Gemini CLI** | `npx skills add aerospike/agent-skills -a gemini-cli` installs to `.agents/skills/aerospike/` (globally `~/.gemini/skills/`). |
 | **GitHub Copilot** | Uses [`.github/copilot-instructions.md`](.github/copilot-instructions.md) in supported clients; see also [AGENTS.md](AGENTS.md). |
-| **Claude Code / similar** | Open [CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md); for one file, use [`compiled-skills/SKILLS.md`](compiled-skills/SKILLS.md), or read skill bodies under `skills/*/`. |
-| **Other chats (Claude, ChatGPT, etc.)** | Upload or link [`compiled-skills/SKILLS.md`](compiled-skills/SKILLS.md), or add the skill folder(s) to a **project** / **knowledge** set. |
+| **Claude Code / similar** | Open [CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md); for one file, use [`compiled-skills/aerospike/SKILL.md`](compiled-skills/aerospike/SKILL.md), or read skill bodies under `skills/*/`. |
+| **Other chats (Claude, ChatGPT, etc.)** | Upload or link [`compiled-skills/aerospike/SKILL.md`](compiled-skills/aerospike/SKILL.md), or add the skill folder(s) to a **project** / **knowledge** set. |
 
 ## Install for Cursor (optional)
 
@@ -100,7 +101,7 @@ Use this when your goal is a **running local database** and a **verified first c
 - **Linting skills:** Run `./scripts/validate-skill.sh` (see [CONTRIBUTING.md](CONTRIBUTING.md#validate-the-skill-package-skill-validator)); CI runs the same check via [`.github/workflows/skill-validator.yml`](.github/workflows/skill-validator.yml).
 - **Spec conformance:** Run `./scripts/validate-spec.sh` to check `SKILL.md` frontmatter against the [Agent Skills specification](https://agentskills.io/specification); CI runs it via [`.github/workflows/spec-conformance.yml`](.github/workflows/spec-conformance.yml).
 - **Publishing:** Registry submission is automated on release—see [`docs/PUBLISHING.md`](docs/PUBLISHING.md).
-- **Compiled skills:** `compiled-skills/` is generated from `skills/`. After editing any skill, run `python3 scripts/compile-agents.py --write`; CI fails the PR if the compiled output is stale.
+- **Compiled skill:** `compiled-skills/` is generated from `skills/`. After editing any skill, run `python3 scripts/compile-agents.py --write`; CI fails the PR if the compiled output is stale. Frontmatter for the published skill lives in `scripts/skills_compile/published_skill.yaml`.
 - **Contributing:** See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add or edit skills and keep root docs in sync.
 - **Redistribution:** This repository is licensed under the [Apache License 2.0](LICENSE), matching [aerospike/data-modeling-guide](https://github.com/aerospike/data-modeling-guide).
 

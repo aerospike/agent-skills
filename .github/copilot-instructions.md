@@ -2,7 +2,7 @@
 
 For a short overview and read order, see [`AGENTS.md`](../AGENTS.md) at the repository root and the skill index [`skills/README.md`](../skills/README.md).
 
-**Fast path:** the published rules for all skills are compiled into [`compiled-skills/SKILLS.md`](../compiled-skills/SKILLS.md).
+**Fast path:** the published rules for all skills are compiled into [`compiled-skills/aerospike/SKILL.md`](../compiled-skills/aerospike/SKILL.md).
 
 When the user’s task involves **Aerospike Database**, route as follows:
 

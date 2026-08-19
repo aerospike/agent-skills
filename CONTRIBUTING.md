@@ -35,7 +35,7 @@ Thanks for helping improve this repository. It holds **Agent Skills** under [`sk
 | Aerospike Compose, custom config, editions, platform notes | [skills/aerospike-getting-started/reference.md](skills/aerospike-getting-started/reference.md) |
 | Aerospike app development rules, examples TOC | [skills/aerospike-development/references/README.md](skills/aerospike-development/references/README.md), [skills/aerospike-development/examples.md](skills/aerospike-development/examples.md) |
 | Tool-agnostic AI entry (read order, scope) | [AGENTS.md](AGENTS.md) |
-| Compiled published rules (auto-generated from skills) | [compiled-skills/SKILLS.md](compiled-skills/SKILLS.md) |
+| Compiled published skill (auto-generated from skills) | [compiled-skills/aerospike/SKILL.md](compiled-skills/aerospike/SKILL.md) |
 | GitHub Copilot repo instructions | [.github/copilot-instructions.md](.github/copilot-instructions.md) |
 | Human install path, checklist | [README.md](README.md) |
 
