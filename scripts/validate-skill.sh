@@ -50,6 +50,12 @@ for root in "${SKILL_ROOTS[@]}"; do
     "${root}/"
   code=$?
   set -e
-  [[ "${code}" -gt "${worst}" ]] && worst="${code}"
+  # skill-validator exits 1 for errors and 2 for warnings-only, so 1 outranks 2.
+  # A numeric max would let warnings in one root mask errors in another.
+  if [[ "${code}" -eq 1 || "${worst}" -eq 1 ]]; then
+    worst=1
+  elif [[ "${code}" -ne 0 ]]; then
+    worst="${code}"
+  fi
 done
 exit "${worst}"
