@@ -18,6 +18,12 @@ https://raw.githubusercontent.com/aerospike/agent-skills/main/compiled-skills/SK
 2. Add it to your agent's **always-on context** (project rules, system prompt, knowledge base, or repo instructions).
 3. See [`AGENTS.md`](../AGENTS.md) for a short overview.
 
+**Prefer the full skill folders?** With the [`skills` CLI](https://skills.sh):
+
+```bash
+npx skills add aerospike/agent-skills
+```
+
 ## By tool
 
 | Tool | What to do |

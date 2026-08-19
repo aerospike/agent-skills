@@ -1,0 +1,15 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Aerospike",
+      "description": "Agent skills for the Aerospike core database: local setup, application development, and design-time data modeling. Core database only, not Aerospike Graph.",
+      "skills": [
+        "aerospike-getting-started",
+        "aerospike-development",
+        "aerospike-data-modeling"
+      ]
+    }
+  ]
+}
