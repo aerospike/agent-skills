@@ -602,8 +602,7 @@ exec skill-validator check \
 with:
 
 ```bash
-# Run per root and surface the worst exit code, so one clean root cannot mask a
-# failure in the other. Exit 2 means warnings-only when --strict is off.
+# Run per root and surface the worst exit code, so one root cannot mask the other.
 worst=0
 for root in "${SKILL_ROOTS[@]}"; do
   set +e
@@ -614,7 +613,13 @@ for root in "${SKILL_ROOTS[@]}"; do
     "${root}/"
   code=$?
   set -e
-  [[ "${code}" -gt "${worst}" ]] && worst="${code}"
+  # skill-validator exits 1 for errors and 2 for warnings-only, so 1 outranks 2.
+  # A numeric max would let warnings in one root mask errors in another.
+  if [[ "${code}" -eq 1 || "${worst}" -eq 1 ]]; then
+    worst=1
+  elif [[ "${code}" -ne 0 ]]; then
+    worst="${code}"
+  fi
 done
 exit "${worst}"
 ```
@@ -623,8 +628,11 @@ exit "${worst}"
 
 Run: `./scripts/validate-skill.sh --ci; echo "exit=$?"`
 
-Expected: output for the three source skills and for `aerospike`, with `exit=0` or `exit=2`
-(warnings-only). If `exit=1`, read the reported problem and fix it before continuing.
+Expected: output for the three source skills and for `aerospike`. `exit=0` or `exit=2` means
+clean or warnings-only. `exit=1` means the linter found errors — read them before continuing.
+Two of them are expected until the repository is public: the header URL
+`https://github.com/aerospike/agent-skills` and the data-modeling guide URL both return HTTP
+404 to an external link checker while the repository is private.
 
 - [ ] **Step 7: Add compiled-skills to both workflows**
 
