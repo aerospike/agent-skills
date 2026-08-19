@@ -1,0 +1,167 @@
+# End-to-end tasks for aerospike-data-modeling, the skill no evaluation run has
+# ever measured. Schema matches the harness in aerospike/agent-skills-eval,
+# which reads this file through its vendor/agent-skills submodule.
+#
+# Regex fields are case-insensitive and searched against the whole output, so a
+# `forbidden` pattern that matches vocabulary the prompt itself invites fails
+# correct answers for echoing the question. The patterns below therefore fire on
+# endorsement or on relational syntax, not on a shared noun.
+- id: dm-design-time-workflow
+  skill: aerospike-data-modeling
+  category: data-modeling
+  prompt: >-
+    We're starting a new service on Aerospike and have no schema yet. Walk me
+    through how to get from our requirements to a data model.
+  required_all:
+    - "access pattern"
+    - "key (design|schema|format)|primary key"
+  required_any:
+    - "entit(y|ies)"
+    - "cardinality"
+    - "who drives the read|read path|write path"
+  forbidden:
+    - "CREATE TABLE"
+    - "\\b(inner|outer|left|right|natural)\\s+join\\b"
+  rubric:
+    - "Starts from access patterns rather than an entity-relationship diagram"
+    - "Covers record granularity, key design, and bin structure"
+    - "Names the deliverables the process produces"
+  expected_refs:
+    - model-design-time-workflow.md
+  weight: 1.0
+
+- id: dm-guide-escalation
+  skill: aerospike-data-modeling
+  category: data-modeling
+  prompt: >-
+    We need a complete Aerospike data model for a new product, not just advice.
+    What's the authoritative process, and is there something more detailed than
+    this skill?
+  required_all:
+    - "data-modeling-guide"
+  required_any:
+    - "github\\.com/aerospike"
+    - "fetch|clone|repository"
+  forbidden:
+    - "no (additional|further) (guide|resource)"
+  rubric:
+    - "Points at the external data modeling guide repository by name"
+    - "Says a full model should not be produced from this skill alone"
+  expected_refs:
+    - ex-guide-escalation.md
+  weight: 1.0
+
+- id: dm-failure-modes-review
+  skill: aerospike-data-modeling
+  category: data-modeling
+  prompt: >-
+    Review this Aerospike design before we build. One set per domain noun, six
+    secondary indexes for our main queries, a separate bin per tag, and a
+    followers list bin per user with no cap.
+  required_all:
+    - "secondary index|\\bSIs?\\b"
+    - "unbounded|\\bcap(s|ped|ping)?\\b|grow"
+  required_any:
+    - "bin per tag|bins like columns"
+    - "key lookup|primary key"
+  # Sentence-final, so only an unqualified verdict counts. A review that credits
+  # one part of a flawed design ("the set layout looks fine, but ...") is a
+  # correct answer and must not be failed for it.
+  forbidden:
+    - "looks (good|fine|solid)\\s*[.!]"
+    - "no (issues|problems)\\s*[.!]"
+  rubric:
+    - "Flags secondary indexes used as the primary query mechanism"
+    - "Flags the unbounded followers collection"
+    - "Flags a bin count that scales with data rather than schema"
+  expected_refs:
+    - model-failure-modes-checklist.md
+  weight: 1.0
+
+- id: dm-record-granularity
+  skill: aerospike-data-modeling
+  category: data-modeling
+  prompt: >-
+    We have users, and each user has a stream of events. Should events be their
+    own Aerospike set, or live inside the user record?
+  required_all:
+    - "cardinality|how many|growth"
+  required_any:
+    - "access pattern"
+    - "record size"
+    - "unbounded"
+  # Relational syntax only. A correct answer explaining the cost of a separate
+  # set says the application has to join the two itself.
+  forbidden:
+    - "\\b(inner|outer|left|right|natural)\\s+join\\b"
+  rubric:
+    - "Makes the decision follow cardinality and the read path, not the noun list"
+    - "Raises record size or unbounded growth as the deciding constraint"
+  # No expected_refs: granularity, denormalization, and hot keys are argued in the
+  # development skill's references, not the data-modeling skill's four. One skill
+  # ships, so the split does not reach a user, and naming a file across skills
+  # would assert a layout we do not have.
+  weight: 1.0
+
+- id: dm-denormalization
+  skill: aerospike-data-modeling
+  category: data-modeling
+  prompt: >-
+    Rendering one post in our Aerospike feed needs the author's display name. Do
+    I read the user record too, or store the name on the post?
+  required_all:
+    - "denormaliz|duplicat"
+  required_any:
+    - "no joins|there are no joins"
+    - "round trip"
+  forbidden:
+    - "\\b(inner|outer|left|right|natural)\\s+join\\b"
+    - "foreign key"
+  rubric:
+    - "Chooses duplication over a second read, and says why"
+    - "Notes the update cost duplication creates"
+  weight: 1.0
+
+- id: dm-hot-key
+  skill: aerospike-data-modeling
+  category: data-modeling
+  prompt: >-
+    I want one Aerospike record holding a global counter that every request
+    increments. Any problem with that?
+  required_all:
+    - "hot[-\\s]?key|hot[-\\s]?spot"
+  required_any:
+    - "shard|split|partition"
+    - "single (record|key)"
+  # The prompt asks "any problem with that?", so only an unconditional blessing
+  # is a failure. "Fine at low write rates, but ..." is a correct answer.
+  forbidden:
+    - "no (problem|issue)s? with (that|this)"
+    - "perfectly fine"
+  rubric:
+    - "Identifies the single-record hot key"
+    - "Offers sharding the counter across records as the fix"
+  weight: 1.0
+
+- id: dm-deliverables
+  skill: aerospike-data-modeling
+  category: data-modeling
+  prompt: >-
+    When you finish designing an Aerospike data model for us, what documents
+    should we end up with?
+  required_all:
+    - "schema guide"
+    - "schema summary"
+  required_any:
+    - "derived|generated from"
+    - "assumptions log"
+    - "index (list|rationale)"
+  forbidden:
+    - "CREATE TABLE"
+    - "\\bDDL\\b"
+  rubric:
+    - "Names the schema guide and the schema summary as the deliverables"
+    - "Describes what each one is for"
+  expected_refs:
+    - model-deliverables-schema-guide-summary.md
+  weight: 1.0

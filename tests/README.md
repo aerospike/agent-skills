@@ -6,6 +6,7 @@
 | `unit/test_payload_integrity.py` | That every skill folder is self-contained — no link leaves its own folder, and every relative link resolves | `python3 -m pytest tests/unit/test_payload_integrity.py -v` |
 | `triggers/` | Whether the published description fires on the right prompts | `python3 tests/run_triggers.py` — see [`triggers/README.md`](triggers/README.md) |
 | `content/verify-server-claims.sh` | The getting-started skill's claims against a real server | `./tests/content/verify-server-claims.sh` (needs Docker) |
+| `tasks/` | End-to-end task prompts, read by the evaluation harness through its submodule | `python3 -m pytest tests/unit/test_task_corpus.py -v` for their shape; the prompts themselves run in [`agent-skills-eval`](https://github.com/aerospike/agent-skills-eval) |
 | `FINDINGS.md` | Ledger of findings from pre-publication testing, with decisions | — |
 
 `verify-server-claims.sh` boots `aerospike/aerospike-server:latest`, the Community image the
