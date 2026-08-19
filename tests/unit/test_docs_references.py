@@ -6,12 +6,21 @@ import pathlib
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 TRACKED_SUFFIXES = {".md", ".json", ".yml", ".sh", ".py"}
-SKIP_DIRS = {".git", "eval", "results", "docs/superpowers", ".venv", ".superpowers", "tests"}
+SKIP_DIRS = {".git", "eval", "results", "docs/superpowers", ".venv", ".superpowers"}
+
+# These name the retired path on purpose: one asserts the compiler no longer
+# emits it, and the other is this guard's own search string.
+SKIP_FILES = {
+    "tests/unit/test_compile_published_skill.py",
+    "tests/unit/test_docs_references.py",
+}
 
 
 def _tracked_files():
     for path in REPO_ROOT.rglob("*"):
         rel = path.relative_to(REPO_ROOT).as_posix()
+        if rel in SKIP_FILES:
+            continue
         if any(rel == d or rel.startswith(f"{d}/") for d in SKIP_DIRS):
             continue
         if path.is_file() and path.suffix in TRACKED_SUFFIXES:
