@@ -22,12 +22,13 @@ separately.
 
 ## Threshold
 
-CI fails below **0.88** overall accuracy, against `composer-2.5`.
+The bar is **0.88** overall accuracy against `composer-2.5`. It is checked by hand
+before publishing, not in CI — see [Running it](#running-it) for why.
 
 That is the worst measured run minus one case, not a target chosen in advance. The
 margin is deliberate and it is not a softer goal: routing is stochastic, and the runs
 below show one or two cases flipping between identical invocations. A threshold set at
-the measurement would go red on that noise alone, which trains people to ignore it.
+the measurement would fail on that noise alone, which trains people to ignore it.
 One case is 0.04 across 25 cases. Raise it when a description change earns it.
 
 | Date | Model | Accuracy | Precision | Recall | Failed |
@@ -53,15 +54,25 @@ what the threshold's margin is sized against.
 
 ## Running it
 
+This is a manual pre-publish check rather than a CI gate, because it needs a model API
+key and this project does not put one in CI. Run it whenever you change the description,
+and before publishing:
+
 ```bash
-export CURSOR_API_KEY=cursor_...
-python3 tests/run_triggers.py --model composer-2.5 --json /tmp/triggers.json
+set -a && . ./agent_api_key.env && set +a     # gitignored; holds CURSOR_API_KEY
+python3 tests/run_triggers.py --model composer-2.5 --min-accuracy 0.88 --json /tmp/triggers.json
 ```
 
-Without a key, score a recorded run instead:
+It exits non-zero below the threshold. Add a row to the table above with what you measured,
+whatever the result — the point of the table is the variance, so a bad run is as much a
+data point as a good one.
+
+Scoring is separated from the model calls, so the corpus, parsing, and scoring logic are
+covered by `tests/unit/test_run_triggers.py` in CI with no key and no network. Only the
+measurement itself is manual. To re-score a run you already have:
 
 ```bash
-python3 tests/run_triggers.py --offline recorded-verdicts.json
+python3 tests/run_triggers.py --offline recorded-verdicts.json --min-accuracy 0.88
 ```
 
 ## When a case fails

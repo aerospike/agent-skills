@@ -180,11 +180,17 @@ pull-request gates. Payload integrity is deterministic and free: the compiled sk
 valid frontmatter, no skill folder links outside itself (F8), and the compiled output is not
 stale.
 
-The trigger check needs a model call, so it runs on pull requests touching `skills/`,
-`compiled-skills/`, or `tests/triggers/`, against a pinned model. Its pass threshold is
-recorded in `tests/triggers/README.md` and CI fails below it. The initial value is set from
-the first measured run rather than guessed, and demanding a perfect score is explicitly not
-the goal — model selection is stochastic.
+The trigger check needs a model call, and this project does not put a model API key in CI,
+so it is a manual pre-publish step rather than a pull-request gate: run it against a pinned
+model whenever the description changes, and before publishing. Its threshold is recorded in
+`tests/triggers/README.md` alongside every measured run. The initial value is set from the
+first measured runs rather than guessed, and demanding a perfect score is explicitly not the
+goal — routing is stochastic, and the recorded runs show individual cases flipping between
+identical invocations.
+
+The runner separates scoring from the model calls, so the corpus, verdict parsing, and
+scoring logic are still covered in CI with no key and no network. Only the measurement is
+manual.
 
 The end-to-end run stays manual and periodic in the evaluation repository. It costs real money
 and takes too long to gate a pull request.

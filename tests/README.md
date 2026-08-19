@@ -26,6 +26,12 @@ python3 -m pytest tests/unit -v                        # compiler, publishing, d
 python3 scripts/compile-agents.py --shape stripped --check
 ./scripts/validate-spec.sh                             # needs skills-ref
 ./scripts/validate-skill.sh                            # needs skill-validator
+./tests/content/verify-server-claims.sh                # needs Docker
+
+# Trigger accuracy. Manual because it needs a model API key, which this project
+# does not put in CI. Exits non-zero below the threshold in triggers/README.md.
+set -a && . ./agent_api_key.env && set +a              # gitignored; holds CURSOR_API_KEY
+python3 tests/run_triggers.py --model composer-2.5 --min-accuracy 0.88
 ```
 
 `skills-ref` needs Python 3.11 or newer; create its virtualenv with `python3.11 -m venv .venv`.
