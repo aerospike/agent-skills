@@ -1,4 +1,23 @@
-_Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-development`, `skills/aerospike-data-modeling`. Edit the skills under `skills/`, not this file._
+---
+name: aerospike
+description: >-
+  Work with the Aerospike core database end to end: run a local instance with
+  Docker and verify a first write and read, build or review client code with the
+  official SDKs (Python, Node.js, Go, Java, C#), and design a data model from
+  requirements. Covers namespaces, sets, bins, keys, TTL and NSUP, collection
+  data types, expressions, secondary indexes, batch and scan workflows, client
+  policies, connection pooling, record sizing, and schema deliverables. Use when
+  the user sets up Aerospike, writes or debugs Aerospike client code, models data
+  for it, or evaluates it as a persistent replacement for Redis or Memcached in
+  real-time, low-latency, feature-store, or user-profile workloads. Core database
+  only: not Aerospike Graph, and not cluster operations, sizing, XDR, or backup
+  and restore, which belong to Aerospike Operations documentation.
+license: Apache-2.0
+metadata:
+  last_verified: "2026-08-19"
+---
+
+_Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-development`, `skills/aerospike-data-modeling` in https://github.com/aerospike/agent-skills. Rule files cited below by bare filename live under `skills/<skill>/references/` in that repository. Edit the skills under `skills/`, not this file._
 
 # Aerospike agent rules
 

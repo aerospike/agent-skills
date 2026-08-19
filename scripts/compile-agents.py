@@ -2,7 +2,9 @@
 """Compile the skills/ source-of-truth into compiled-skills/ consumption artifacts.
 
 The modular files under ``skills/`` are the source of truth for authors; this
-script builds the published ``compiled-skills/SKILLS.md`` that end users download.
+script builds the published ``compiled-skills/aerospike/SKILL.md`` that registries
+fetch and end users download. Its frontmatter is hand-written in
+``scripts/skills_compile/published_skill.yaml``.
 
 Usage (maintainers):
     python scripts/compile-agents.py --write
@@ -16,9 +18,24 @@ import json
 import pathlib
 import sys
 
+import yaml
+
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 COMPILED_DIR = "compiled-skills"
-SINGLE_OUT = f"{COMPILED_DIR}/SKILLS.md"
+PUBLISHED_NAME = "aerospike"
+# Folder name must equal the frontmatter `name`: the spec convention, and what the
+# skills CLI uses as the install directory.
+SINGLE_OUT = f"{COMPILED_DIR}/{PUBLISHED_NAME}/SKILL.md"
+LEGACY_SINGLE_OUT = f"{COMPILED_DIR}/SKILLS.md"
+REPO_URL = "https://github.com/aerospike/agent-skills"
+SPEC_KEYS = {
+    "name",
+    "description",
+    "license",
+    "compatibility",
+    "metadata",
+    "allowed-tools",
+}
 
 sys.path.insert(0, str(REPO_ROOT))
 
@@ -37,9 +54,39 @@ RENDERERS = {
 }
 
 
+def _frontmatter() -> str:
+    """Return the published skill's YAML frontmatter block.
+
+    Emitted verbatim rather than re-serialized, so the author controls formatting
+    and ``--check`` stays byte-stable across runs. Validated here so a malformed
+    header fails the compile instead of a registry submission.
+    """
+    src = REPO_ROOT / "scripts" / "skills_compile" / "published_skill.yaml"
+    text = src.read_text(encoding="utf-8").strip("\n")
+    meta = yaml.safe_load(text) or {}
+
+    missing = {"name", "description", "license"} - set(meta)
+    if missing:
+        raise ValueError(f"{src.name} is missing required key(s): {sorted(missing)}")
+    extra = set(meta) - SPEC_KEYS
+    if extra:
+        raise ValueError(
+            f"{src.name} has non-spec key(s): {sorted(extra)}. "
+            f"The spec allows only {sorted(SPEC_KEYS)}."
+        )
+    if meta["name"] != PUBLISHED_NAME:
+        raise ValueError(
+            f"{src.name} declares name {meta['name']!r} but the published folder is "
+            f"{PUBLISHED_NAME!r}; they must match."
+        )
+    return f"---\n{text}\n---\n"
+
+
 def _header(skill_dirs: list[str]) -> str:
     return (
-        f"_Auto-generated from `{'`, `'.join(skill_dirs)}`. "
+        f"_Auto-generated from `{'`, `'.join(skill_dirs)}` in {REPO_URL}. "
+        f"Rule files cited below by bare filename live under "
+        f"`skills/<skill>/references/` in that repository. "
         f"Edit the skills under `skills/`, not this file._\n"
     )
 
@@ -56,7 +103,7 @@ def compile_outputs(
 
     if layout == "single":
         body = render(skills).strip()
-        out[SINGLE_OUT] = f"{_header(skill_dirs)}\n{body}\n"
+        out[SINGLE_OUT] = f"{_frontmatter()}\n{_header(skill_dirs)}\n{body}\n"
         return out
 
     if layout == "multi":
@@ -86,7 +133,7 @@ def main(argv: list[str] | None = None) -> int:
         "--layout",
         choices=["single", "multi"],
         default="single",
-        help="single -> compiled-skills/SKILLS.md; multi -> one .md per skill",
+        help="single -> compiled-skills/aerospike/SKILL.md; multi -> one .md per skill",
     )
     ap.add_argument("--skills", nargs="*", default=DEFAULT_SKILLS)
     ap.add_argument("--write", action="store_true")
@@ -103,6 +150,8 @@ def main(argv: list[str] | None = None) -> int:
             path = REPO_ROOT / rel
             if not path.exists() or path.read_text(encoding="utf-8") != expected:
                 stale.append(rel)
+        if (REPO_ROOT / LEGACY_SINGLE_OUT).exists():
+            stale.append(f"{LEGACY_SINGLE_OUT} (superseded by {SINGLE_OUT}; delete it)")
         manifest_path = out_root / "manifest.json"
         if manifest_path.exists():
             try:
