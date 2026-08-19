@@ -12,6 +12,8 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILLS_DIR="${ROOT}/skills"
+# The compiled skill is what registries fetch and validate, so it must conform too.
+PUBLISHED_DIR="${ROOT}/compiled-skills/aerospike"
 SKILLS_REF_REF="69ef37e9424c0a7ea9dd2293b559e43ec8176379"
 
 if ! command -v skills-ref >/dev/null 2>&1; then
@@ -28,13 +30,18 @@ fi
 
 # skills-ref validates one directory per invocation, so loop and aggregate rather
 # than exiting on the first failure -- one run should report every problem.
+skill_dirs=()
+for skill_dir in "${SKILLS_DIR}"/*/; do
+  [[ -f "${skill_dir}SKILL.md" ]] && skill_dirs+=("${skill_dir%/}")
+done
+[[ -f "${PUBLISHED_DIR}/SKILL.md" ]] && skill_dirs+=("${PUBLISHED_DIR}")
+
 failed=()
 checked=0
-for skill_dir in "${SKILLS_DIR}"/*/; do
-  [[ -f "${skill_dir}SKILL.md" ]] || continue
+for skill_dir in "${skill_dirs[@]}"; do
   checked=$((checked + 1))
-  if ! skills-ref validate "${skill_dir%/}"; then
-    failed+=("$(basename "${skill_dir%/}")")
+  if ! skills-ref validate "${skill_dir}"; then
+    failed+=("$(basename "${skill_dir}")")
   fi
 done
 

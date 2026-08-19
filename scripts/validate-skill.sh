@@ -4,8 +4,9 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-# Multi-skill root: skill-validator discovers each subdirectory that contains SKILL.md.
-SKILL_DIR="${ROOT}/skills"
+# Multi-skill roots: skill-validator discovers each subdirectory containing SKILL.md.
+# compiled-skills/ holds the published artifact, which must be linted like the sources.
+SKILL_ROOTS=("${ROOT}/skills" "${ROOT}/compiled-skills")
 
 usage() {
   echo "Usage: $0 [--ci]" >&2
@@ -37,8 +38,18 @@ fi
 
 # No --allow-extra-frontmatter: the Agent Skills spec allows only six frontmatter
 # keys, so an unexpected key must surface here rather than being waived.
-exec skill-validator check \
-  "${strict_flag[@]}" \
-  --allow-flat-layouts \
-  "${extra_args[@]}" \
-  "${SKILL_DIR}/"
+# Run per root and surface the worst exit code, so one clean root cannot mask a
+# failure in the other. Exit 2 means warnings-only when --strict is off.
+worst=0
+for root in "${SKILL_ROOTS[@]}"; do
+  set +e
+  skill-validator check \
+    "${strict_flag[@]}" \
+    --allow-flat-layouts \
+    "${extra_args[@]}" \
+    "${root}/"
+  code=$?
+  set -e
+  [[ "${code}" -gt "${worst}" ]] && worst="${code}"
+done
+exit "${worst}"

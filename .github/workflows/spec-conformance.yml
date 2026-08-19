@@ -13,12 +13,14 @@ on:
   pull_request:
     paths:
       - "skills/**"
+      - "compiled-skills/**"
       - "scripts/validate-spec.sh"
       - ".github/workflows/spec-conformance.yml"
   push:
     branches: [main, master, init]
     paths:
       - "skills/**"
+      - "compiled-skills/**"
       - "scripts/validate-spec.sh"
       - ".github/workflows/spec-conformance.yml"
   # Called by publish-registries.yml so a release cannot publish a nonconformant tree.
@@ -62,7 +64,7 @@ jobs:
             echo
             echo "Validator: \`skills-ref\` @ \`${SKILLS_REF_REF}\`"
             echo
-            for skill_dir in skills/*/; do
+            for skill_dir in skills/*/ compiled-skills/aerospike/; do
               [ -f "${skill_dir}SKILL.md" ] || continue
               echo "### ${skill_dir%/}"
               echo '```json'

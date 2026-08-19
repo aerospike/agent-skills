@@ -6,6 +6,7 @@ on:
   pull_request:
     paths:
       - "skills/**"
+      - "compiled-skills/**"
       - ".github/workflows/skill-validator.yml"
       - "scripts/validate-skill.sh"
   push:
@@ -15,6 +16,7 @@ on:
       - init
     paths:
       - "skills/**"
+      - "compiled-skills/**"
       - ".github/workflows/skill-validator.yml"
       - "scripts/validate-skill.sh"
   # Called by publish-registries.yml so a release cannot publish a tree with
@@ -64,7 +66,7 @@ jobs:
             set +e
             skill-validator check \
               --allow-flat-layouts \
-              -o markdown skills/
+              -o markdown skills/ compiled-skills/
             sum=$?
             set -e
             [[ "$sum" -eq 0 || "$sum" -eq 2 ]] || exit "$sum"

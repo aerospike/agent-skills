@@ -13,3 +13,6 @@ results/
 .env
 .env.*
 !.env.example
+
+# Local virtualenv for skills-ref, which has no PyPI release.
+.venv/
