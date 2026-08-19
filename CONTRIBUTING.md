@@ -35,7 +35,8 @@ Thanks for helping improve this repository. It holds **Agent Skills** under [`sk
 | Aerospike Compose, custom config, editions, platform notes | [skills/aerospike-getting-started/reference.md](skills/aerospike-getting-started/reference.md) |
 | Aerospike app development rules, examples TOC | [skills/aerospike-development/references/README.md](skills/aerospike-development/references/README.md), [skills/aerospike-development/examples.md](skills/aerospike-development/examples.md) |
 | Tool-agnostic AI entry (read order, scope) | [AGENTS.md](AGENTS.md) |
-| Compiled published skill (auto-generated from skills) | [compiled-skills/aerospike/SKILL.md](compiled-skills/aerospike/SKILL.md) |
+| Compiled published skill (auto-generated body; do not hand-edit) | [compiled-skills/aerospike/SKILL.md](compiled-skills/aerospike/SKILL.md) |
+| Published skill frontmatter (hand-written) | [scripts/skills_compile/published_skill.yaml](scripts/skills_compile/published_skill.yaml) |
 | GitHub Copilot repo instructions | [.github/copilot-instructions.md](.github/copilot-instructions.md) |
 | Human install path, checklist | [README.md](README.md) |
 
@@ -120,10 +121,11 @@ Submission is automated on release and gated behind conformance, public visibili
 ## Before you open a pull request
 
 1. **Fact-check** any product behavior you document against current **official** docs or release notes for that product—not only blog posts or old threads.
-2. **Run** `./scripts/validate-skill.sh` (see above).
-3. **Exercise the skill** you changed: follow the happy path in `SKILL.md` (e.g. commands, containers, client smoke test) when the skill includes procedural steps.
-4. **If you changed `skills/`**, regenerate compiled output: `python scripts/compile-agents.py --write` (or let CI on `main` do it). PRs run a drift check — stale `compiled-skills/` fails CI.
-5. **Keep diffs focused**—one logical change per PR when possible (e.g. “fix port wording in Aerospike skill” vs mixing unrelated skills or refactors).
+2. **Run** `python3 -m pytest tests/unit -v` (see [tests/README.md](tests/README.md)).
+3. **Run** `./scripts/validate-skill.sh` (see above).
+4. **Exercise the skill** you changed: follow the happy path in `SKILL.md` (e.g. commands, containers, client smoke test) when the skill includes procedural steps.
+5. **If you changed `skills/` or [`scripts/skills_compile/published_skill.yaml`](scripts/skills_compile/published_skill.yaml)**, regenerate compiled output: `python scripts/compile-agents.py --write` (or let CI on `main` do it). PRs run a drift check — stale `compiled-skills/` fails CI.
+6. **Keep diffs focused**—one logical change per PR when possible (e.g. “fix port wording in Aerospike skill” vs mixing unrelated skills or refactors).
 
 For **Aerospike** changes specifically: verify ports, namespaces, TTL/NSUP, and image names against [Aerospike documentation](https://aerospike.com/docs/); run the Docker flow and at least **one** client example from [`examples.md`](skills/aerospike-getting-started/examples.md) for a stack you have installed. Avoid duplicating the full `aerospike.conf` in multiple files—keep one canonical copy in [`SKILL.md`](skills/aerospike-getting-started/SKILL.md) unless you have a strong reason.
 
