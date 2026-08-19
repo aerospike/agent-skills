@@ -42,10 +42,21 @@ fi
 # failure in the other. Exit 2 means warnings-only when --strict is off.
 worst=0
 for root in "${SKILL_ROOTS[@]}"; do
+  skip_args=()
+  # Skip only the links group for compiled-skills/. The compiled body's links
+  # are inherited from skills/, which this loop still link-checks in full, and
+  # two of the URLs (github.com/aerospike/agent-skills and
+  # github.com/aerospike/data-modeling-guide) cannot resolve until those
+  # repositories are public. A blanket --skip links on both roots would hide
+  # real authoring bugs in skills/.
+  if [[ "${root}" == "${ROOT}/compiled-skills" ]]; then
+    skip_args+=(--skip links)
+  fi
   set +e
   skill-validator check \
     "${strict_flag[@]}" \
     --allow-flat-layouts \
+    "${skip_args[@]}" \
     "${extra_args[@]}" \
     "${root}/"
   code=$?

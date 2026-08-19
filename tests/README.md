@@ -18,4 +18,9 @@ python3 scripts/compile-agents.py --shape stripped --check
 ./scripts/validate-skill.sh                            # needs skill-validator
 ```
 
+Confirm these two URLs resolve (skill-validator skips link checks on `compiled-skills/`; both 404 until the repositories are public):
+
+- `https://github.com/aerospike/agent-skills`
+- `https://github.com/aerospike/data-modeling-guide`
+
 `skills-ref` needs Python 3.11 or newer; create its virtualenv with `python3.11 -m venv .venv`.
