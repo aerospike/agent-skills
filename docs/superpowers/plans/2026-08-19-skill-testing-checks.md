@@ -1105,7 +1105,7 @@ jobs:
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     env:
       TRIGGER_MODEL: composer-2.5
-      MIN_ACCURACY: "<MEASURED>"
+      MIN_ACCURACY: "0.88"
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
@@ -1149,8 +1149,8 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 ```
 
-Replace `<MEASURED>` with the threshold recorded in `tests/triggers/README.md` in Task 2.
-The two must agree.
+The threshold `0.88` is the one recorded in `tests/triggers/README.md`: the worst of three
+measured runs minus one case. The two must agree, so change both together or neither.
 
 - [ ] **Step 4: Gate publishing on a fresh compiled artifact**
 
@@ -1189,7 +1189,7 @@ python3 -c "import yaml; [yaml.safe_load(open(f)) for f in ['.github/workflows/t
 python3 -m pytest tests/unit -q
 ```
 
-Expected: `valid`, then 44 passed.
+Expected: `valid`, then 49 passed.
 
 - [ ] **Step 6: Document and commit**
 
@@ -1632,7 +1632,7 @@ Add a row to `tests/README.md`:
 
 Run: `python3 -m pytest tests/unit -q`
 
-Expected: 56 passed — 44 after Task 3, plus 12 here (five checks and one parametrized over
+Expected: 61 passed — 49 after Task 3, plus 12 here (five checks and one parametrized over
 the seven tasks).
 
 ```bash
@@ -1926,7 +1926,7 @@ python3 scripts/compile-agents.py --shape stripped --check
 ./scripts/validate-spec.sh
 ./scripts/validate-skill.sh --ci; echo "exit=$?"
 ./tests/content/verify-server-claims.sh
-python3 tests/run_triggers.py --model composer-2.5 --min-accuracy <THRESHOLD>
+python3 tests/run_triggers.py --model composer-2.5 --min-accuracy 0.88
 git status --short
 ```
 
