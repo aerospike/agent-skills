@@ -503,7 +503,7 @@ Run:
 
 ```bash
 printf '\n# Local virtualenv for skills-ref, which has no PyPI release.\n.venv/\n' >> .gitignore
-python3 -m venv .venv && . .venv/bin/activate
+python3.11 -m venv .venv && . .venv/bin/activate
 pip install "git+https://github.com/agentskills/agentskills.git@69ef37e9424c0a7ea9dd2293b559e43ec8176379#subdirectory=skills-ref"
 go install github.com/agent-ecosystem/skill-validator/cmd/skill-validator@v1.5.5
 export PATH="$PATH:$(go env GOPATH)/bin"
