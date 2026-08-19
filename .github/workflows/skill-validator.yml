@@ -64,9 +64,10 @@ jobs:
           {
             echo "## skill-validator"
             set +e
-            skill-validator check \
-              --allow-flat-layouts \
-              -o markdown skills/ compiled-skills/
+            # Via the script, not a direct call: it owns the root list and the
+            # compiled-skills link-skip, and `skill-validator check` takes exactly
+            # one path, so a second root here is rejected rather than validated.
+            ./scripts/validate-skill.sh --summary
             sum=$?
             set -e
             [[ "$sum" -eq 0 || "$sum" -eq 2 ]] || exit "$sum"

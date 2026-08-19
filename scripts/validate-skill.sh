@@ -9,9 +9,10 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILL_ROOTS=("${ROOT}/skills" "${ROOT}/compiled-skills")
 
 usage() {
-  echo "Usage: $0 [--ci]" >&2
-  echo "  --ci   GitHub Actions: --emit-annotations and no --strict (warnings exit 2)." >&2
-  echo "        Default local run uses --strict so warnings fail the script." >&2
+  echo "Usage: $0 [--ci | --summary]" >&2
+  echo "  --ci        GitHub Actions: --emit-annotations and no --strict (warnings exit 2)." >&2
+  echo "  --summary   Markdown report for a job summary: no --strict, no annotations." >&2
+  echo "              Default local run uses --strict so warnings fail the script." >&2
   exit 2
 }
 
@@ -21,6 +22,11 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --ci)
       extra_args+=(--emit-annotations)
+      strict_flag=()
+      ;;
+    --summary)
+      # No annotations: they would be interleaved into the markdown report.
+      extra_args+=(-o markdown)
       strict_flag=()
       ;;
     -h|--help) usage ;;

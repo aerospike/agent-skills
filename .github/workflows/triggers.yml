@@ -41,7 +41,23 @@ jobs:
 
       - run: pip install -r scripts/requirements-compile.txt cursor-sdk
 
+      # The job-level `if` only rules out forks. A same-repo PR still reaches here
+      # when the secret is simply not configured, and the run would fail for a
+      # missing credential rather than anything about the skill. Skip loudly.
+      - name: Check for the API key
+        id: key
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+        run: |
+          if [[ -n "${CURSOR_API_KEY}" ]]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::CURSOR_API_KEY is not configured, so trigger accuracy was not measured."
+          fi
+
       - name: Score the published description
+        if: steps.key.outputs.present == 'true'
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
         run: |
@@ -64,7 +80,10 @@ jobs:
                 echo "|---|---|---|"
                 jq -r '.failures[] | "| " + .[0] + " | " + .[1] + " | " + .[2] + " |"' triggers.json
               fi
+            elif [[ "${{ steps.key.outputs.present }}" != "true" ]]; then
+              echo "Not measured: \`CURSOR_API_KEY\` is not configured on this repository."
+              echo "Add the secret to turn this check back on; until then it cannot gate anything."
             else
-              echo "No score was produced."
+              echo "No score was produced — the run itself failed."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
