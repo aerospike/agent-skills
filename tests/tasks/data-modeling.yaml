@@ -1,6 +1,6 @@
 # End-to-end tasks for aerospike-data-modeling, the skill no evaluation run has
-# ever measured. Schema matches the harness in aerospike/agent-skills-eval,
-# which reads this file through its vendor/agent-skills submodule.
+# ever measured. Schema matches the separate evaluation harness, which reads
+# this file through its vendor/agent-skills submodule.
 #
 # Regex fields are case-insensitive and searched against the whole output, so a
 # `forbidden` pattern that matches vocabulary the prompt itself invites fails
