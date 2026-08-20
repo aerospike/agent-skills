@@ -5,3 +5,18 @@
 
 __pycache__/
 .idea/
+
+# Local eval harness working tree. The harness itself lives in a separate repo;
+# these hold API keys and raw model output that must never reach this repository.
+eval/
+results/
+.env
+.env.*
+!.env.example
+
+# Local virtualenv for skills-ref, which has no PyPI release.
+.venv/
+
+# Agent scratch space (briefs, reports, session notes).
+.superpowers/
+agent_api_key.env

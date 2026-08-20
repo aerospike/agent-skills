@@ -14,7 +14,7 @@ Thanks for helping improve this repository. It holds **Agent Skills** under [`sk
 
 ## Adding a new skill (especially Aerospike)
 
-1. Create `skills/<skill-name>/` with a required `SKILL.md` at the skill root. YAML **`name`** must match the parent folder name; **`description`** explains what and when; optional **`last_verified`** after you validate facts. For frontmatter shape, see an existing skill such as [`skills/aerospike-getting-started/SKILL.md`](skills/aerospike-getting-started/SKILL.md).
+1. Create `skills/<skill-name>/` with a required `SKILL.md` at the skill root. YAML **`name`** must match the parent folder name; **`description`** explains what and when; optional **`metadata.last_verified`** after you validate facts. For frontmatter shape, see an existing skill such as [`skills/aerospike-getting-started/SKILL.md`](skills/aerospike-getting-started/SKILL.md).
 2. Add any companion files inside that folder only (skill markdown must not link outside the skill directory—see validator note below).
 3. Run [`./scripts/validate-skill.sh`](scripts/validate-skill.sh) from the repo root and fix reported issues.
 4. Update [`skills/README.md`](skills/README.md) with a table row linking to the new `SKILL.md`.
@@ -35,7 +35,8 @@ Thanks for helping improve this repository. It holds **Agent Skills** under [`sk
 | Aerospike Compose, custom config, editions, platform notes | [skills/aerospike-getting-started/reference.md](skills/aerospike-getting-started/reference.md) |
 | Aerospike app development rules, examples TOC | [skills/aerospike-development/references/README.md](skills/aerospike-development/references/README.md), [skills/aerospike-development/examples.md](skills/aerospike-development/examples.md) |
 | Tool-agnostic AI entry (read order, scope) | [AGENTS.md](AGENTS.md) |
-| Compiled published rules (auto-generated from skills) | [compiled-skills/SKILLS.md](compiled-skills/SKILLS.md) |
+| Compiled published skill (auto-generated body; do not hand-edit) | [compiled-skills/aerospike/SKILL.md](compiled-skills/aerospike/SKILL.md) |
+| Published skill frontmatter (hand-written) | [scripts/skills_compile/published_skill.yaml](scripts/skills_compile/published_skill.yaml) |
 | GitHub Copilot repo instructions | [.github/copilot-instructions.md](.github/copilot-instructions.md) |
 | Human install path, checklist | [README.md](README.md) |
 
@@ -45,9 +46,28 @@ Thanks for helping improve this repository. It holds **Agent Skills** under [`sk
 
 ## Skill frontmatter (`SKILL.md`)
 
-- **`name`:** Lowercase letters, numbers, hyphens; max 64 characters; must match the parent folder name.
-- **`description`:** Third person; include **what** the skill does and **when** to use it (trigger phrases). Stay under **1024** characters.
-- **`last_verified` (optional):** Bump this **ISO date** when you change commands, images, or product facts for **that skill**—after you have manually re-checked the documented flow.
+The [Agent Skills specification](https://agentskills.io/specification) defines a **closed** set of six frontmatter keys. Only these are allowed in a `SKILL.md`, and the official validator rejects anything else:
+
+`name`, `description`, `license`, `compatibility`, `metadata`, `allowed-tools`
+
+- **`name`:** Lowercase letters, numbers, hyphens; 1–64 characters; no leading, trailing, or consecutive hyphens; must match the parent folder name.
+- **`description`:** Third person; include **what** the skill does and **when** to use it (trigger phrases). 1–1024 characters.
+- **`license` (optional):** `Apache-2.0` for skills in this repository, matching [LICENSE](LICENSE). Registries factor license clarity into trust scoring.
+- **`metadata` (optional):** The spec's extension point—a map of string keys to **string** values. Anything not in the six keys above belongs here.
+- **`metadata.last_verified`:** Bump this **ISO date** when you change commands, images, or product facts for **that skill**—after you have manually re-checked the documented flow. **Quote it** (`"2026-04-21"`), because an unquoted YAML date parses to a date object and `metadata` values must be strings.
+
+```yaml
+---
+name: aerospike-getting-started
+description: >-
+  What the skill does, and when an agent should reach for it.
+license: Apache-2.0
+metadata:
+  last_verified: "2026-04-21"
+---
+```
+
+This closed key set applies to `SKILL.md` only. Companion files under `references/` are not skill manifests, so their frontmatter is free-form.
 
 ## Validate the skill package (skill-validator)
 
@@ -73,20 +93,39 @@ CI runs [agent-ecosystem/skill-validator](https://github.com/agent-ecosystem/ski
    - **Raw one-liner** (strict, same as local script default):
 
      ```bash
-     skill-validator check --strict --allow-flat-layouts --allow-extra-frontmatter skills/
+     skill-validator check --strict --allow-flat-layouts skills/
      ```
+
+   `--allow-flat-layouts` is intentional: `examples.md` and `reference.md` beside `SKILL.md` are spec-legal, and only this third-party tool objects to them. There is deliberately **no** `--allow-extra-frontmatter`, so an unexpected frontmatter key fails here instead of being waived.
 
    Optional: [Homebrew install](https://github.com/agent-ecosystem/skill-validator#install-cli) (`brew tap agent-ecosystem/tap && brew install skill-validator`) if you prefer not to use `go install`.
 
 **Note:** Skill markdown must not link **outside** the skill directory (e.g. no `../README.md`); describe repo-level files in prose instead.
 
+## Check spec conformance (skills-ref)
+
+Registries validate against the [Agent Skills specification](https://agentskills.io/specification), so this check is separate from the linter above: it answers only "does this frontmatter conform to the standard." CI runs it via [`.github/workflows/spec-conformance.yml`](.github/workflows/spec-conformance.yml).
+
+```bash
+python3 -m venv .venv && . .venv/bin/activate   # requires Python 3.11+
+pip install "git+https://github.com/agentskills/agentskills.git@69ef37e9424c0a7ea9dd2293b559e43ec8176379#subdirectory=skills-ref"
+./scripts/validate-spec.sh
+```
+
+The commit is pinned because `skills-ref` has no PyPI release. Keep the pin in [`scripts/validate-spec.sh`](scripts/validate-spec.sh) and the workflow in sync.
+
+## Publishing to registries
+
+Submission is automated on release and gated behind conformance, public visibility, a kill-switch variable, and reviewer approval. Do not submit by hand—see [`docs/PUBLISHING.md`](docs/PUBLISHING.md).
+
 ## Before you open a pull request
 
 1. **Fact-check** any product behavior you document against current **official** docs or release notes for that product—not only blog posts or old threads.
-2. **Run** `./scripts/validate-skill.sh` (see above).
-3. **Exercise the skill** you changed: follow the happy path in `SKILL.md` (e.g. commands, containers, client smoke test) when the skill includes procedural steps.
-4. **If you changed `skills/`**, regenerate compiled output: `python scripts/compile-agents.py --write` (or let CI on `main` do it). PRs run a drift check — stale `compiled-skills/` fails CI.
-5. **Keep diffs focused**—one logical change per PR when possible (e.g. “fix port wording in Aerospike skill” vs mixing unrelated skills or refactors).
+2. **Run** `python3 -m pytest tests/unit -v` (see [tests/README.md](tests/README.md)).
+3. **Run** `./scripts/validate-skill.sh` (see above).
+4. **Exercise the skill** you changed: follow the happy path in `SKILL.md` (e.g. commands, containers, client smoke test) when the skill includes procedural steps.
+5. **If you changed `skills/` or [`scripts/skills_compile/published_skill.yaml`](scripts/skills_compile/published_skill.yaml)**, regenerate compiled output: `python scripts/compile-agents.py --write` (or let CI on `main` do it). PRs run a drift check — stale `compiled-skills/` fails CI.
+6. **Keep diffs focused**—one logical change per PR when possible (e.g. “fix port wording in Aerospike skill” vs mixing unrelated skills or refactors).
 
 For **Aerospike** changes specifically: verify ports, namespaces, TTL/NSUP, and image names against [Aerospike documentation](https://aerospike.com/docs/); run the Docker flow and at least **one** client example from [`examples.md`](skills/aerospike-getting-started/examples.md) for a stack you have installed. Avoid duplicating the full `aerospike.conf` in multiple files—keep one canonical copy in [`SKILL.md`](skills/aerospike-getting-started/SKILL.md) unless you have a strong reason.
 

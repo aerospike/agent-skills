@@ -17,7 +17,14 @@ from typing import Any
 import yaml
 
 _FM_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n?", re.DOTALL)
-_LABEL_RE = re.compile(r"^\*\*(.+?)\*\*\s*$", re.MULTILINE)
+# The five labels references/_template.md defines. Matching a closed set keeps
+# bold *content* lines -- an enumerated heading, a bolded URL -- from being read
+# as section boundaries, which silently truncates the rule they sit inside.
+CANONICAL_LABELS = ("Rule", "Why", "Prefer", "Avoid", "See also")
+_LABEL_RE = re.compile(
+    r"^\*\*(" + "|".join(re.escape(label) for label in CANONICAL_LABELS) + r")\*\*\s*$",
+    re.MULTILINE,
+)
 _HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$", re.MULTILINE)
 
 # Reference-folder files that are scaffolding rather than knowledge.

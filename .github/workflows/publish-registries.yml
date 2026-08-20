@@ -1,0 +1,202 @@
+# Publish the compiled skill (compiled-skills/aerospike) to agent-skill registries on release.
+#
+# This is the only path that contacts a registry. One skill is submitted: the artifact
+# compiled from the three authoring folders under skills/. The first listing and every
+# later refresh run the same reviewed code. It is merged inert and held behind four
+# independent gates; see docs/PUBLISHING.md for the operator's view.
+#
+#   1. Conformance  - the spec-conformance, skill-validator, and compile-agents
+#                     workflows must pass. The last one fails on a stale artifact,
+#                     so a release cannot submit output that lags its sources.
+#   2. Visibility   - the repository must be public, or a submitted URL would 404.
+#   3. Kill switch  - repository variable REGISTRY_PUBLISH_ENABLED must be "true".
+#   4. Approval     - the publish job runs in the "registries" environment, which
+#                     requires a reviewer. Neither registry documents a way to
+#                     delete a submission, so this gate is permanent, not just a
+#                     safeguard for the initial rollout.
+#
+# Gates 2 and 3 skip with a notice rather than failing: a release cut during the
+# hold period should not report a broken build.
+name: publish-registries
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Render payloads without contacting any registry"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  # Never let two releases submit concurrently; registries dedupe on their side but
+  # interleaved receipts would make it impossible to tell what was published.
+  group: publish-registries
+  cancel-in-progress: false
+
+jobs:
+  gate-spec:
+    uses: ./.github/workflows/spec-conformance.yml
+
+  gate-lint:
+    uses: ./.github/workflows/skill-validator.yml
+
+  gate-compiled:
+    uses: ./.github/workflows/compile-agents.yml
+
+  preflight:
+    needs: [gate-spec, gate-lint, gate-compiled]
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.decide.outputs.mode }}
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
+      - name: Decide publish mode
+        id: decide
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # On a release there is no dry_run input, so the intent is a real publish.
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
+          PUBLISH_ENABLED: ${{ vars.REGISTRY_PUBLISH_ENABLED }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${DRY_RUN}" == "true" ]]; then
+            echo "mode=dry-run" >> "$GITHUB_OUTPUT"
+            echo "Dry run requested: payloads will be rendered, no registry contacted."
+            exit 0
+          fi
+
+          visibility="$(gh api "repos/${GITHUB_REPOSITORY}" --jq '.visibility' | tr '[:upper:]' '[:lower:]')"
+          if [[ "${visibility}" != "public" ]]; then
+            echo "mode=blocked" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Publishing skipped::Repository is ${visibility}, not public. Registries require a public URL, so nothing was submitted."
+            exit 0
+          fi
+
+          if [[ "${PUBLISH_ENABLED}" != "true" ]]; then
+            echo "mode=held" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Publishing held::Repository variable REGISTRY_PUBLISH_ENABLED is not \"true\". Set it to go live; see docs/PUBLISHING.md."
+            exit 0
+          fi
+
+          echo "mode=publish" >> "$GITHUB_OUTPUT"
+          echo "All gates passed; publishing pends reviewer approval of the registries environment."
+
+  dry-run:
+    needs: preflight
+    if: needs.preflight.outputs.mode == 'dry-run'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # No registry is contacted here, including openagentskill's /validate endpoint,
+      # which reads SKILL.md over the public URL and so cannot work while the
+      # repository is internal. Calling it would report a failure that looks like a
+      # bug in this workflow rather than the expected state.
+      - name: Render payloads
+        run: |
+          set -euo pipefail
+          repo_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
+
+          # Each script runs before anything is written to the summary so a failure
+          # surfaces as a failed step rather than being swallowed by a pipeline.
+          ./scripts/publish-openagentskill.sh --repo-url "${repo_url}" --dry-run | tee oas.txt
+          ./scripts/publish-upskill.sh --repo-url "${repo_url}" --dry-run | tee upskill.txt
+
+          {
+            echo "## Registry publish dry run"
+            echo
+            echo "No registry was contacted. Repository URL: \`${repo_url}\`"
+            echo
+            echo '### openagentskill'
+            echo '```json'
+            cat oas.txt
+            echo '```'
+            echo '### upskill'
+            echo '```'
+            cat upskill.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  publish:
+    needs: preflight
+    if: needs.preflight.outputs.mode == 'publish'
+    runs-on: ubuntu-latest
+    # Holds the job pending until a reviewer approves. Configure required reviewers
+    # on this environment, or the gate is decorative.
+    environment: registries
+    env:
+      UPSKILL_VERSION: 0.10.1
+      # Submitted tree URLs point at the default branch, not the release tag, so a
+      # listing keeps tracking updates instead of freezing at one release.
+      PUBLISH_REF: main
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+
+      - name: Submit to openagentskill
+        run: |
+          ./scripts/publish-openagentskill.sh \
+            --repo-url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+            --agent-id "aerospike-agent-skills-ci" \
+            --receipts receipts.jsonl
+
+      - name: Submit to upskill
+        run: |
+          # Pinned rather than floating: a CLI that no-ops when misconfigured is not
+          # one to auto-upgrade underneath us.
+          npm install -g "@autoloops/upskill@${UPSKILL_VERSION}"
+          ./scripts/publish-upskill.sh \
+            --repo-url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+            --ref "${PUBLISH_REF}" \
+            --receipts receipts.jsonl
+
+      - name: Summarize submissions
+        if: always()
+        run: |
+          {
+            echo "## Registry submissions"
+            echo
+            if [[ -s receipts.jsonl ]]; then
+              echo "| Registry | Skill | Status |"
+              echo "|---|---|---|"
+              jq -r '"| " + .registry + " | " + .skill + " | " + .status + " |"' receipts.jsonl
+              echo
+              echo "Submission ids and status tokens are in the \`registry-receipts\` artifact."
+              echo "Transcribe them into \`docs/PUBLISHING.md\`; a token is the only way to poll a submission later."
+            else
+              echo "No receipts were written."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Receipts carry private status tokens, so they are archived rather than logged.
+      - name: Upload receipts
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: registry-receipts
+          path: receipts.jsonl
+          if-no-files-found: warn
+          retention-days: 90

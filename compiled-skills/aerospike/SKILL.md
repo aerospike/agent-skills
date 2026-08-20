@@ -1,4 +1,26 @@
-_Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-development`, `skills/aerospike-data-modeling`. Edit the skills under `skills/`, not this file._
+---
+name: aerospike
+description: >-
+  Work with the Aerospike core database end to end: run a local instance with
+  Docker and verify a first write and read, build or review client code with the
+  official SDKs (Python, Node.js, Go, Java, C#), and design or review a
+  data model, whether from requirements or against a schema that already
+  exists. Covers namespaces, sets, bins, primary key design, TTL and NSUP,
+  collection data types, expressions, secondary indexes, batch and scan
+  workflows, client policies, connection pooling, record sizing, and schema
+  deliverables. Use when the user sets up Aerospike, writes or debugs Aerospike
+  client code, chooses keys or models data for it, reviews an Aerospike schema
+  before building, or evaluates it as a persistent replacement for Redis or
+  Memcached in real-time, low-latency, feature-store, or user-profile workloads.
+  Core database only: not Aerospike Graph, and not cluster operations, sizing,
+  XDR, or backup and restore, which belong to Aerospike Operations documentation.
+license: Apache-2.0
+metadata:
+  last_verified: "2026-04-21"
+  server_versions: "7.0+"
+---
+
+_Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-development`, `skills/aerospike-data-modeling` in https://github.com/aerospike/agent-skills. Rule files cited below by bare filename live under `skills/<skill>/` or its `references/` folder in that repository. Edit the skills under `skills/`, not this file._
 
 # Aerospike agent rules
 
@@ -231,7 +253,7 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 
 
 ### Fetch the data modeling guide before designing a full model [HIGH]
-- This skill carries the decision layer. The full design-time process lives in the
+- This skill carries the decision layer. The full design-time process lives in the https://github.com/aerospike/data-modeling-guide repository. For a new application or a redesign, fetch it and follow its checklist — do not produce a complete model from this skill alone.
 - Prefer: Reading current values (version minimums, size limits, complexity) from the guide rather than recalling them; Naming the specific guide file you used, so a reviewer can retrace the decision
 - Avoid: Presenting a model as complete when the guide's checklist and sizing worksheets were never applied; Quoting a version gate or size limit from memory
 

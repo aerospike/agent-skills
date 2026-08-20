@@ -18,7 +18,7 @@ Apply when the user (or task) involves **Aerospike**, **Docker-based Aerospike**
 
 ## Read order
 
-**Fast path:** [`compiled-skills/SKILLS.md`](compiled-skills/SKILLS.md) — published rules for the getting-started, development, and data-modeling skills in one file, updated on every merge to `main`. [Install guide](compiled-skills/README.md).
+**Fast path:** [`compiled-skills/aerospike/SKILL.md`](compiled-skills/aerospike/SKILL.md) — published rules for the getting-started, development, and data-modeling skills in one file, updated on every merge to `main`. [Install guide](compiled-skills/README.md).
 
 **More detail** (optional, under `skills/`):
 
@@ -27,7 +27,7 @@ Apply when the user (or task) involves **Aerospike**, **Docker-based Aerospike**
 3. **Application development:** [`skills/aerospike-development/SKILL.md`](skills/aerospike-development/SKILL.md) → [`skills/aerospike-development/references/README.md`](skills/aerospike-development/references/README.md) → [`skills/aerospike-development/reference.md`](skills/aerospike-development/reference.md) / [`skills/aerospike-development/examples.md`](skills/aerospike-development/examples.md) as needed.
 4. **Design-time data modeling:** [`skills/aerospike-data-modeling/SKILL.md`](skills/aerospike-data-modeling/SKILL.md) → [`skills/aerospike-data-modeling/references/`](skills/aerospike-data-modeling/references/) → [`skills/aerospike-data-modeling/reference.md`](skills/aerospike-data-modeling/reference.md) as needed.
 
-Do not invent REST APIs, SQL DDL, or wrong package names; follow the blacklist in [`skills/aerospike-getting-started/SKILL.md`](skills/aerospike-getting-started/SKILL.md) / [`compiled-skills/SKILLS.md`](compiled-skills/SKILLS.md).
+Do not invent REST APIs, SQL DDL, or wrong package names; follow the blacklist in [`skills/aerospike-getting-started/SKILL.md`](skills/aerospike-getting-started/SKILL.md) / [`compiled-skills/aerospike/SKILL.md`](compiled-skills/aerospike/SKILL.md).
 
 ## Humans
 
