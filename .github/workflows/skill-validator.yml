@@ -6,6 +6,7 @@ on:
   pull_request:
     paths:
       - "skills/**"
+      - "compiled-skills/**"
       - ".github/workflows/skill-validator.yml"
       - "scripts/validate-skill.sh"
   push:
@@ -15,8 +16,12 @@ on:
       - init
     paths:
       - "skills/**"
+      - "compiled-skills/**"
       - ".github/workflows/skill-validator.yml"
       - "scripts/validate-skill.sh"
+  # Called by publish-registries.yml so a release cannot publish a tree with
+  # broken links or oversized references.
+  workflow_call:
 
 env:
   SKILL_VALIDATOR_VERSION: v1.5.5
@@ -59,9 +64,10 @@ jobs:
           {
             echo "## skill-validator"
             set +e
-            skill-validator check \
-              --allow-flat-layouts --allow-extra-frontmatter \
-              -o markdown skills/
+            # Via the script, not a direct call: it owns the root list and the
+            # compiled-skills link-skip, and `skill-validator check` takes exactly
+            # one path, so a second root here is rejected rather than validated.
+            ./scripts/validate-skill.sh --summary
             sum=$?
             set -e
             [[ "$sum" -eq 0 || "$sum" -eq 2 ]] || exit "$sum"

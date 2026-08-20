@@ -28,5 +28,5 @@ Short rationale tied to Aerospike behavior or client architecture.
 
 **See also**
 
-- [Related rule](other-rule.md) (if applicable)
+- Related rule, if applicable, written as `[Rule Title]` followed by `(rule-filename.md)`
 - Language hubs: [Java](https://aerospike.com/docs/develop/client/java), [Python](https://aerospike.com/docs/develop/client/python), [Go](https://aerospike.com/docs/develop/client/go), [Node.js](https://aerospike.com/docs/develop/client/node)

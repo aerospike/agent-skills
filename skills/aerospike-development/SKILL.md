@@ -9,7 +9,10 @@ description: >-
   aerospike-data-modeling instead. Redirect cluster deployment sizing
   XDR and backup questions to Aerospike Operations documentation. Core
   database only; not Aerospike Graph.
-last_verified: 2026-04-21
+license: Apache-2.0
+metadata:
+  last_verified: "2026-04-21"
+  server_versions: "7.0+"
 ---
 
 # Aerospike: application development

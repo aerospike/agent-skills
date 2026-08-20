@@ -14,7 +14,7 @@ import aerospike
 config = {
     "hosts": [("127.0.0.1", 3000)],
     "policies": {
-        "timeout": 1000,
+        "total_timeout": 1000,
         "write": {
             "socket_timeout": 500,
             "max_retries": 2,

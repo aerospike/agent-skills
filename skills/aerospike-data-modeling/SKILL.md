@@ -9,7 +9,10 @@ description: >-
   reviewing client code against a model that already exists, or for client APIs,
   policies, CDT operations, and expression usage, use aerospike-development
   instead. Core database only; not Aerospike Graph.
-last_verified: 2026-08-06
+license: Apache-2.0
+metadata:
+  last_verified: "2026-08-06"
+  server_versions: "7.0+"
 ---
 
 # Aerospike: data model design
