@@ -43,7 +43,7 @@ The **canonical list of skills** (and what to copy) is [`skills/README.md`](skil
 | [compiled-skills/aerospike/SKILL.md](compiled-skills/aerospike/SKILL.md) | Published agent skill, compiled from `skills/` into one file |
 | [.github/copilot-instructions.md](.github/copilot-instructions.md) | GitHub Copilot repository instructions |
 
-Skill packaging evaluation (structure A/B tests, coverage gates) lives in the separate [agent-skills-eval](https://github.com/citrusleaf/agent-skills-eval) repository.
+Skill packaging evaluation (structure A/B tests, coverage gates) runs in a separate harness repository and is not part of this repository's checks.
 
 The **canonical** `aerospike.conf` and commands for local setup live in [`skills/aerospike-getting-started/SKILL.md`](skills/aerospike-getting-started/SKILL.md) (not duplicated here).
 
