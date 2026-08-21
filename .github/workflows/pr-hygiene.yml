@@ -1,0 +1,17 @@
+# Validate the PR title as a conventional commit.
+# JIRA is never required here: outside contributors cannot see or open Aerospike tickets.
+name: pr-hygiene
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  hygiene:
+    uses: aerospike/shared-workflows/.github/workflows/reusable_pr-hygiene.yml@0d843cff870d70ac527048ab0d006c7c301fbb2f # v4.1.0
+    with:
+      pr_title: ${{ github.event.pull_request.title }}
+      types-requiring-jira: ""
