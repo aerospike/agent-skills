@@ -40,7 +40,7 @@ Gates 2 and 3 **skip with a notice** instead of failing, so a release cut while 
 Prerequisites: the repository is public, and open-source sign-off is recorded on [AIE-13](https://aerospike.atlassian.net/browse/AIE-13).
 
 1. Run the workflow manually with `dry_run: true` and confirm the rendered payloads look right. Do this after the repository is public — openagentskill's `/validate` endpoint reads `SKILL.md` over the public URL, so it is the first check that can only pass once we are public.
-2. Create the `registries` environment (**Settings → Environments**) and add the [code owners](../.github/CODEOWNERS) as **required reviewers**. Without reviewers configured, gate 4 does nothing.
+2. Confirm the `registries` environment (**Settings → Environments**) lists the [code owners](../.github/CODEOWNERS) as **required reviewers**. It is configured already; without reviewers, gate 4 does nothing.
 3. Set the repository variable (**Settings → Variables → Actions**): `REGISTRY_PUBLISH_ENABLED` = `true`.
 4. Cut a release, or run the workflow with `dry_run: false`.
 5. Approve the pending environment prompt.

@@ -37,7 +37,7 @@ Modeling ignores index overhead and device I/O until clusters hit **latency**, *
 This band is a design target derived from index-to-data ratio, I/O size, and
 defragmentation cost — not a measured hard boundary. If benchmarking on your
 hardware and workload shows a different range, replace it here with the
-verified figures and note the test conditions. The internal
+verified figures and note the test conditions. The
 `aerospike/data-modeling-guide` repository holds the fuller treatment, including
 the distinction between this target band, the configured `max-record-size`
 limit, and the architectural ceiling.
