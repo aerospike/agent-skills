@@ -139,6 +139,16 @@ type(scope): description
 
 Common types here are `docs` (skill content), `feat` (a new skill or capability), `fix`, and `chore` (tooling and repo plumbing). The rules come from `@commitlint/config-conventional` via [`commitlint.config.mjs`](commitlint.config.mjs), matching [aerospike/data-modeling-guide](https://github.com/aerospike/data-modeling-guide).
 
+### Pull request titles
+
+The PR title follows the same convention and is checked in CI by
+[`pr-hygiene.yml`](.github/workflows/pr-hygiene.yml), which must pass before
+merge. Dependabot, StepSecurity, and revert titles are allowlisted.
+
+**No JIRA reference is required, on any PR type.** Outside contributors cannot
+see or open Aerospike tickets. Aerospike engineers may include one for their own
+tracking, but no check enforces it.
+
 ### Local hooks
 
 Hooks live in [`.pre-commit-config.yaml`](.pre-commit-config.yaml): secret scanning (gitleaks), shellcheck, whitespace fixes, and commitlint. They are **not** active until you install them:

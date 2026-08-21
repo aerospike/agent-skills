@@ -1,7 +1,7 @@
-<!-- PR titles often follow: type(scope): [JIRA-123] description
-     Examples: feat(api): [ENG-456] add user endpoint
-               fix: [INFRA-789] correct deploy path
-     Some PR types, allowlisted patterns, or the `skip-jira` label are exceptions.
+<!-- PR titles follow conventional commit format: type(scope): description
+     Examples: feat(skills): add an aerospike-operations skill
+               fix: correct the TTL example in aerospike-getting-started
+     No JIRA reference is required.
      See CONTRIBUTING.md for the full title rules. -->
 
 # Description
