@@ -48,9 +48,6 @@ Copying those values into a skill guarantees they go stale, and a stale copy is
 worse than a pointer because nothing signals that it is wrong. Read them from
 the guide at the time you need them.
 
-Both repositories are Aerospike-internal, so access depends on the user's GitHub
-authorization.
-
 **Prefer**
 
 - Reading current values (version minimums, size limits, complexity) from the guide rather than recalling them
