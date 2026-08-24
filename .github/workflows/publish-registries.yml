@@ -2,9 +2,12 @@
 #
 # This is the only path that contacts a registry. One skill is submitted: the artifact
 # compiled from the three authoring folders under skills/. The first listing and every
-# later refresh run the same reviewed code. It is merged inert and held behind four
+# later refresh run the same reviewed code. It is merged inert and held behind five
 # independent gates; see docs/PUBLISHING.md for the operator's view.
 #
+#   0. Version      - the release tag must be a stable semantic version (vX.Y.Z) above
+#                     every existing tag. A release candidate or a malformed tag fails
+#                     the release build rather than publishing something permanent.
 #   1. Conformance  - the spec-conformance, skill-validator, and compile-agents
 #                     workflows must pass. The last one fails on a stale artifact,
 #                     so a release cannot submit output that lags its sources.
@@ -39,6 +42,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  gate-version:
+    uses: ./.github/workflows/release-version.yml
+
   gate-spec:
     uses: ./.github/workflows/spec-conformance.yml
 
@@ -49,7 +55,7 @@ jobs:
     uses: ./.github/workflows/compile-agents.yml
 
   preflight:
-    needs: [gate-spec, gate-lint, gate-compiled]
+    needs: [gate-version, gate-spec, gate-lint, gate-compiled]
     runs-on: ubuntu-latest
     outputs:
       mode: ${{ steps.decide.outputs.mode }}

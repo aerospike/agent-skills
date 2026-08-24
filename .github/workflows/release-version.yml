@@ -1,0 +1,52 @@
+# Enforces the release versioning rules: a stable semantic version, above the last one.
+#
+# Called only by publish-registries.yml, as the gate that runs before any registry is
+# contacted. A release tagged v1.2, v1.2.3-rc.1, or below an existing tag fails here,
+# which fails the release build and publishes nothing.
+#
+# The rules live in scripts/check-release-version.sh so a maintainer can run the same
+# check before cutting the release instead of learning about it afterwards:
+#
+#   ./scripts/check-release-version.sh --tag v1.2.0
+name: release-version
+
+on:
+  # Not a standalone trigger: publish-registries.yml already runs on release, so a
+  # release trigger here would duplicate the check on every release.
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        with:
+          egress-policy: audit
+
+      # Full history. The ordering check compares against every existing tag, and the
+      # default shallow release checkout carries only the tag being released, which
+      # would make every release look like the first one.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Check the release tag
+        if: github.event_name == 'release'
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+          FLAGGED_PRERELEASE: ${{ github.event.release.prerelease }}
+        run: |
+          ./scripts/check-release-version.sh \
+            --tag "${TAG}" \
+            --flagged-prerelease "${FLAGGED_PRERELEASE}"
+
+      # A manual dry run has no release to check. Skipping keeps a rehearsal from
+      # failing on a rule that only applies to releases.
+      - name: Note that a manual run has no tag to check
+        if: github.event_name != 'release'
+        run: |
+          echo "::notice title=Version check skipped::No release tag on a ${GITHUB_EVENT_NAME} run. The versioning rules apply when a release is published."
