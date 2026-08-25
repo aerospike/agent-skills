@@ -116,7 +116,13 @@ The commit is pinned because `skills-ref` has no PyPI release. Keep the pin in [
 
 ## Publishing to registries
 
-Submission is automated on release and gated behind conformance, public visibility, a kill-switch variable, and reviewer approval. Do not submit by hand—see [`docs/PUBLISHING.md`](docs/PUBLISHING.md).
+Submission is automated on release and gated behind a stable semantic version tag, conformance, public visibility, a kill-switch variable, and reviewer approval. Do not submit by hand—see [`docs/PUBLISHING.md`](docs/PUBLISHING.md).
+
+Release tags are `vMAJOR.MINOR.PATCH` with no prerelease suffix, and must exceed the previous tag. Check one before cutting a release:
+
+```bash
+./scripts/check-release-version.sh --tag v1.4.0
+```
 
 ## Before you open a pull request
 

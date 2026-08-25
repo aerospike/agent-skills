@@ -6,34 +6,59 @@ This document is for whoever cuts a release, or turns publishing on for the firs
 
 ## How to publish
 
-Cut a GitHub release. That is the whole procedure — then approve the environment prompt when GitHub asks.
+Tag a stable semantic version — `vX.Y.Z`, above the last release — and cut a GitHub release. That is the whole procedure, then approve the environment prompt when GitHub asks. See [Version numbers](#version-numbers) for what the tag has to look like.
 
 To rehearse without submitting anything, run the workflow manually from the Actions tab with **Run workflow**. The `dry_run` input defaults to `true`, which renders the exact payloads into the job summary and contacts nothing.
 
-## The four gates
+## Version numbers
+
+Releases are [semantic versions](https://semver.org/) with a `v` prefix, and [`release-version.yml`](../.github/workflows/release-version.yml) enforces three rules on every release before any gate below is reached:
+
+| Rule | Rejected | Accepted |
+|------|----------|----------|
+| Exactly `vMAJOR.MINOR.PATCH`, no leading zeros | `1.4.0`, `v1.4`, `v1.04.0` | `v1.4.0` |
+| No prerelease suffix, no build metadata, and not flagged **Set as a pre-release** on the release | `v1.4.0-rc.1`, `v1.4.0+build.3` | `v1.4.0` |
+| Above the highest existing tag | `v1.3.9` after `v1.4.0` | `v1.4.1`, `v1.5.0`, `v2.0.0` |
+
+Stability is the rule worth understanding: publishing is **permanent**, because no registry documents a way to delete a submission. A release candidate that reaches a registry cannot be taken back, so a prerelease is not allowed to be a release here. Use a **draft** release to stage notes instead — drafts publish nothing until released.
+
+Check a tag before you cut anything, rather than finding out from a red release build:
+
+```bash
+./scripts/check-release-version.sh --tag v1.4.0
+```
+
+The rules live in that script, not in the workflow, so the local check and the enforced check are the same code.
+
+One gap to know about: a release creates its tag before the check runs, so the ordering rule compares against every *other* tag. Publishing a second release on a tag that already exists therefore reads as new — git cannot distinguish a tag the release just created from one that was already there. Nothing else re-uses a version number, so this is a caveat rather than a hole.
+
+## The five gates
 
 Every gate must pass before a single request leaves the runner.
 
 ```mermaid
 flowchart TD
-    Rel[release published] --> Conf[1: conformance workflows]
+    Rel[release published] --> Ver[0: tag is a stable, increasing semver]
+    Ver --> Conf[1: conformance workflows]
     Conf --> Vis[2: repository is public]
     Vis --> Flag[3: REGISTRY_PUBLISH_ENABLED is true]
     Flag --> Env[4: registries environment approval]
     Env --> Submit[submit to openagentskill + upskill]
-    Conf -->|fail| Fail[workflow fails, nothing submitted]
+    Ver -->|fail| Fail[workflow fails, nothing submitted]
+    Conf -->|fail| Fail
     Vis -->|not public| Skip[skipped with a notice]
     Flag -->|not true| Skip
 ```
 
 | Gate | Mechanism | Why |
 |------|-----------|-----|
+| 0. Version | `needs:` on [`release-version.yml`](../.github/workflows/release-version.yml), which runs [`scripts/check-release-version.sh`](../scripts/check-release-version.sh) | A listing points at a version number people rely on. A malformed tag, a release candidate, or a version that goes backwards must not become a permanent submission. |
 | 1. Conformance | `needs:` on [`spec-conformance.yml`](../.github/workflows/spec-conformance.yml), [`skill-validator.yml`](../.github/workflows/skill-validator.yml), and [`compile-agents.yml`](../.github/workflows/compile-agents.yml) | Never publish a tree that fails the standard, or an artifact that lags the sources it was compiled from. The pull request run does not prove the tag is clean. |
 | 2. Visibility | `gh api repos/... --jq .visibility` must be `public` | Every registry validates a public URL. Submitting a link that 404s wastes our one credible shot with that registry. |
 | 3. Kill switch | Repository variable `REGISTRY_PUBLISH_ENABLED` must be exactly `true` | The deliberate hold, and the rollback. Setting it back to `false` stops all publishing without reverting code. |
 | 4. Approval | The publish job runs in the `registries` environment | Neither registry documents a way to delete a submission, so a human confirms every one. **Permanent, not just for the initial rollout.** |
 
-Gates 2 and 3 **skip with a notice** instead of failing, so a release cut while publishing is held does not produce a red build. Gate 1 fails hard.
+Gates 2 and 3 **skip with a notice** instead of failing, so a release cut while publishing is held does not produce a red build. Gates 0 and 1 fail hard — and they fail even while publishing is held, so a badly numbered release is reported the moment it is cut rather than at the first live publish.
 
 ## Turning publishing on for the first time
 
@@ -42,7 +67,7 @@ Prerequisites: the repository is public, and open-source sign-off is recorded on
 1. Run the workflow manually with `dry_run: true` and confirm the rendered payloads look right. Do this after the repository is public — openagentskill's `/validate` endpoint reads `SKILL.md` over the public URL, so it is the first check that can only pass once we are public.
 2. Confirm the `registries` environment (**Settings → Environments**) lists the [code owners](../.github/CODEOWNERS) as **required reviewers**. It is configured already; without reviewers, gate 4 does nothing.
 3. Set the repository variable (**Settings → Variables → Actions**): `REGISTRY_PUBLISH_ENABLED` = `true`.
-4. Cut a release, or run the workflow with `dry_run: false`.
+4. Cut a release tagged `vX.Y.Z`, or run the workflow with `dry_run: false`.
 5. Approve the pending environment prompt.
 6. Verify each listing URL resolves and record it in the table below.
 
