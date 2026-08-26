@@ -88,10 +88,14 @@ The script resolves the repository through `POST /api/skills/validate` first, th
 }
 ```
 
-Two behaviors worth knowing:
+Four behaviors worth knowing:
 
+- **Use the `www` host.** The bare `openagentskill.com` answers every API request with a 307 to `www.openagentskill.com`. A `curl` without `-L` reads that as a failure, which is how the first live publish attempt died — reporting "the repository is not publicly readable yet" about a public repository. The script now targets the canonical host *and* follows redirects.
+- **Frontmatter is parsed by line, not by a YAML parser.** With `description: >-`, `/validate` returned the literal string `">-"` as our description. The description is what drives trigger matching and what a human reads, so the published frontmatter keeps it on **one line** as a plain scalar — the only form a real YAML parser and a line-based parser agree on. That rules out `": "` anywhere in the text. A unit test enforces it; do not reformat it into a block scalar.
 - **Re-submission is expected and safe.** A duplicate response is treated as success, which is what makes a release-triggered refresh idempotent.
 - **Listed and recommended are different states.** Only Reviewed, Verified, or Agent Proven skills enter default agent recommendations. Appearing in the directory does not mean agents will suggest us.
+
+`/validate` ignores any `ref` and always reads the default branch, so a fix cannot be rehearsed from a branch — it has to land on `main` before the registry will see it.
 
 Each submission returns `{id, token, statusUrl}`. **The token is the only way to poll that submission later.** Tokens are private, so the workflow keeps them out of logs and the job summary, uploading them as the `registry-receipts` artifact (90-day retention). Transcribe them into the table below before the artifact expires.
 

@@ -70,6 +70,37 @@ def test_description_covers_all_three_source_domains(published):
         assert excluded in lowered, f"description should rule out {excluded!r}"
 
 
+def test_description_is_one_line_so_naive_registry_parsers_read_it(published):
+    """openagentskill parses frontmatter by line, not with a YAML parser.
+
+    With a folded block scalar (``description: >-``) its /validate endpoint
+    returned the literal string ">-" as our description -- the text that drives
+    trigger matching and that a human reads before installing. Submissions cannot
+    be deleted, so a reformat here would permanently degrade the listing.
+
+    A single-line plain scalar is the one form both a real YAML parser and a
+    "rest of the line" parser agree on. That rules out ": " anywhere in the text,
+    which would otherwise make the plain scalar invalid YAML.
+    """
+    _, text = published
+    frontmatter = text[4 : text.index("\n---", 4)]
+
+    line = next(
+        ln for ln in frontmatter.splitlines() if ln.startswith("description:")
+    )
+    naive = line.split(":", 1)[1].strip()
+
+    assert not naive.startswith((">", "|")), (
+        "description must not use a YAML block scalar; registries that parse by "
+        "line would read the indicator instead of the text"
+    )
+
+    from scripts.skills_compile.skillsrc import split_frontmatter
+
+    meta, _ = split_frontmatter(text)
+    assert meta["description"] == naive
+
+
 def test_header_carries_the_repository_url_for_cited_rule_files(compiler, published):
     _, text = published
     assert compiler.REPO_URL in text

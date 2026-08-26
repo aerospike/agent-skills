@@ -9,7 +9,10 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-API="${OAS_API:-https://openagentskill.com/api}"
+# The www host is canonical: the bare domain answers every request with a 307 to it.
+# Both curl calls below pass -L so a future redirect is followed rather than read as
+# a failure, but keep this pointed at the canonical host so the redirect never happens.
+API="${OAS_API:-https://www.openagentskill.com/api}"
 REPO_URL=""
 AGENT_ID="aerospike-agent-skills-ci"
 RECEIPTS=""
@@ -58,14 +61,22 @@ SKILL_PATH="compiled-skills/${SKILL_NAME}/SKILL.md"
 if [[ "${DRY_RUN}" -eq 0 ]]; then
   echo "Resolving skill paths via ${API}/skills/validate"
   validate_body="$(jq -cn --arg repository "${REPO_URL}" '{repository: $repository}')"
-  validate_out="$(curl -sS -X POST "${API}/skills/validate" \
+  validate_out="$(curl -sSL -X POST "${API}/skills/validate" \
     -H 'Content-Type: application/json' \
     -d "${validate_body}" \
     -w '\n%{http_code}')"
   validate_code="$(tail -n1 <<<"${validate_out}")"
   if [[ "${validate_code}" != 2* ]]; then
     echo "Registry could not read ${REPO_URL} (HTTP ${validate_code})." >&2
-    echo "This usually means the repository is not publicly readable yet." >&2
+    # A 3xx here is our own misconfiguration, not a visibility problem. Saying so
+    # matters: the old message blamed repository visibility for every failure and
+    # sent one investigation looking at the wrong thing entirely.
+    if [[ "${validate_code}" == 3* ]]; then
+      echo "The endpoint redirected and the redirect was not followed. Check that" >&2
+      echo "the API base points at the canonical host: ${API}" >&2
+    else
+      echo "This usually means the repository is not publicly readable yet." >&2
+    fi
     sed '$d' <<<"${validate_out}" >&2
     exit 1
   fi
@@ -95,7 +106,7 @@ for name in "${SKILL_NAME}"; do
   fi
 
   echo "Submitting ${name}"
-  response="$(curl -sS -X POST "${API}/skills/submit" \
+  response="$(curl -sSL -X POST "${API}/skills/submit" \
     -H 'Content-Type: application/json' \
     -d "${payload}" \
     -w '\n%{http_code}')"
