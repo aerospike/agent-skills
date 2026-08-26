@@ -2,7 +2,7 @@
 #
 # This is the only path that contacts a registry. One skill is submitted: the artifact
 # compiled from the three authoring folders under skills/. The first listing and every
-# later refresh run the same reviewed code. It is merged inert and held behind five
+# later refresh run the same reviewed code. It is merged inert and held behind four
 # independent gates; see docs/PUBLISHING.md for the operator's view.
 #
 #   0. Version      - the release tag must be a stable semantic version (vX.Y.Z) above
@@ -13,13 +13,15 @@
 #                     so a release cannot submit output that lags its sources.
 #   2. Visibility   - the repository must be public, or a submitted URL would 404.
 #   3. Kill switch  - repository variable REGISTRY_PUBLISH_ENABLED must be "true".
-#   4. Approval     - the publish job runs in the "registries" environment, which
-#                     requires a reviewer. Neither registry documents a way to
-#                     delete a submission, so this gate is permanent, not just a
-#                     safeguard for the initial rollout.
 #
-# Gates 2 and 3 skip with a notice rather than failing: a release cut during the
-# hold period should not report a broken build.
+# There is deliberately no reviewer approval step: a release that clears these four
+# gates publishes on its own. Those gates are the authorization, and re-submission is
+# an idempotent refresh that both scripts treat as success. A first listing still
+# cannot be deleted, so the kill switch is what holds publishing before it starts --
+# leave it unset until the first submission is genuinely intended.
+#
+# Gates 2 and 3 skip with a notice rather than failing: a release cut while publishing
+# is held should not report a broken build.
 name: publish-registries
 
 on:
@@ -95,7 +97,7 @@ jobs:
           fi
 
           echo "mode=publish" >> "$GITHUB_OUTPUT"
-          echo "All gates passed; publishing pends reviewer approval of the registries environment."
+          echo "All gates passed; submitting to registries."
 
   dry-run:
     needs: preflight
@@ -142,9 +144,6 @@ jobs:
     needs: preflight
     if: needs.preflight.outputs.mode == 'publish'
     runs-on: ubuntu-latest
-    # Holds the job pending until a reviewer approves. Configure required reviewers
-    # on this environment, or the gate is decorative.
-    environment: registries
     env:
       UPSKILL_VERSION: 0.10.1
       # Submitted tree URLs point at the default branch, not the release tag, so a
