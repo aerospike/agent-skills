@@ -11,7 +11,7 @@ description: >-
   database only (not Aerospike Graph).
 license: Apache-2.0
 metadata:
-  last_verified: "2026-08-26"
+  last_verified: "2026-04-21"
   server_versions: "7.0+"
 ---
 
