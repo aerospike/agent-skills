@@ -6,7 +6,7 @@ This document is for whoever cuts a release, or turns publishing on for the firs
 
 ## How to publish
 
-Tag a stable semantic version — `vX.Y.Z`, above the last release — and cut a GitHub release. That is the whole procedure, then approve the environment prompt when GitHub asks. See [Version numbers](#version-numbers) for what the tag has to look like.
+Tag a stable semantic version — `vX.Y.Z`, above the last release — and cut a GitHub release. That is the whole procedure: a release that clears the gates below submits on its own, with nothing to approve. See [Version numbers](#version-numbers) for what the tag has to look like.
 
 To rehearse without submitting anything, run the workflow manually from the Actions tab with **Run workflow**. The `dry_run` input defaults to `true`, which renders the exact payloads into the job summary and contacts nothing.
 
@@ -32,7 +32,7 @@ The rules live in that script, not in the workflow, so the local check and the e
 
 One gap to know about: a release creates its tag before the check runs, so the ordering rule compares against every *other* tag. Publishing a second release on a tag that already exists therefore reads as new — git cannot distinguish a tag the release just created from one that was already there. Nothing else re-uses a version number, so this is a caveat rather than a hole.
 
-## The five gates
+## The four gates
 
 Every gate must pass before a single request leaves the runner.
 
@@ -42,8 +42,7 @@ flowchart TD
     Ver --> Conf[1: conformance workflows]
     Conf --> Vis[2: repository is public]
     Vis --> Flag[3: REGISTRY_PUBLISH_ENABLED is true]
-    Flag --> Env[4: registries environment approval]
-    Env --> Submit[submit to openagentskill + upskill]
+    Flag --> Submit[submit to openagentskill + upskill]
     Ver -->|fail| Fail[workflow fails, nothing submitted]
     Conf -->|fail| Fail
     Vis -->|not public| Skip[skipped with a notice]
@@ -56,20 +55,19 @@ flowchart TD
 | 1. Conformance | `needs:` on [`spec-conformance.yml`](../.github/workflows/spec-conformance.yml), [`skill-validator.yml`](../.github/workflows/skill-validator.yml), and [`compile-agents.yml`](../.github/workflows/compile-agents.yml) | Never publish a tree that fails the standard, or an artifact that lags the sources it was compiled from. The pull request run does not prove the tag is clean. |
 | 2. Visibility | `gh api repos/... --jq .visibility` must be `public` | Every registry validates a public URL. Submitting a link that 404s wastes our one credible shot with that registry. |
 | 3. Kill switch | Repository variable `REGISTRY_PUBLISH_ENABLED` must be exactly `true` | The deliberate hold, and the rollback. Setting it back to `false` stops all publishing without reverting code. |
-| 4. Approval | The publish job runs in the `registries` environment | Neither registry documents a way to delete a submission, so a human confirms every one. **Permanent, not just for the initial rollout.** |
 
 Gates 2 and 3 **skip with a notice** instead of failing, so a release cut while publishing is held does not produce a red build. Gates 0 and 1 fail hard — and they fail even while publishing is held, so a badly numbered release is reported the moment it is cut rather than at the first live publish.
+
+There is no reviewer approval step. A release that clears these four gates submits unattended, which is the point: a correctly versioned release is the authorization, and re-submission is an idempotent refresh. The consequence to respect is that a **first** listing cannot be deleted by any documented means, so gate 3 is what holds publishing until that first submission is genuinely intended.
 
 ## Turning publishing on for the first time
 
 Prerequisites: the repository is public, and open-source sign-off is recorded on [AIE-13](https://aerospike.atlassian.net/browse/AIE-13).
 
 1. Run the workflow manually with `dry_run: true` and confirm the rendered payloads look right. Do this after the repository is public — openagentskill's `/validate` endpoint reads `SKILL.md` over the public URL, so it is the first check that can only pass once we are public.
-2. Confirm the `registries` environment (**Settings → Environments**) lists the [code owners](../.github/CODEOWNERS) as **required reviewers**. It is configured already; without reviewers, gate 4 does nothing.
-3. Set the repository variable (**Settings → Variables → Actions**): `REGISTRY_PUBLISH_ENABLED` = `true`.
-4. Cut a release tagged `vX.Y.Z`, or run the workflow with `dry_run: false`.
-5. Approve the pending environment prompt.
-6. Verify each listing URL resolves and record it in the table below.
+2. Set the repository variable (**Settings → Variables → Actions**): `REGISTRY_PUBLISH_ENABLED` = `true`.
+3. Cut a release tagged `vX.Y.Z`, or run the workflow with `dry_run: false`.
+4. Verify each listing URL resolves and record it in the table below.
 
 ## Registries
 
