@@ -161,7 +161,13 @@ jobs:
         with:
           node-version: "22"
 
+      # The two registries are independent, so neither is allowed to block the
+      # other. Without continue-on-error the second step is skipped when the first
+      # fails, which is how one registry's problem silently became a publish to
+      # neither. The gate step below still fails the job if either leg failed.
       - name: Submit to openagentskill
+        id: openagentskill
+        continue-on-error: true
         run: |
           ./scripts/publish-openagentskill.sh \
             --repo-url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
@@ -169,6 +175,8 @@ jobs:
             --receipts receipts.jsonl
 
       - name: Submit to upskill
+        id: upskill
+        continue-on-error: true
         run: |
           # Pinned rather than floating: a CLI that no-ops when misconfigured is not
           # one to auto-upgrade underneath us.
@@ -205,3 +213,24 @@ jobs:
           path: receipts.jsonl
           if-no-files-found: warn
           retention-days: 90
+
+      # Runs last so both submissions and the receipts artifact survive a failure.
+      # continue-on-error above turns each step green, so this is what makes a
+      # rejected submission fail the release build.
+      - name: Fail if either registry rejected the submission
+        if: always()
+        env:
+          OPENAGENTSKILL: ${{ steps.openagentskill.outcome }}
+          UPSKILL: ${{ steps.upskill.outcome }}
+        run: |
+          failed=0
+          for registry in OPENAGENTSKILL UPSKILL; do
+            if [[ "${!registry}" != "success" ]]; then
+              echo "::error title=Submission failed::${registry} submission ${!registry}. See that step's log."
+              failed=1
+            fi
+          done
+          if [[ "${failed}" -eq 0 ]]; then
+            echo "Both registries accepted the submission."
+          fi
+          exit "${failed}"

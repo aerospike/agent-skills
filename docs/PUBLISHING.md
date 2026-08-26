@@ -107,6 +107,14 @@ Each submission returns `{id, token, statusUrl}`. **The token is the only way to
 
 The trap here is worth stating plainly: submissions are **disabled by default**, and `upskill submit` exits **successfully while doing nothing** when they are off. A naive workflow reports a green publish that never happened. The script therefore sets `submissions true` and then verifies the setting landed in `~/.config/upskill/config.json`, failing if it did not and warning loudly if the config file cannot be found.
 
+The setting is named `submissions` on the command line but persists as **`submissionsEnabled`**:
+
+```json
+{ "telemetryEnabled": false, "submissionsEnabled": true, "contextEnabled": false }
+```
+
+Checking the command-line name found no key at all, read that as disabled, and aborted a correctly configured publish — the guard against a silent no-op became a hard failure on a working setup. The check now accepts either spelling and only refuses on an explicit `false`; a missing key warns instead, because an unrecognised schema is unknown, not off.
+
 Skills land in the `community` trust tier. Promotion to `reviewed` or `verified` is on upskill's roadmap and has no documented criteria or SLA, so do not promise a timeline.
 
 Submitted URLs point at the **default branch**, not the release tag, so a listing keeps tracking updates rather than freezing at one release.
@@ -154,8 +162,10 @@ Both run in CI on every pull request that touches `skills/`. Both also cover `co
 
 Fill in as submissions land, and record the same links on [AIE-13](https://aerospike.atlassian.net/browse/AIE-13).
 
+**Never record a status token here.** A token is private and this repository is public. The `statusUrl` in a receipt embeds one, so record the submission id alone and leave the token in the `registry-receipts` artifact.
+
 | Registry | Listing URL | Submission id | First submitted | Notes |
 |----------|-------------|---------------|-----------------|-------|
-| openagentskill | _pending_ | _pending_ | _pending_ | Tokens in the `registry-receipts` artifact |
-| upskill | _pending_ | n/a | _pending_ | `community` trust tier |
+| openagentskill | _pending review_ | `308e1dd3-23be-4f68-800a-5d87561e4efc` | 2026-08-26 (v1.0.0) | Accepted with status `submitted`. Token in the `registry-receipts` artifact of that run |
+| upskill | _pending_ | n/a | _not yet submitted_ | First attempt failed on the config key mismatch above | 
 | skills.sh | _pending_ | n/a | n/a | Telemetry-driven; no submission |

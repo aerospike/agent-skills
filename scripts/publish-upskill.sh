@@ -61,12 +61,29 @@ if [[ "${DRY_RUN}" -eq 0 ]]; then
   upskill config set submissions true
 
   if [[ -f "${CONFIG_PATH}" ]]; then
-    if ! jq -e '.submissions == true' >/dev/null "${CONFIG_PATH}"; then
-      echo "upskill submissions are still disabled in ${CONFIG_PATH}; refusing to" >&2
+    # The CLI's setting is named "submissions" but persists as "submissionsEnabled".
+    # Checking the display name found no key at all, read that as "disabled", and
+    # aborted a correctly configured publish. Accept either spelling, and treat a
+    # missing key as unknown rather than false: only an explicit false is grounds
+    # to refuse, because only that means submit would no-op.
+    # has() rather than `//`: jq's alternative operator treats false as absent, so
+    # `.submissionsEnabled // "unknown"` would report an explicitly disabled config
+    # as unknown and proceed -- losing the one case this check exists to catch.
+    enabled="$(jq -r '
+      if has("submissionsEnabled") then (.submissionsEnabled | tostring)
+      elif has("submissions") then (.submissions | tostring)
+      else "unknown" end' "${CONFIG_PATH}")"
+    if [[ "${enabled}" == "false" ]]; then
+      echo "upskill submissions are disabled in ${CONFIG_PATH}; refusing to" >&2
       echo "continue, because submit would silently no-op." >&2
       exit 1
     fi
-    echo "Verified submissions are enabled in ${CONFIG_PATH}."
+    if [[ "${enabled}" == "true" ]]; then
+      echo "Verified submissions are enabled in ${CONFIG_PATH}."
+    else
+      echo "::warning::Could not find a submissions setting in ${CONFIG_PATH}. The CLI may have renamed it."
+      echo "::warning::Treat this run's upskill results as unconfirmed and check the listing by hand."
+    fi
   else
     echo "::warning::Could not find ${CONFIG_PATH} to confirm submissions are enabled."
     echo "::warning::Treat this run's upskill results as unconfirmed and check the listing by hand."

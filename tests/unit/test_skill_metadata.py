@@ -30,3 +30,38 @@ def test_every_skill_on_disk_is_covered():
 
     assert on_disk <= set(SKILL_FILES)
     assert len(SKILL_FILES) == 4
+
+
+def test_published_last_verified_is_the_oldest_of_its_sources():
+    """The published date must describe the weakest link, not the freshest part.
+
+    The compiled skill is a union of three independently verified skills, so one
+    date cannot be true of all of it. The floor is the only reading that never
+    overstates: a consumer asking "how current is this guidance" is really asking
+    about the oldest thing in the bundle.
+
+    This is a guard, not a preference. The published value is hand-written in
+    ``scripts/skills_compile/published_skill.yaml`` and derived from nothing, so
+    re-verifying one source used to leave it silently wrong. Bumping a source now
+    fails here until the published value follows.
+    """
+    sources = sorted(REPO_ROOT.glob("skills/*/SKILL.md"))
+    assert sources, "no source skills found"
+
+    dates = {}
+    for path in sources:
+        meta, _ = split_frontmatter(path.read_text(encoding="utf-8"))
+        dates[path.parent.name] = meta["metadata"]["last_verified"]
+
+    published_meta, _ = split_frontmatter(
+        (REPO_ROOT / "compiled-skills" / "aerospike" / "SKILL.md").read_text(
+            encoding="utf-8"
+        )
+    )
+    published = published_meta["metadata"]["last_verified"]
+
+    # ISO dates, so lexicographic order is chronological order.
+    assert published == min(dates.values()), (
+        f"published last_verified is {published}, but the oldest source is "
+        f"{min(dates.values())}. Source dates: {dates}"
+    )
