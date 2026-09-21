@@ -122,24 +122,42 @@ for name in "${SKILL_NAME}"; do
       echo "  ${name}: already listed, nothing to do."
     else
       echo "  ${name}: submission failed (HTTP ${code})." >&2
-      echo "  ${body}" >&2
+      # Redacted on this path too. A rejection is not expected to carry a token,
+      # but this echo goes straight to a public workflow log, so it is not the
+      # place to find out that the API attached one to an error.
+      echo "  $(jq -c 'del(.submission.token, .submission.statusUrl)' <<<"${body}" \
+        2>/dev/null || printf '%s' "${body}")" >&2
       failures=$((failures + 1))
       continue
     fi
   fi
 
   if [[ -n "${RECEIPTS}" ]]; then
+    # Redact the status token before it reaches the receipts file.
+    #
+    # The response carries `submission.token`, and `submission.statusUrl` embeds
+    # the same value in its query string -- so both have to go, not just the
+    # obvious one. The original design archived the token as a workflow artifact
+    # on the reasoning that an artifact is more private than a log. That premise
+    # does not hold here: this repository is public, and a public repository's
+    # artifacts are downloadable by anyone who can read it, which is every GitHub
+    # account. Uploading the token is publishing it.
+    #
+    # Dropping it costs less than it appears. Submission is idempotent and each
+    # one returns its own fresh token, so re-submitting is the supported way to
+    # get a pollable handle back. The id is what identifies the listing, and the
+    # id is what the receipt keeps.
     jq -cn \
       --arg registry "openagentskill" \
       --arg skill "${name}" \
       --arg status "${status}" \
-      --argjson response "$(jq -c '.' <<<"${body}" 2>/dev/null || echo '{}')" \
+      --argjson response \
+        "$(jq -c 'del(.submission.token, .submission.statusUrl)' <<<"${body}" \
+          2>/dev/null || echo '{}')" \
       '{registry: $registry, skill: $skill, status: $status, response: $response}' \
       >>"${RECEIPTS}"
   fi
 
-  # The status token is the only way to poll this submission later, but it is
-  # private -- keep it out of logs and let the caller archive the receipts file.
   jq -r '"  " + (.submission.status // "submitted") + " id=" + (.submission.id // "unknown")' \
     <<<"${body}" 2>/dev/null || true
 done

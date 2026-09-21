@@ -1,10 +1,12 @@
 """Both registries must receive exactly one submission: the compiled skill."""
 
+import http.server
 import json
 import os
 import pathlib
 import shutil
 import subprocess
+import threading
 
 import pytest
 
@@ -126,3 +128,111 @@ def test_scripts_fail_when_the_compiled_skill_is_absent(script, tmp_path):
 
     assert result.returncode != 0
     assert "compile-agents.py --write" in result.stderr
+
+
+class _StubRegistry(http.server.BaseHTTPRequestHandler):
+    """Accepts /skills/validate and answers /skills/submit like the real API.
+
+    The submit response carries a status token in both places the real one does:
+    ``submission.token`` and, embedded in a query string, ``submission.statusUrl``.
+    """
+
+    TOKEN = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
+    SUBMISSION_ID = "11111111-2222-3333-4444-555555555555"
+
+    def do_POST(self):  # noqa: N802 - name fixed by BaseHTTPRequestHandler
+        self.rfile.read(int(self.headers.get("Content-Length", 0)))
+        if self.path.endswith("/skills/validate"):
+            body = {"success": True}
+        else:
+            body = {
+                "success": True,
+                "submission": {
+                    "id": self.SUBMISSION_ID,
+                    "token": self.TOKEN,
+                    "status": "submitted",
+                    "skill": {"name": "aerospike"},
+                    "statusUrl": (
+                        f"/api/skills/submissions/{self.SUBMISSION_ID}"
+                        f"?token={self.TOKEN}"
+                    ),
+                },
+            }
+        payload = json.dumps(body).encode()
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(payload)))
+        self.end_headers()
+        self.wfile.write(payload)
+
+    def log_message(self, *args):
+        pass
+
+
+@pytest.fixture
+def stub_registry():
+    server = http.server.HTTPServer(("127.0.0.1", 0), _StubRegistry)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        yield f"http://127.0.0.1:{server.server_port}/api"
+    finally:
+        server.shutdown()
+        server.server_close()
+
+
+def test_receipt_records_the_submission_id_but_not_its_status_token(
+    stub_registry, tmp_path
+):
+    """The receipt is uploaded as a workflow artifact, and this repository is
+    public -- a public repository's artifacts are readable by any GitHub account.
+    So the receipt is a published file, and a status token must never reach it.
+
+    Both carriers are checked. An earlier version of this script redacted nothing,
+    and `statusUrl` would still have leaked the token in a query string even if
+    only the obvious `token` field had been removed.
+    """
+    receipts = tmp_path / "receipts.jsonl"
+    result = subprocess.run(
+        [
+            str(REPO_ROOT / "scripts" / "publish-openagentskill.sh"),
+            "--repo-url", REPO_URL,
+            "--receipts", str(receipts),
+        ],
+        capture_output=True,
+        text=True,
+        cwd=REPO_ROOT,
+        env={**os.environ, "OAS_API": stub_registry},
+    )
+    assert result.returncode == 0, result.stderr
+
+    raw = receipts.read_text()
+    assert _StubRegistry.TOKEN not in raw, "status token leaked into the receipt"
+    assert "statusUrl" not in raw, "statusUrl embeds the token in its query string"
+
+    receipt = json.loads(raw.strip())
+    submission = receipt["response"]["submission"]
+    assert submission["id"] == _StubRegistry.SUBMISSION_ID
+    assert "token" not in submission
+    # The rest of the response is still archived; redaction is surgical.
+    assert submission["skill"]["name"] == "aerospike"
+    assert receipt["registry"] == "openagentskill"
+
+
+def test_the_token_never_reaches_stdout_or_stderr(stub_registry, tmp_path):
+    """The log is the other public surface. The script prints a progress line per
+    submission, and that line must carry the id alone."""
+    result = subprocess.run(
+        [
+            str(REPO_ROOT / "scripts" / "publish-openagentskill.sh"),
+            "--repo-url", REPO_URL,
+            "--receipts", str(tmp_path / "receipts.jsonl"),
+        ],
+        capture_output=True,
+        text=True,
+        cwd=REPO_ROOT,
+        env={**os.environ, "OAS_API": stub_registry},
+    )
+    assert result.returncode == 0, result.stderr
+    assert _StubRegistry.TOKEN not in result.stdout + result.stderr
+    assert _StubRegistry.SUBMISSION_ID in result.stdout
