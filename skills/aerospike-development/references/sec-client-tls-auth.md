@@ -2,7 +2,7 @@
 title: Terminate TLS and apply access credentials in the client
 impact: MEDIUM
 tags: security, tls, authentication
-doc: https://aerospike.com/docs/develop/learn/security/
+doc: https://aerospike.com/docs/database/learn/security/access-control
 last_verified: 2026-04-21
 ---
 

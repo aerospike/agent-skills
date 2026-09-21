@@ -4,7 +4,6 @@ impact: HIGH
 tags: policy, timeouts, retries, socket-timeout, total-timeout, max-retries, idempotent, timeout-delay
 doc: https://aerospike.com/docs/database/learn/policies/
 also:
-  - https://aerospike.com/docs/develop/learn/policies
   - https://aerospike.com/docs/develop/client/java/policies/
 last_verified: 2026-04-21
 ---

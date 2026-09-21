@@ -4,7 +4,6 @@ impact: HIGH
 tags: policy, write, generation, cas, optimistic-lock
 doc: https://aerospike.com/docs/database/learn/policies/
 also:
-  - https://aerospike.com/docs/develop/learn/policies
   - https://aerospike.com/docs/database/reference/error-codes/#server-errors
 last_verified: 2026-04-21
 ---
