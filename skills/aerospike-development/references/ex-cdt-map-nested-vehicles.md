@@ -66,4 +66,4 @@ ops = [
 
 **Why:** Server-side `operate` updates the nested structure atomically; `TreeMap` / `KeyOrderedDict` match the **K-ordered** map wire form the server expects for reliable map equality checks.
 
-**More:** [Context (CDT paths)](https://aerospike.com/docs/develop/data-types/collections/context/) · [Path expressions](https://aerospike.com/docs/develop/expressions/path/) · [Go / C# / Node.js tabs](https://aerospike.com/docs/develop/expressions/nesting#add-a-new-vehicle-as-the-default) on the same page
+**More:** [Map operation cards](https://aerospike.com/docs/develop/data-types/collections/map/operations/) (every map operation with args, return and per-language code) · [Context (CDT paths)](https://aerospike.com/docs/develop/data-types/collections/context/) · [Path expressions](https://aerospike.com/docs/develop/expressions/path/) · [Go / C# / Node.js tabs](https://aerospike.com/docs/develop/expressions/nesting#add-a-new-vehicle-as-the-default) on the same page

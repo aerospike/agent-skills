@@ -2,7 +2,7 @@
 
 Related rules: [cdt-server-side-ops.md](cdt-server-side-ops.md), [cdt-bounded-collections.md](cdt-bounded-collections.md)
 
-**Official sources:** [List data type](https://aerospike.com/docs/develop/data-types/collections/list), [Bin operations](https://aerospike.com/docs/develop/learn/bin-operations/), [Java client hub](https://aerospike.com/docs/develop/client/java) (atomic `operate` + CDT APIs for your SDK version).
+**Official sources:** [`append` operation card](https://aerospike.com/docs/develop/data-types/collections/list/operations/#append) (args, return value and code in every supported language), [List data type](https://aerospike.com/docs/develop/data-types/collections/list), [Bin operations](https://aerospike.com/docs/develop/learn/bin-operations/), [Java client hub](https://aerospike.com/docs/develop/client/java) (atomic `operate` + CDT APIs for your SDK version).
 
 **Scenario:** Append one item to a per-user click history without read-modify-write.
 

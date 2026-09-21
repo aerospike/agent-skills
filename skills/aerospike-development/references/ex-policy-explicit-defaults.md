@@ -2,7 +2,7 @@
 
 Related rules: [policy-reuse-timeouts-retries.md](policy-reuse-timeouts-retries.md)
 
-**Official sources:** [Policies (develop/learn)](https://aerospike.com/docs/develop/learn/policies) · [Policies (database/learn)](https://aerospike.com/docs/database/learn/policies/); per-call policy dicts follow the Python client’s policy fields as in [Create — Policies](https://aerospike.com/docs/develop/client/python/usage/atomic/create#policies) and [Read — Policies](https://aerospike.com/docs/develop/client/python/usage/atomic/read#policies).
+**Official sources:** [Policies](https://aerospike.com/docs/database/learn/policies/); per-call policy dicts follow the Python client’s policy fields as in [Create — Policies](https://aerospike.com/docs/develop/client/python/usage/atomic/create#policies) and [Read — Policies](https://aerospike.com/docs/develop/client/python/usage/atomic/read#policies).
 
 **Docs:** [Python client](https://aerospike.com/docs/develop/client/python)
 
