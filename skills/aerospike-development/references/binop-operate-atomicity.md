@@ -29,6 +29,6 @@ Interleaved reads and writes on the same key from multiple clients produce lost 
 **See also**
 
 - [binop-operate-record-lock-read-write.md](binop-operate-record-lock-read-write.md) (record lock, mixed read/write, latency)
-- [ex-bin-operate-mixed-read-write.md](ex-bin-operate-mixed-read-write.md)
+- [bin-operate-mixed-read-write.md](../examples/bin-operate-mixed-read-write.md)
 - [cdt-server-side-ops.md](cdt-server-side-ops.md)
 - [single-record-operations.md](single-record-operations.md)

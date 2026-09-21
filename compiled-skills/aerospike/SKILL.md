@@ -9,7 +9,7 @@ metadata:
 
 _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-development`, `skills/aerospike-data-modeling` in https://github.com/aerospike/agent-skills. Edit the skills under `skills/`, not this file._
 
-**Reading a rule in full.** A rule is a `###` heading of the form `<rule> — <title> [IMPACT]`; a `###` heading without that shape is a section of the skill itself, not a rule. Each rule states its instruction and nothing more — the reasoning, the worked detail and the documentation links live in its own file, shipped in the `references/` folder beside this one. That file is `references/<skill>-<rule>.md`, where `<skill>` is the `##` heading the rule sits under: `client-singleton` under `aerospike-development` is `references/aerospike-development-client-singleton.md`. Rules cite each other by bare filename and resolve the same way._
+**Reading a rule in full.** A rule is a `###` heading of the form `<rule> — <title> [IMPACT]`; a `###` heading without that shape is a section of the skill itself, not a rule. Each rule states its instruction and nothing more — the reasoning, the worked detail and the documentation links live in its own file, shipped in the `references/` folder beside this one. That file is `references/<skill>-<rule>.md`, where `<skill>` is the `##` heading the rule sits under: `client-singleton` under `aerospike-development` is `references/aerospike-development-client-singleton.md`. Rules cite each other by bare filename and resolve the same way. Worked examples named under `Worked examples` live in `examples/<skill>-<name>.md`, the same naming one folder over._
 
 # Aerospike agent rules
 
@@ -84,6 +84,9 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 - model- -> Namespace and set boundaries; flat bins vs CDTs vs multiple records; keys, denormalization, access paths; operate / batch / expressions; record size vs index RAM and disk; hot keys and error 14 / KEY_BUSY
 - sec- -> TLS and access control on the client
 
+### Worked examples
+- Runnable code for a task, in `examples/`: batch-read-by-keys, bin-operate-mixed-read-write, cdt-list-append, cdt-map-nested-vehicles, official-batch, official-put-get, policy-explicit-defaults, singleton-client
+
 ### batch-parallel-key-operations — Use batch APIs for many primary-key operations [MEDIUM]
 - When reading or writing many records by known primary keys, use the client’s batch APIs instead of serial single-key calls, subject to reasonable batch sizes and error-handling needs.
 
@@ -116,30 +119,6 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 
 ### client-source-of-truth — Read the client repository before generating code for it [HIGH]
 - Open the chosen client's repository README before writing code against it, and take the API surface from there rather than from memory.
-
-### ex-batch-read-by-keys — worked example
-- See the linked file for runnable code and official-doc links.
-
-### ex-bin-operate-mixed-read-write — worked example
-- See the linked file for runnable code and official-doc links.
-
-### ex-cdt-list-append — worked example
-- See the linked file for runnable code and official-doc links.
-
-### ex-cdt-map-nested-vehicles — worked example
-- See the linked file for runnable code and official-doc links.
-
-### ex-official-batch — worked example
-- See the linked file for runnable code and official-doc links.
-
-### ex-official-put-get — worked example
-- See the linked file for runnable code and official-doc links.
-
-### ex-policy-explicit-defaults — worked example
-- See the linked file for runnable code and official-doc links.
-
-### ex-singleton-client — worked example
-- See the linked file for runnable code and official-doc links.
 
 ### expr-compute-to-data — Use filter and operation expressions for compute-to-data [HIGH]
 - Use filter expressions and operation expressions (and path expressions for nested bins) to evaluate and update data on the server when they fit the problem.

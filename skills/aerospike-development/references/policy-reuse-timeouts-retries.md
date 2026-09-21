@@ -49,6 +49,6 @@ Per-call policy allocation adds GC pressure in managed languages and obscures wh
 - [policy-generation-cas.md](policy-generation-cas.md)
 - [policy-replace-whole-record.md](policy-replace-whole-record.md)
 - [policy-read-replica-consistency.md](policy-read-replica-consistency.md)
-- [ex-policy-explicit-defaults.md](ex-policy-explicit-defaults.md)
+- [policy-explicit-defaults.md](../examples/policy-explicit-defaults.md)
 - [policy-client-defaults.md](policy-client-defaults.md)
 - [sec-client-tls-auth.md](sec-client-tls-auth.md)

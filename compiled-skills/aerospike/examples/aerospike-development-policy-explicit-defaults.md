@@ -1,8 +1,8 @@
 # Example: Explicit write defaults
 
-Related rules: [policy-reuse-timeouts-retries.md](aerospike-development-policy-reuse-timeouts-retries.md)
+Related rules: [policy-reuse-timeouts-retries.md](../references/aerospike-development-policy-reuse-timeouts-retries.md)
 
-**All languages.** The linked documentation page carries this in tabbed examples, in the canonical tab order: **Java SDK, Python SDK, Rust, C#, Go, Node.js, C, Java (legacy), Python (legacy)**. Java, Python and C are on essentially every page, with Go, C# and Node.js close behind; **Java SDK, Python SDK and Rust are still rolling out** and are present on a minority of pages today. The snippets below are one or two languages for orientation — the documentation is the complete set, and the client's own repository is authoritative for its API surface ([client-source-of-truth.md](aerospike-development-client-source-of-truth.md)).
+**All languages.** The linked documentation page carries this in tabbed examples, in the canonical tab order: **Java SDK, Python SDK, Rust, C#, Go, Node.js, C, Java (legacy), Python (legacy)**. Java, Python and C are on essentially every page, with Go, C# and Node.js close behind; **Java SDK, Python SDK and Rust are still rolling out** and are present on a minority of pages today. The snippets below are one or two languages for orientation — the documentation is the complete set, and the client's own repository is authoritative for its API surface ([client-source-of-truth.md](../references/aerospike-development-client-source-of-truth.md)).
 
 **Official sources:** [Policies](https://aerospike.com/docs/database/learn/policies/); per-call policy dicts follow the Python client’s policy fields as in [Create — Policies](https://aerospike.com/docs/develop/client/python/usage/atomic/create#policies) and [Read — Policies](https://aerospike.com/docs/develop/client/python/usage/atomic/read#policies).
 

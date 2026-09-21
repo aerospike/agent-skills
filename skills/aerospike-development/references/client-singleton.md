@@ -37,4 +37,4 @@ The client maintains connection pools to cluster nodes, background tending for t
 - [client-error-rate-backoff.md](client-error-rate-backoff.md)
 - [policy-client-defaults.md](policy-client-defaults.md)
 - [policy-reuse-timeouts-retries.md](policy-reuse-timeouts-retries.md)
-- [ex-singleton-client.md](ex-singleton-client.md)
+- [singleton-client.md](../examples/singleton-client.md)

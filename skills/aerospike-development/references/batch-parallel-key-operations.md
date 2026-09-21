@@ -43,5 +43,5 @@ Batch APIs reduce round trips and let the cluster process key groups in parallel
 - [policy-write-commit-level.md](policy-write-commit-level.md)
 - [single-delete-durable-deletes.md](single-delete-durable-deletes.md)
 - [binop-operate-record-lock-read-write.md](binop-operate-record-lock-read-write.md)
-- [ex-batch-read-by-keys.md](ex-batch-read-by-keys.md)
+- [batch-read-by-keys.md](../examples/batch-read-by-keys.md)
 - [policy-reuse-timeouts-retries.md](policy-reuse-timeouts-retries.md)

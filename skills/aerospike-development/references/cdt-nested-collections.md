@@ -36,8 +36,8 @@ Unordered map construction from the client can omit the K-ordered flag or reorde
 
 **See also**
 
-- [ex-cdt-map-nested-vehicles.md](ex-cdt-map-nested-vehicles.md)
-- [ex-cdt-list-append.md](ex-cdt-list-append.md)
+- [cdt-map-nested-vehicles.md](../examples/cdt-map-nested-vehicles.md)
+- [cdt-list-append.md](../examples/cdt-list-append.md)
 - [cdt-server-side-ops.md](cdt-server-side-ops.md)
 - [cdt-bounded-collections.md](cdt-bounded-collections.md)
 - [expr-compute-to-data.md](expr-compute-to-data.md)

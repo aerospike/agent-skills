@@ -36,4 +36,4 @@ Implicit defaults differ between **reads** and **writes** and between **single-k
 - [client-singleton.md](client-singleton.md)
 - [policy-reuse-timeouts-retries.md](policy-reuse-timeouts-retries.md)
 - [batch-parallel-key-operations.md](batch-parallel-key-operations.md)
-- [ex-policy-explicit-defaults.md](ex-policy-explicit-defaults.md)
+- [policy-explicit-defaults.md](../examples/policy-explicit-defaults.md)

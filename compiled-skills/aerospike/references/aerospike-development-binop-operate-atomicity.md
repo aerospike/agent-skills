@@ -29,6 +29,6 @@ Interleaved reads and writes on the same key from multiple clients produce lost 
 **See also**
 
 - [binop-operate-record-lock-read-write.md](aerospike-development-binop-operate-record-lock-read-write.md) (record lock, mixed read/write, latency)
-- [ex-bin-operate-mixed-read-write.md](aerospike-development-ex-bin-operate-mixed-read-write.md)
+- [bin-operate-mixed-read-write.md](../examples/aerospike-development-bin-operate-mixed-read-write.md)
 - [cdt-server-side-ops.md](aerospike-development-cdt-server-side-ops.md)
 - [single-record-operations.md](aerospike-development-single-record-operations.md)

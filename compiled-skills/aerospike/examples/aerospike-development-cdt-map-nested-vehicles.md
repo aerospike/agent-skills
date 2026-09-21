@@ -1,8 +1,8 @@
 # Example: Nested list of maps — insert a vehicle at index 0
 
-Related rules: [cdt-nested-collections.md](aerospike-development-cdt-nested-collections.md), [cdt-server-side-ops.md](aerospike-development-cdt-server-side-ops.md), [cdt-bounded-collections.md](aerospike-development-cdt-bounded-collections.md)
+Related rules: [cdt-nested-collections.md](../references/aerospike-development-cdt-nested-collections.md), [cdt-server-side-ops.md](../references/aerospike-development-cdt-server-side-ops.md), [cdt-bounded-collections.md](../references/aerospike-development-cdt-bounded-collections.md)
 
-**All languages.** The linked documentation page carries this in tabbed examples, in the canonical tab order: **Java SDK, Python SDK, Rust, C#, Go, Node.js, C, Java (legacy), Python (legacy)**. Java, Python and C are on essentially every page, with Go, C# and Node.js close behind; **Java SDK, Python SDK and Rust are still rolling out** and are present on a minority of pages today. The snippets below are one or two languages for orientation — the documentation is the complete set, and the client's own repository is authoritative for its API surface ([client-source-of-truth.md](aerospike-development-client-source-of-truth.md)).
+**All languages.** The linked documentation page carries this in tabbed examples, in the canonical tab order: **Java SDK, Python SDK, Rust, C#, Go, Node.js, C, Java (legacy), Python (legacy)**. Java, Python and C are on essentially every page, with Go, C# and Node.js close behind; **Java SDK, Python SDK and Rust are still rolling out** and are present on a minority of pages today. The snippets below are one or two languages for orientation — the documentation is the complete set, and the client's own repository is authoritative for its API surface ([client-source-of-truth.md](../references/aerospike-development-client-source-of-truth.md)).
 
 **Official source:** [Working with nested collection data types — Add a new vehicle as the default](https://aerospike.com/docs/develop/expressions/nesting#add-a-new-vehicle-as-the-default)
 

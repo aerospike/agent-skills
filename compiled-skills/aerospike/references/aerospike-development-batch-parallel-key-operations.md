@@ -43,5 +43,5 @@ Batch APIs reduce round trips and let the cluster process key groups in parallel
 - [policy-write-commit-level.md](aerospike-development-policy-write-commit-level.md)
 - [single-delete-durable-deletes.md](aerospike-development-single-delete-durable-deletes.md)
 - [binop-operate-record-lock-read-write.md](aerospike-development-binop-operate-record-lock-read-write.md)
-- [ex-batch-read-by-keys.md](aerospike-development-ex-batch-read-by-keys.md)
+- [batch-read-by-keys.md](../examples/aerospike-development-batch-read-by-keys.md)
 - [policy-reuse-timeouts-retries.md](aerospike-development-policy-reuse-timeouts-retries.md)

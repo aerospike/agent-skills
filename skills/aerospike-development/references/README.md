@@ -6,14 +6,14 @@
 
 | File | Topic |
 |------|--------|
-| [ex-cdt-list-append.md](ex-cdt-list-append.md) | CDT list append (Java) |
-| [ex-cdt-map-nested-vehicles.md](ex-cdt-map-nested-vehicles.md) | Nested maps / vehicles (Java + Python) |
-| [ex-singleton-client.md](ex-singleton-client.md) | Singleton client (Python) |
-| [ex-policy-explicit-defaults.md](ex-policy-explicit-defaults.md) | Policy defaults (Python) |
-| [ex-batch-read-by-keys.md](ex-batch-read-by-keys.md) | Batch reads (conceptual) |
-| [ex-official-put-get.md](ex-official-put-get.md) | Create/Read **links** + minimal Python/Java |
-| [ex-official-batch.md](ex-official-batch.md) | Batch **links** + minimal Python/Java |
-| [ex-bin-operate-mixed-read-write.md](ex-bin-operate-mixed-read-write.md) | `operate` mixed R/W (Java) |
+| [cdt-list-append.md](../examples/cdt-list-append.md) | CDT list append (Java) |
+| [cdt-map-nested-vehicles.md](../examples/cdt-map-nested-vehicles.md) | Nested maps / vehicles (Java + Python) |
+| [singleton-client.md](../examples/singleton-client.md) | Singleton client (Python) |
+| [policy-explicit-defaults.md](../examples/policy-explicit-defaults.md) | Policy defaults (Python) |
+| [batch-read-by-keys.md](../examples/batch-read-by-keys.md) | Batch reads (conceptual) |
+| [official-put-get.md](../examples/official-put-get.md) | Create/Read **links** + minimal Python/Java |
+| [official-batch.md](../examples/official-batch.md) | Batch **links** + minimal Python/Java |
+| [bin-operate-mixed-read-write.md](../examples/bin-operate-mixed-read-write.md) | `operate` mixed R/W (Java) |
 
 TOC: [examples.md](../examples.md).
 

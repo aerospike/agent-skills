@@ -37,4 +37,4 @@ The client maintains connection pools to cluster nodes, background tending for t
 - [client-error-rate-backoff.md](aerospike-development-client-error-rate-backoff.md)
 - [policy-client-defaults.md](aerospike-development-policy-client-defaults.md)
 - [policy-reuse-timeouts-retries.md](aerospike-development-policy-reuse-timeouts-retries.md)
-- [ex-singleton-client.md](aerospike-development-ex-singleton-client.md)
+- [singleton-client.md](../examples/aerospike-development-singleton-client.md)

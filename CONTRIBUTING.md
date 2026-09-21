@@ -10,7 +10,7 @@ Thanks for helping improve this repository. It holds **Agent Skills** under [`sk
 ### Current skills (examples)
 
 - **[`skills/aerospike-getting-started/`](skills/aerospike-getting-started/)** — Aerospike Database getting started: single-node local setup (Docker), ports/namespaces/TTL, official client snippets, Community vs Enterprise pointers, troubleshooting for new users, anti-hallucination rules. Not a substitute for full production or multi-region guides—link to [Aerospike documentation](https://aerospike.com/docs/) for that.
-- **[`skills/aerospike-development/`](skills/aerospike-development/)** — Application-level client guidance: modular rules and `ex-*` examples under [`references/`](skills/aerospike-development/references/README.md), doc map in [`reference.md`](skills/aerospike-development/reference.md). Not cluster operations.
+- **[`skills/aerospike-development/`](skills/aerospike-development/)** — Application-level client guidance: modular rules under [`references/`](skills/aerospike-development/references/README.md) and worked examples under [`examples/`](skills/aerospike-development/examples/), doc map in [`reference.md`](skills/aerospike-development/reference.md). Not cluster operations.
 
 ## Adding a new skill (especially Aerospike)
 
@@ -114,7 +114,7 @@ Five labels, each **bold and alone on its line**. The set is closed—[`skillsrc
 | `**Why**` | No | Rationale. Ships in `references/`. |
 | `**See also**` | No | Bibliography. Ships in `references/`. |
 
-A file with **no `**Rule**`** gets a stub heading pointing at it and contributes no instruction—correct for the `ex-*` worked examples, a mistake for anything else.
+A file with **no `**Rule**`** contributes no instruction. Worked examples live in `examples/` rather than `references/`, and `SKILL.md` names them once under **Worked examples** instead of giving each a heading; the coverage check still requires every shipped example to appear in that list.
 
 ### Transforms that silently change what ships
 

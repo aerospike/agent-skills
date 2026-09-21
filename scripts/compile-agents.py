@@ -99,27 +99,37 @@ def _header(skill_dirs: list[str]) -> str:
         f"`references/<skill>-<rule>.md`, where `<skill>` is the `##` heading "
         f"the rule sits under: `client-singleton` under `aerospike-development` "
         f"is `references/aerospike-development-client-singleton.md`. Rules cite "
-        f"each other by bare filename and resolve the same way._\n"
+        f"each other by bare filename and resolve the same way. Worked examples "
+        f"named under `Worked examples` live in `examples/<skill>-<name>.md`, "
+        f"the same naming one folder over._\n"
     )
 
 
 _MD_LINK_RE = re.compile(r"(\[[^\]]*\]\()([^)]+)(\))")
 
 
-def _portable_links(text: str, skill_dir: str, published: dict[str, str]) -> str:
+def _portable_links(
+    text: str,
+    skill_dir: str,
+    published: dict[str, tuple[str, str]],
+    folder: str = "references",
+) -> str:
     """Make a rule file's relative links resolve inside the published package.
 
     Two rewrites, both of which exist because the package is flat where the
     source tree is nested per skill:
 
-    - A sibling citation (``policy-generation-cas.md``) becomes its published
-      name (``aerospike-development-policy-generation-cas.md``). This is the
-      same ``<skill>-<rule>`` derivation the header states, so the citations in
-      the rule text and the headings in SKILL.md resolve by one rule rather
-      than two conventions.
-    - A link that escapes ``references/`` (``../reference.md``) becomes a
+    - A citation of another published file becomes its published name, with
+      ``../<folder>/`` in front when the target sits in the other folder. This
+      is the same ``<skill>-<name>`` derivation the header states, so citations
+      in the text and headings in SKILL.md resolve by one rule rather than two
+      conventions.
+    - A link that escapes the package (``../reference.md``) becomes a
       repository URL. Those links are correct where they were written, so they
       are fixed here rather than in the source.
+
+    ``published`` maps a source basename to ``(folder, published name)``;
+    ``folder`` is where the file being rewritten will live.
     """
 
     def fix(m: re.Match[str]) -> str:
@@ -128,10 +138,13 @@ def _portable_links(text: str, skill_dir: str, published: dict[str, str]) -> str
             return m.group(0)
         path, _, frag = target.partition("#")
         suffix = f"#{frag}" if frag else ""
-        if path in published:
-            return f"{m.group(1)}{published[path]}{suffix}{m.group(3)}"
-        resolved = posixpath.normpath(posixpath.join(f"{skill_dir}/references", path))
-        if resolved.startswith(f"{skill_dir}/references/"):
+        base = posixpath.basename(path)
+        if base in published:
+            dest_folder, name = published[base]
+            prefix = "" if dest_folder == folder else f"../{dest_folder}/"
+            return f"{m.group(1)}{prefix}{name}{suffix}{m.group(3)}"
+        resolved = posixpath.normpath(posixpath.join(f"{skill_dir}/{folder}", path))
+        if resolved.startswith(f"{skill_dir}/{folder}/"):
             return m.group(0)
         return f"{m.group(1)}{REPO_URL}/blob/main/{resolved}{suffix}{m.group(3)}"
 
@@ -145,7 +158,7 @@ def _reference_outputs(skills: list[skillsrc.SkillSource]) -> dict[str, str]:
     collision fails the compile rather than silently overwriting one rule with
     another from a different skill.
     """
-    published: dict[str, str] = {}
+    published: dict[str, tuple[str, str]] = {}
     for sk in skills:
         for ref in sk.refs:
             if ref.name in published:
@@ -154,14 +167,26 @@ def _reference_outputs(skills: list[skillsrc.SkillSource]) -> dict[str, str]:
                     "references/ folder is flat, so basenames must be unique "
                     "across skills for citations to resolve"
                 )
-            published[ref.name] = f"{skillsrc.rule_id(sk.name, ref.name)}.md"
+            published[ref.name] = ("references", f"{skillsrc.rule_id(sk.name, ref.name)}.md")
+
+    for sk in skills:
+        for ex in sk.examples:
+            if ex.name in published:
+                raise ValueError(
+                    f"{ex.name} appears in more than one skill or as both a rule "
+                    "and an example; published names must be unique"
+                )
+            published[ex.name] = ("examples", f"{skillsrc.rule_id(sk.name, ex.name)}.md")
 
     out: dict[str, str] = {}
     for sk in skills:
         skill_dir = str(sk.dir.relative_to(REPO_ROOT))
         for ref in sk.refs:
-            rel = f"{SINGLE_DIR}/references/{published[ref.name]}"
+            rel = f"{SINGLE_DIR}/references/{published[ref.name][1]}"
             out[rel] = _portable_links(ref.raw, skill_dir, published)
+        for ex in sk.examples:
+            rel = f"{SINGLE_DIR}/examples/{published[ex.name][1]}"
+            out[rel] = _portable_links(ex.raw, skill_dir, published, folder="examples")
     return out
 
 

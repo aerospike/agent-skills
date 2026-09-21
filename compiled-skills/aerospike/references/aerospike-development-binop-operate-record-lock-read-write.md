@@ -36,4 +36,4 @@ Use the **`operate`** command when you need **multiple bin-level changes on the 
 - [binop-operate-atomicity.md](aerospike-development-binop-operate-atomicity.md)
 - [single-record-operations.md](aerospike-development-single-record-operations.md)
 - [cdt-server-side-ops.md](aerospike-development-cdt-server-side-ops.md)
-- [ex-bin-operate-mixed-read-write.md](aerospike-development-ex-bin-operate-mixed-read-write.md)
+- [bin-operate-mixed-read-write.md](../examples/aerospike-development-bin-operate-mixed-read-write.md)

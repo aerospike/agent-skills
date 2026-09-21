@@ -1,8 +1,8 @@
 # Example: CDT list append
 
-Related rules: [cdt-server-side-ops.md](aerospike-development-cdt-server-side-ops.md), [cdt-bounded-collections.md](aerospike-development-cdt-bounded-collections.md)
+Related rules: [cdt-server-side-ops.md](../references/cdt-server-side-ops.md), [cdt-bounded-collections.md](../references/cdt-bounded-collections.md)
 
-**All languages.** The linked documentation page carries this in tabbed examples, in the canonical tab order: **Java SDK, Python SDK, Rust, C#, Go, Node.js, C, Java (legacy), Python (legacy)**. Java, Python and C are on essentially every page, with Go, C# and Node.js close behind; **Java SDK, Python SDK and Rust are still rolling out** and are present on a minority of pages today. The snippets below are one or two languages for orientation — the documentation is the complete set, and the client's own repository is authoritative for its API surface ([client-source-of-truth.md](aerospike-development-client-source-of-truth.md)).
+**All languages.** The linked documentation page carries this in tabbed examples, in the canonical tab order: **Java SDK, Python SDK, Rust, C#, Go, Node.js, C, Java (legacy), Python (legacy)**. Java, Python and C are on essentially every page, with Go, C# and Node.js close behind; **Java SDK, Python SDK and Rust are still rolling out** and are present on a minority of pages today. The snippets below are one or two languages for orientation — the documentation is the complete set, and the client's own repository is authoritative for its API surface ([client-source-of-truth.md](../references/client-source-of-truth.md)).
 
 **Official sources:** [`append` operation card](https://aerospike.com/docs/develop/data-types/collections/list/operations/#append) (args, return value, and a code tab per client), [List data type](https://aerospike.com/docs/develop/data-types/collections/list), [Bin operations](https://aerospike.com/docs/develop/learn/bin-operations/), [Java client hub](https://aerospike.com/docs/develop/client/java) (atomic `operate` + CDT APIs for your SDK version).
 

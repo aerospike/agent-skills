@@ -1,8 +1,8 @@
 # Example: `operate` with mixed read and write
 
-Related rules: [binop-operate-record-lock-read-write.md](binop-operate-record-lock-read-write.md), [binop-operate-atomicity.md](binop-operate-atomicity.md)
+Related rules: [binop-operate-record-lock-read-write.md](../references/aerospike-development-binop-operate-record-lock-read-write.md), [binop-operate-atomicity.md](../references/aerospike-development-binop-operate-atomicity.md)
 
-**All languages.** The linked documentation page carries this in tabbed examples, in the canonical tab order: **Java SDK, Python SDK, Rust, C#, Go, Node.js, C, Java (legacy), Python (legacy)**. Java, Python and C are on essentially every page, with Go, C# and Node.js close behind; **Java SDK, Python SDK and Rust are still rolling out** and are present on a minority of pages today. The snippets below are one or two languages for orientation — the documentation is the complete set, and the client's own repository is authoritative for its API surface ([client-source-of-truth.md](client-source-of-truth.md)).
+**All languages.** The linked documentation page carries this in tabbed examples, in the canonical tab order: **Java SDK, Python SDK, Rust, C#, Go, Node.js, C, Java (legacy), Python (legacy)**. Java, Python and C are on essentially every page, with Go, C# and Node.js close behind; **Java SDK, Python SDK and Rust are still rolling out** and are present on a minority of pages today. The snippets below are one or two languages for orientation — the documentation is the complete set, and the client's own repository is authoritative for its API surface ([client-source-of-truth.md](../references/aerospike-development-client-source-of-truth.md)).
 
 **Official source:** [Bin operations — Code example of the operate command](https://aerospike.com/docs/develop/learn/bin-operations/#code-example-of-the-operate-command)
 

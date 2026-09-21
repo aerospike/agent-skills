@@ -110,6 +110,7 @@ class SkillSource:
     skill_md_body: str
     companions: list[CompanionFile] = field(default_factory=list)
     refs: list[RefFile] = field(default_factory=list)
+    examples: list[RefFile] = field(default_factory=list)
 
 
 def load_skill(skill_dir: str | pathlib.Path) -> SkillSource:
@@ -144,6 +145,29 @@ def load_skill(skill_dir: str | pathlib.Path) -> SkillSource:
                     raw=raw,
                 )
             )
+    # Worked examples are a separate kind: no **Rule**, no instruction, just
+    # runnable code and pointers at the official per-language tabs. Keeping them
+    # in their own directory makes that structural rather than a filename
+    # convention, and lets SKILL.md list them once instead of per file.
+    examples: list[RefFile] = []
+    ex_dir = d / "examples"
+    if ex_dir.is_dir():
+        for md in sorted(ex_dir.glob("*.md")):
+            if md.name in _SKIP_REFS:
+                continue
+            raw = md.read_text(encoding="utf-8")
+            emeta, ebody = split_frontmatter(raw)
+            examples.append(
+                RefFile(
+                    name=md.name,
+                    prefix=md.stem.split("-")[0],
+                    rel=f"examples/{md.name}",
+                    meta=emeta,
+                    body=ebody,
+                    raw=raw,
+                )
+            )
+
     return SkillSource(
         name=name,
         dir=d,
@@ -152,4 +176,5 @@ def load_skill(skill_dir: str | pathlib.Path) -> SkillSource:
         skill_md_body=body,
         companions=companions,
         refs=refs,
+        examples=examples,
     )

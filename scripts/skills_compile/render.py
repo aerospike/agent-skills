@@ -258,16 +258,17 @@ def render_stripped(
             if items:
                 parts.append(f"\n### {title}")
                 parts.extend(f"- {it}" for it in items)
+        if sk.examples:
+            names = ", ".join(
+                (e.name[:-3] if e.name.endswith(".md") else e.name) for e in sk.examples
+            )
+            parts.append("\n### Worked examples")
+            parts.append(f"- Runnable code for a task, in `examples/`: {names}")
         for ref in sk.refs:
             secs = skillsrc.labeled_sections(ref.body)
             rule = secs.get("Rule", "").strip()
             stem = ref.name[:-3] if ref.name.endswith(".md") else ref.name
             if not rule:
-                # Worked examples carry no **Rule**, so they used to be dropped
-                # without a trace. They ship in references/, so give each one a
-                # heading: a file nothing points at does not exist to a reader.
-                parts.append(f"\n### {stem} — worked example")
-                parts.append("- See the linked file for runnable code and official-doc links.")
                 continue
             title = ref.meta.get("title") or ref.name
             impact = ref.meta.get("impact", "")

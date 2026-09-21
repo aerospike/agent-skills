@@ -85,6 +85,22 @@ def coverage_report(skills: list[skillsrc.SkillSource], published: set[str]) -> 
     slices = _rule_slices(body)
 
     for sk in skills:
+        # Examples carry no instruction, but a shipped file that SKILL.md never
+        # names cannot be found by a reader -- the same guarantee the rules get.
+        listed = next(
+            (ln for ln in body.splitlines() if ln.startswith("- Runnable code for a task")),
+            "",
+        )
+        for ex in sk.examples:
+            stem = ex.name[:-3] if ex.name.endswith(".md") else ex.name
+            if f"{skillsrc.rule_id(sk.name, ex.name)}.md" in published and stem not in listed:
+                rep.defects.append(
+                    Defect(
+                        "unreachable-example",
+                        ex.name,
+                        "shipped but not named in the Worked examples list",
+                    )
+                )
         for ref in sk.refs:
             secs = skillsrc.labeled_sections(ref.body)
             rule = secs.get("Rule", "").strip()
