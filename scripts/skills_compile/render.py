@@ -24,17 +24,43 @@ def _collapse(text: str) -> str:
     return _clean_inline(para.replace("\n", " "))
 
 
-def _extract_bullets(content: str) -> list[str]:
-    out: list[str] = []
+def _list_items(content: str) -> list[str]:
+    """Group list lines into items, folding continuation lines into their item.
+
+    ``_BULLET_RE`` matches one line at a time, so a hard-wrapped bullet used to
+    ship only its first physical line, and a ``**bold**`` run spanning the wrap
+    left a stray ``**`` behind. A non-bullet line directly under a bullet, with
+    no blank line between, is a continuation and belongs to it.
+
+    A blank line closes the item, so prose that merely follows a list is still
+    dropped rather than being glued onto the last bullet -- that separate loss
+    is reported by the coverage check, not silently papered over here.
+    """
+    items: list[list[str]] = []
+    open_item = False
     for line in content.splitlines():
+        if not line.strip():
+            open_item = False
+            continue
         if line.lstrip().startswith("|"):
+            open_item = False
             continue
         m = _BULLET_RE.match(line)
         if m:
-            cleaned = _clean_inline(m.group(1))
-            if cleaned:
-                out.append(cleaned)
+            items.append([m.group(1)])
+            open_item = True
+        elif open_item:
+            items[-1].append(line.strip())
+    out: list[str] = []
+    for parts in items:
+        cleaned = _clean_inline(" ".join(parts))
+        if cleaned:
+            out.append(cleaned)
     return out
+
+
+def _extract_bullets(content: str) -> list[str]:
+    return _list_items(content)
 
 
 def _extract_table_rows(content: str) -> list[str]:
