@@ -58,7 +58,7 @@ def test_one_skill_going_bare_does_not_thin_the_others(skills):
     body = render_stripped(skills)
     # A rule from a skill still at imperative keeps its instruction bullet.
     lines = body.splitlines()
-    heads = [i for i, ln in enumerate(lines) if ln.startswith("### ex-guide-escalation — ")]
+    heads = [i for i, ln in enumerate(lines) if ln.startswith("#### ex-guide-escalation — ")]
     assert heads, "expected a data-modeling rule heading"
     assert lines[heads[0] + 1].startswith("- "), "imperative was stripped from the wrong skill"
 

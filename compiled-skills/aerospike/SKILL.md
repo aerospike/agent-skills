@@ -9,7 +9,7 @@ metadata:
 
 _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-development`, `skills/aerospike-data-modeling` in https://github.com/aerospike/agent-skills. Edit the skills under `skills/`, not this file._
 
-**Reading a rule in full.** A rule is a `###` heading of the form `<rule> — <title> [IMPACT]`; a `###` heading without that shape is a section of the skill itself, not a rule. Each rule states its instruction and nothing more — the reasoning, the worked detail and the documentation links live in its own file, shipped in the `references/` folder beside this one. That file is `references/<skill>-<rule>.md`, where `<skill>` is the `##` heading the rule sits under: `client-singleton` under `aerospike-development` is `references/aerospike-development-client-singleton.md`. Rules cite each other by bare filename and resolve the same way. Worked examples named under `Worked examples` live in `examples/<skill>-<name>.md`, the same naming one folder over._
+**Reading a rule in full.** Rules are grouped under a `###` heading naming their filename prefix (`client-`, `policy-`, …), explained in the skill's own prefix table. Each rule is a `####` heading of the form `<rule> — <title> [IMPACT]`. Each states its instruction and nothing more — the reasoning, the worked detail and the documentation links live in its own file, shipped in the `references/` folder beside this one. That file is `references/<skill>-<rule>.md`, where `<skill>` is the `##` heading the rule sits under: `client-singleton` under `aerospike-development` is `references/aerospike-development-client-singleton.md`. Rules cite each other by bare filename and resolve the same way. Worked examples named under `Worked examples` live in `examples/<skill>-<name>.md`, the same naming one folder over._
 
 # Aerospike agent rules
 
@@ -87,101 +87,121 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 ### Worked examples
 - Runnable code for a task, in `examples/`: batch-official-links, batch-read-by-keys, cdt-list-append, cdt-map-nested-vehicles, client-singleton, operate-mixed-read-write, policy-explicit-defaults, single-put-get
 
-### batch-parallel-key-operations — Use batch APIs for many primary-key operations [MEDIUM]
-- When reading or writing many records by known primary keys, use the client’s batch APIs instead of serial single-key calls, subject to reasonable batch sizes and error-handling needs.
+### client-
 
-### cdt-bounded-collections — Keep lists and maps bounded [HIGH]
-- Never grow lists or maps without bounds.
-
-### cdt-nested-collections — Model nested lists and maps with CDT context, ordering, and expressions [HIGH]
-- When you store lists of maps, maps of lists, or deeper nesting, use the official patterns in Working with nested collection data types: CDT operate APIs with context where you address a single slot, expression composition (ListExp / MapExp) for filters and computed reads, and path expressions (selectByPath / modifyByPath) when you traverse or change multiple nested elements in one shot.
-
-### cdt-server-side-ops — Prefer server-side CDT operations over read-modify-write [HIGH]
-- For updates to lists, maps, or nested documents modeled in CDTs, use operate with CDT operations so work runs atomically on the server.
-
-### client-direct-node-access — Reach every cluster node directly (no proxy in the data path) [HIGH]
+#### client-direct-node-access — Reach every cluster node directly (no proxy in the data path) [HIGH]
 - The Aerospike client must have direct network reachability to every node in the cluster (not only to seed hosts).
 
-### client-error-rate-backoff — Use client error-rate backoff to protect the cluster under failure storms [MEDIUM]
+#### client-error-rate-backoff — Use client error-rate backoff to protect the cluster under failure storms [MEDIUM]
 - Many Aerospike clients support client-side error-rate limiting (sometimes described as backoff): if a node returns too many errors within a sliding window of client tend iterations, the client stops sending new commands to that node until the error rate drops—surfacing a backoff-style exception to the application instead of hammering a sick node.
 
-### client-pools-warmup — Size connection pools and warm up on startup [MEDIUM]
+#### client-pools-warmup — Size connection pools and warm up on startup [MEDIUM]
 - Configure minimum and maximum connections per node (SDK-specific names such as minConnsPerNode / maxConnsPerNode) for your workload.
 
-### client-singleton — Use one Aerospike client per process [HIGH]
+#### client-singleton — Use one Aerospike client per process [HIGH]
 - Instantiate the Aerospike client once per application process (or equivalent isolation boundary) and share it across threads/workers.
 
-### client-source-of-truth — Read the client repository before generating code for it [HIGH]
+#### client-source-of-truth — Read the client repository before generating code for it [HIGH]
 - Open the chosen client's repository README before writing code against it, and take the API surface from there rather than from memory.
 
-### expr-compute-to-data — Use filter and operation expressions for compute-to-data [HIGH]
-- Use filter expressions and operation expressions (and path expressions for nested bins) to evaluate and update data on the server when they fit the problem.
+### policy-
 
-### model-access-paths-denormalization — Model for primary-key access paths and denormalize deliberately [HIGH]
-- Design schemas around how data is read and written: namespace, set, and user key should make the common path a single primary-key operation.
-
-### model-bin-cdt-multiple-records — Choose flat bins, nested CDTs, or multiple records for one logical entity [HIGH]
-- Flat bins: prefer when fields are read or written together under one primary key, record size stays within bounds, and you do not need deep partial structure.
-
-### model-client-api-choice — Pick client APIs by key cardinality and work done per request [MEDIUM]
-- One key, multiple bins or a record-shaped update: prefer operate (and record lock / mixed R/W semantics) so the server does one round-trip and you avoid get/put races.
-
-### model-hot-keys — Design and mitigate hot keys (error 14 / KEY_BUSY) [HIGH]
-- When many clients hit the same primary key at once, that record becomes a hot key: work serializes on the server and you can see high latency, timeouts, or failures such as error code 14 / KEY_BUSY (exact name depends on the client—see the support article and your SDK).
-
-### model-namespace-set-boundaries — Draw namespace and set boundaries for retention, security, and operations [HIGH]
-- Use one namespace when a single set of cluster-scoped options (replication, strong consistency vs AP mode where applicable, default TTL, NSUP behavior) and one operational “slice” of data fits the workload.
-
-### model-record-size-hardware-efficiency — Size records for primary-index overhead and disk bandwidth [HIGH]
-- In hybrid memory architecture (HMA) and All Flash deployments, record data lives on device and reads generally come from the storage path—plan I/O accordingly.
-
-### operate-atomicity — Use operate for multi-bin atomic updates on one key [HIGH]
-- When a single logical update touches multiple bins or uses CDT ops on one record, use operate (multi-operation) so the server applies the sequence atomically for that record, rather than separate put/get cycles that can interleave with other writers.
-
-### operate-record-lock-read-write — Use operate for one record lock, many ops, and mixed reads and writes [HIGH]
-- Use the operate command when you need multiple bin-level changes on the same record key in one server round trip.
-
-### policy-client-defaults — Set client-level policy defaults per operation type [MEDIUM]
+#### policy-client-defaults — Set client-level policy defaults per operation type [MEDIUM]
 - Aerospike clients let you attach default policies to the client object so API calls that pass null (or use implicit defaults) still get predictable timeouts, retries, and behavior.
 
-### policy-generation-cas — Use generation policy only for CAS (optimistic concurrency) [HIGH]
+#### policy-generation-cas — Use generation policy only for CAS (optimistic concurrency) [HIGH]
 - WritePolicy.generationPolicy is for CAS: read → edit on the client → write that must fail if the record changed meanwhile.
 
-### policy-read-replica-consistency — Set read replica, AP read mode, and SC read mode to match namespace semantics [HIGH]
+#### policy-read-replica-consistency — Set read replica, AP read mode, and SC read mode to match namespace semantics [HIGH]
 - Configure Policy.replica, readModeAP (AP namespaces), and readModeSC (strong-consistency namespaces) so reads see the staleness and ordering guarantees your application needs.
 
-### policy-replace-whole-record — Use replace semantics when overwriting an entire record [MEDIUM]
+#### policy-replace-whole-record — Use replace semantics when overwriting an entire record [MEDIUM]
 - Match recordExistsAction (or the SDK’s WritePolicy equivalent) to the real operation.
 
-### policy-reuse-timeouts-retries — Reuse policies and set explicit timeouts and retries [HIGH]
+#### policy-reuse-timeouts-retries — Reuse policies and set explicit timeouts and retries [HIGH]
 - Reuse read/write/operate policy objects (or set defaults on the client) instead of allocating new policy instances on hot paths.
 
-### policy-send-key — Understand sendKey when the stored user key matters [MEDIUM]
+#### policy-send-key — Understand sendKey when the stored user key matters [MEDIUM]
 - Policy.sendKey controls whether the client sends the user-defined key alongside the digest on reads and writes.
 
-### policy-write-commit-level — Choose write commit level deliberately (COMMIT_ALL vs COMMIT_MASTER) [HIGH]
+#### policy-write-commit-level — Choose write commit level deliberately (COMMIT_ALL vs COMMIT_MASTER) [HIGH]
 - Choose WritePolicy.commitLevel deliberately — it controls when the client gets success after a write, and the two levels differ in durability, not just latency.
 
-### query-secondary-index-discipline — Design secondary indexes for query paths—not for every column [HIGH]
+### cdt-
+
+#### cdt-bounded-collections — Keep lists and maps bounded [HIGH]
+- Never grow lists or maps without bounds.
+
+#### cdt-nested-collections — Model nested lists and maps with CDT context, ordering, and expressions [HIGH]
+- When you store lists of maps, maps of lists, or deeper nesting, use the official patterns in Working with nested collection data types: CDT operate APIs with context where you address a single slot, expression composition (ListExp / MapExp) for filters and computed reads, and path expressions (selectByPath / modifyByPath) when you traverse or change multiple nested elements in one shot.
+
+#### cdt-server-side-ops — Prefer server-side CDT operations over read-modify-write [HIGH]
+- For updates to lists, maps, or nested documents modeled in CDTs, use operate with CDT operations so work runs atomically on the server.
+
+### expr-
+
+#### expr-compute-to-data — Use filter and operation expressions for compute-to-data [HIGH]
+- Use filter expressions and operation expressions (and path expressions for nested bins) to evaluate and update data on the server when they fit the problem.
+
+### query-
+
+#### query-secondary-index-discipline — Design secondary indexes for query paths—not for every column [HIGH]
 - Use secondary indexes for predicates that match a planned query path at sensible cardinality.
 
-### query-sindex-by-access-path — Derive secondary index needs from read and write access paths [HIGH]
+#### query-sindex-by-access-path — Derive secondary index needs from read and write access paths [HIGH]
 - Before adding a secondary index, list access paths (one line each: who reads, predicate, key known or not, latency budget).
 
-### sec-client-tls-auth — Terminate TLS and apply access credentials in the client [MEDIUM]
-- When the cluster requires TLS or access control, configure the client with the correct TLS context and credentials per official security guides—not custom shortcuts.
+### batch-
 
-### single-delete-durable-deletes — Use delete/remove correctly and opt into durable deletes when the app requires them [HIGH]
+#### batch-parallel-key-operations — Use batch APIs for many primary-key operations [MEDIUM]
+- When reading or writing many records by known primary keys, use the client’s batch APIs instead of serial single-key calls, subject to reasonable batch sizes and error-handling needs.
+
+### operate-
+
+#### operate-atomicity — Use operate for multi-bin atomic updates on one key [HIGH]
+- When a single logical update touches multiple bins or uses CDT ops on one record, use operate (multi-operation) so the server applies the sequence atomically for that record, rather than separate put/get cycles that can interleave with other writers.
+
+#### operate-record-lock-read-write — Use operate for one record lock, many ops, and mixed reads and writes [HIGH]
+- Use the operate command when you need multiple bin-level changes on the same record key in one server round trip.
+
+### single-
+
+#### single-delete-durable-deletes — Use delete/remove correctly and opt into durable deletes when the app requires them [HIGH]
 - Use the client’s single-record delete API (delete / remove per SDK) to remove a record by primary key, as described under Delete a record.
 
-### single-record-operations — Know single-record CRUD vs bin-level operations [MEDIUM]
+#### single-record-operations — Know single-record CRUD vs bin-level operations [MEDIUM]
 - Distinguish whole-record put/get/delete from bin operations and operate.
 
-### single-ttl-expiration-retention — Do not shorten void-time carelessly—cold restart and retention semantics [HIGH]
+#### single-ttl-expiration-retention — Do not shorten void-time carelessly—cold restart and retention semantics [HIGH]
 - Do not reduce a record’s remaining lifetime (void-time) on writes unless you intend it and accept cold-start risk.
 
-### single-ttl-nsup-default-ttl — Align client TTL with NSUP, default-ttl, and special write TTL values [HIGH]
+#### single-ttl-nsup-default-ttl — Align client TTL with NSUP, default-ttl, and special write TTL values [HIGH]
 - Namespace Supervisor (NSUP) must be configured consistently with how the app sends TTL on writes.
+
+### model-
+
+#### model-access-paths-denormalization — Model for primary-key access paths and denormalize deliberately [HIGH]
+- Design schemas around how data is read and written: namespace, set, and user key should make the common path a single primary-key operation.
+
+#### model-bin-cdt-multiple-records — Choose flat bins, nested CDTs, or multiple records for one logical entity [HIGH]
+- Flat bins: prefer when fields are read or written together under one primary key, record size stays within bounds, and you do not need deep partial structure.
+
+#### model-client-api-choice — Pick client APIs by key cardinality and work done per request [MEDIUM]
+- One key, multiple bins or a record-shaped update: prefer operate (and record lock / mixed R/W semantics) so the server does one round-trip and you avoid get/put races.
+
+#### model-hot-keys — Design and mitigate hot keys (error 14 / KEY_BUSY) [HIGH]
+- When many clients hit the same primary key at once, that record becomes a hot key: work serializes on the server and you can see high latency, timeouts, or failures such as error code 14 / KEY_BUSY (exact name depends on the client—see the support article and your SDK).
+
+#### model-namespace-set-boundaries — Draw namespace and set boundaries for retention, security, and operations [HIGH]
+- Use one namespace when a single set of cluster-scoped options (replication, strong consistency vs AP mode where applicable, default TTL, NSUP behavior) and one operational “slice” of data fits the workload.
+
+#### model-record-size-hardware-efficiency — Size records for primary-index overhead and disk bandwidth [HIGH]
+- In hybrid memory architecture (HMA) and All Flash deployments, record data lives on device and reads generally come from the storage path—plan I/O accordingly.
+
+### sec-
+
+#### sec-client-tls-auth — Terminate TLS and apply access credentials in the client [MEDIUM]
+- When the cluster requires TLS or access control, configure the client with the correct TLS context and credentials per official security guides—not custom shortcuts.
 
 ## aerospike-data-modeling
 
@@ -232,14 +252,18 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 - Expression indexes — sparse or computed-value indexing.
 - Multi-record transactions — atomic multi-record updates; require a strong-consistency namespace, and carry limits that rule them out for wide cascades. See concepts-and-patterns.md § Multi-record consistency.
 
-### ex-guide-escalation — Fetch the data modeling guide before designing a full model [HIGH]
+### ex-
+
+#### ex-guide-escalation — Fetch the data modeling guide before designing a full model [HIGH]
 - This skill carries the decision layer.
 
-### model-deliverables-schema-guide-summary — Produce a schema guide and a derived schema summary [MEDIUM]
+### model-
+
+#### model-deliverables-schema-guide-summary — Produce a schema guide and a derived schema summary [MEDIUM]
 - Design work produces two documents, written to files.
 
-### model-design-time-workflow — Work the design-time loop one entity group at a time [HIGH]
+#### model-design-time-workflow — Work the design-time loop one entity group at a time [HIGH]
 - Data model design is an interactive process with mandatory stop points, not a document you fill in.
 
-### model-failure-modes-checklist — Run the seven failure-mode detection tests against a drafted model [HIGH]
+#### model-failure-modes-checklist — Run the seven failure-mode detection tests against a drafted model [HIGH]
 - Each failure mode below has a detection test — something you can run against a draft and get a yes/no answer.

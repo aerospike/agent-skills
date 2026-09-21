@@ -165,6 +165,35 @@ def _bullets_inline(content: str) -> str:
     return "; ".join(_extract_bullets(content))
 
 
+_PREFIX_ROW_RE = re.compile(r"^\|\s*`([a-z]+)-`")
+
+
+def _prefix_order(sk: skillsrc.SkillSource) -> list[str]:
+    """Prefix order from the skill's own prefix table, if it has one.
+
+    The table already ships as the legend for these groups, and its order is
+    the author's priority rather than the alphabet -- connection lifecycle
+    before security, not batch before client. Falls back to alphabetical when a
+    skill declares no table, so grouping never depends on prose shape.
+    """
+    for _level, title, content in skillsrc.heading_sections(sk.skill_md_body):
+        if not any(k in title.lower() for k in _SECTION_KEYS):
+            continue
+        found = [m.group(1) for m in (_PREFIX_ROW_RE.match(l) for l in content.splitlines()) if m]
+        if found:
+            return found
+    return []
+
+
+def _by_prefix(sk: skillsrc.SkillSource) -> list[skillsrc.RefFile]:
+    """Rules grouped by filename prefix, groups in the skill's declared order."""
+    order = _prefix_order(sk)
+    rank = {p: i for i, p in enumerate(order)}
+    return sorted(
+        sk.refs, key=lambda r: (rank.get(r.prefix, len(rank)), r.prefix, r.name)
+    )
+
+
 _SENTENCE_END_RE = re.compile(r"(?<=[.!?]) ")
 
 
@@ -264,7 +293,11 @@ def render_stripped(
             )
             parts.append("\n### Worked examples")
             parts.append(f"- Runnable code for a task, in `examples/`: {names}")
-        for ref in sk.refs:
+        group = None
+        for ref in _by_prefix(sk):
+            if ref.prefix != group:
+                group = ref.prefix
+                parts.append(f"\n### {group}-")
             secs = skillsrc.labeled_sections(ref.body)
             rule = secs.get("Rule", "").strip()
             stem = ref.name[:-3] if ref.name.endswith(".md") else ref.name
@@ -272,7 +305,7 @@ def render_stripped(
                 continue
             title = ref.meta.get("title") or ref.name
             impact = ref.meta.get("impact", "")
-            head = f"\n### {stem} — {title}" + (f" [{impact}]" if impact else "")
+            head = f"\n#### {stem} — {title}" + (f" [{impact}]" if impact else "")
             if sk_density == "bare":
                 # The instruction is the first sentence of **Rule** in the
                 # shipped reference file, so this drops a duplicate, not a fact.

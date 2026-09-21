@@ -112,9 +112,10 @@ def test_header_states_how_to_derive_a_rule_file_path(compiler, published):
     _, text = published
     assert compiler.REPO_URL in text
     assert "`references/<skill>-<rule>.md`" in text
-    # A skill's own sections are `###` too, so the header must say how to tell
-    # a rule heading from one of them or the derivation is ambiguous.
+    # A skill's own sections and the prefix groups are both `###`, so the header
+    # must say how to tell a rule from them or the derivation is ambiguous.
     assert "`<rule> — <title> [IMPACT]`" in text
+    assert "`####` heading" in text
 
 
 def test_every_rule_heading_resolves_to_a_published_file(compiler):
@@ -132,10 +133,10 @@ def test_every_rule_heading_resolves_to_a_published_file(compiler):
     for line in body.splitlines():
         if line.startswith("## "):
             skill = line[3:].strip()
-        elif line.startswith("### ") and skill and " — " in line:
-            # The header's shape test: `<rule> — <title> [IMPACT]`. A `###`
-            # without an em-dash is one of the skill's own sections.
-            rule = line[4:].split(" — ")[0].strip()
+        elif line.startswith("#### ") and skill and " — " in line:
+            # The header's shape test: a rule is a `####` under a `###` prefix
+            # group. A `###` is a prefix group or one of the skill's sections.
+            rule = line[5:].split(" — ")[0].strip()
             derived = f"{compiler.SINGLE_DIR}/references/{skill}-{rule}.md"
             assert derived in outputs, (
                 f"{skill} / {rule} reads as a rule heading but derives to a "

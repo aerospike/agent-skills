@@ -77,7 +77,7 @@ A rule file is compiled into [`compiled-skills/aerospike/SKILL.md`](compiled-ski
 
 `SKILL.md` is a **router**, not a manual. Per the [Agent Skills spec's progressive disclosure](https://agentskills.io/specification), it loads whenever the skill activates and should stay under 5,000 tokens; the rule files ship beside it in `references/` and are read only when a rule applies. So:
 
-1. **Tier 1 — `SKILL.md`.** Each rule contributes a heading and **the first sentence of its `Rule`**. That is the instruction, and nothing else.
+1. **Tier 1 — `SKILL.md`.** Rules are grouped under a `###` heading naming their filename prefix, and each rule is a `####` heading plus **the first sentence of its `Rule`**. That is the instruction, and nothing else. Group order follows the skill's own prefix table, so the prefix you choose also decides where the rule appears.
 2. **Tier 2 — `references/<skill>-<rule>.md`.** The whole rule file, verbatim, including everything tier 1 omits.
 3. **Tier 3 — aerospike.com/docs**, reached from tier 2.
 

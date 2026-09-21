@@ -23,7 +23,7 @@ from dataclasses import dataclass, field
 from scripts.skills_compile import render, skillsrc
 
 # Matches a rendered rule heading: `### <rule> — <title> [IMPACT]`.
-_RULE_HEAD_RE = re.compile(r"^### (?P<rule>\S+) — (?P<title>.*?)(?: \[(?P<impact>\w+)\])?$")
+_RULE_HEAD_RE = re.compile(r"^#### (?P<rule>\S+) — (?P<title>.*?)(?: \[(?P<impact>\w+)\])?$")
 _WORD_RE = re.compile(r"\w+")
 
 
@@ -67,7 +67,7 @@ def _rule_slices(body: str) -> dict[str, str]:
         if m:
             current = m.group("rule")
             out[current] = []
-        elif line.startswith("### ") or line.startswith("## "):
+        elif line.startswith(("#### ", "### ", "## ")):
             current = None
         elif current is not None:
             out[current].append(line)
