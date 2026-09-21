@@ -7,7 +7,7 @@
     "skills/aerospike-data-modeling"
   ],
   "files": {
-    "compiled-skills/aerospike/SKILL.md": 25788,
+    "compiled-skills/aerospike/SKILL.md": 23441,
     "compiled-skills/aerospike/examples/aerospike-development-batch-official-links.md": 2815,
     "compiled-skills/aerospike/examples/aerospike-development-batch-read-by-keys.md": 2402,
     "compiled-skills/aerospike/examples/aerospike-development-cdt-list-append.md": 2317,
@@ -20,6 +20,7 @@
     "compiled-skills/aerospike/references/aerospike-data-modeling-model-deliverables-schema-guide-summary.md": 3006,
     "compiled-skills/aerospike/references/aerospike-data-modeling-model-design-time-workflow.md": 3657,
     "compiled-skills/aerospike/references/aerospike-data-modeling-model-failure-modes-checklist.md": 3968,
+    "compiled-skills/aerospike/references/aerospike-data-modeling-model-mental-model.md": 4372,
     "compiled-skills/aerospike/references/aerospike-development-batch-parallel-key-operations.md": 4198,
     "compiled-skills/aerospike/references/aerospike-development-cdt-bounded-collections.md": 1436,
     "compiled-skills/aerospike/references/aerospike-development-cdt-nested-collections.md": 3418,

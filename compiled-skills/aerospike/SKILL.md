@@ -207,33 +207,16 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 
 
 ### Critical deliverables: schema guide and schema summary
-- Schema guide -> The full design: entity and relationship map, access pattern matrix, key schema, bin schema, one JSON example record per set, relationship and consolidation decisions, sizing worksheets, index rationale, growth and hot-key plan, validation plan. Plus the reasoning — an assumptions log, the alternatives rejected, and what evidence would reopen each decision.
-- Schema summary -> The condensed contract derived from the guide: one table per set with key format, bins, types, and a one-line purpose; the index list; growth and overflow triggers. No rationale.
+- Design produces two documents, written to files: a schema guide (the full design and its reasoning) and a schema summary (the condensed contract, generated from the guide, never authored independently). Both are required before any code. Contents and the regeneration rule: references/model-deliverables-schema-guide-summary.md.
 
 ### Critical rules: the mental model for data architects
-- Records are semi-structured. A record is a collection of strongly typed bins, and the typing is per bin per record — there is no set-level schema. Two records in the same set can have entirely different bins, and the server enforces nothing. Absent bins cost nothing, so sparse and heterogeneous shapes are cheap rather than wasteful. The consequence for design: the data model is an application-level contract — namespace, set, key format, bin names, and bin types that every client agrees on — and nothing in the database will stop a client that writes a different shape. Write the contract down; that is what the schema guide is for.
-- Records are the unit of I/O. Record data is stored contiguously, so every read fetches the entire record from storage, and every write rewrites the entire record — Aerospike does not do in-place updates. Requesting a subset of bins trims what crosses the network, not what is read from device. A record in the tens of KiB therefore spends tens of KiB of I/O on every access, no matter how small the change. Record size is an I/O budget, not just a storage number.
-- There are no server-side joins. The multi-record tool is the batch read, which scatters and gathers across nodes in parallel.
-- Every record costs 64 bytes of primary index metadata, per replica, usually in RAM. Many tiny records spend more memory on index than on data.
-- Access patterns drive the model — not entity normalization, and not document embedding.
-- Consolidate, but bound it. Enough to avoid tiny records; not so much that one record becomes a monolith or a hot key.
+- Required reading before designing anything. Aerospike is neither relational nor document: records are semi-structured and are the unit of I/O, there are no server-side joins, every record costs about 64 bytes of index per replica, and access patterns drive the model. The six properties and the record-sizing bounds: references/model-mental-model.md.
 
 ### Clarification rules: do not design without clarifying first
-- Produce a written clarification document first, not a schema — it is the first deliverable.
-- Ask requirements-gap questions — "what is the p95 fan-out?", "is eventual consistency acceptable here?" — never mechanism-preference questions like "which pattern do you prefer?".
-- Apply deterministic guidance instead of asking when it already resolves a choice.
-- Stop and ask rather than assuming when entity ownership, lifecycle, cardinality, or an access path is unclear — do not fill the gap and continue.
-- Record an input you cannot obtain as an explicit assumption with a reconsider trigger, rather than burying it.
-- Design one entity group at a time and pass its review before starting the next.
+- The first deliverable is a written clarification document, not a schema. Ask requirements-gap questions, never mechanism-preference ones; stop rather than assume; record an input you cannot obtain as an explicit assumption with a reconsider trigger; design one entity group at a time and pass its review before the next. The full loop: references/model-design-time-workflow.md.
 
 ### Common pitfalls: failure modes to check while drafting
-- Record granularity comes from cardinality and who drives the read — never from the entity list. One set per domain noun means the model came from an ER diagram.
-- The most frequent reads must be key lookups or bounded batch reads. If more than one or two access patterns resolve via secondary-index query, fix the keys, not the indexes.
-- Single-element mutations happen server-side, in place. Any read-modify-write of a whole bin should have been a CDT operation.
-- A bin is a container, not a field. Bin counts that scale with data rather than schema belong in one CDT bin. Bin names cap at 15 characters.
-- Duplicate data deliberately when two access patterns need it in two shapes. A second round trip purely to assemble a response is a normalization you should have collapsed.
-- Every collection bin needs a growth ceiling and a decided behavior at it. If element count is driven by user behavior rather than a design decision, it is unbounded.
-- Small independent entities still need an explicit sizing decision. Index overhead against a small payload is real cost; consolidating all of them into one record is the opposite error.
+- Seven ways Aerospike models go wrong — record granularity from the entity list, secondary indexes as the primary query path, ignoring CDTs, bins used as columns, normalizing instead of denormalizing, unbounded collection growth, and small entities with no sizing decision. Check them during design, not after. Each with a detection test you can run: references/model-failure-modes-checklist.md.
 
 ### Escalation mapping: use the data modeling guide
 - New model from scratch (required first read) -> new-app-modeling-checklist.md
@@ -267,3 +250,6 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 
 #### model-failure-modes-checklist — Run the seven failure-mode detection tests against a drafted model [HIGH]
 - Each failure mode below has a detection test — something you can run against a draft and get a yes/no answer.
+
+#### model-mental-model — Design from access patterns, not from an entity list [HIGH]
+- Derive the model from the read and write paths the application actually runs, never from an entity list or a normalized schema.
