@@ -12,7 +12,7 @@ last_verified: 2026-04-21
 
 **Rule**
 
-**`WritePolicy.commitLevel`** controls when the client gets success after a write:
+Choose **`WritePolicy.commitLevel`** deliberately — it controls when the client gets success after a write, and the two levels differ in durability, not just latency.
 
 | Level | Behavior |
 |--------|----------|

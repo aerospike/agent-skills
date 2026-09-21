@@ -7,8 +7,8 @@
     "skills/aerospike-data-modeling"
   ],
   "files": {
-    "compiled-skills/aerospike/SKILL.md": 25270,
-    "compiled-skills/aerospike/references/aerospike-data-modeling-ex-guide-escalation.md": 3066,
+    "compiled-skills/aerospike/SKILL.md": 26253,
+    "compiled-skills/aerospike/references/aerospike-data-modeling-ex-guide-escalation.md": 2973,
     "compiled-skills/aerospike/references/aerospike-data-modeling-model-deliverables-schema-guide-summary.md": 3006,
     "compiled-skills/aerospike/references/aerospike-data-modeling-model-design-time-workflow.md": 3657,
     "compiled-skills/aerospike/references/aerospike-data-modeling-model-failure-modes-checklist.md": 3968,
@@ -43,7 +43,7 @@
     "compiled-skills/aerospike/references/aerospike-development-policy-replace-whole-record.md": 1860,
     "compiled-skills/aerospike/references/aerospike-development-policy-reuse-timeouts-retries.md": 4530,
     "compiled-skills/aerospike/references/aerospike-development-policy-send-key.md": 2235,
-    "compiled-skills/aerospike/references/aerospike-development-policy-write-commit-level.md": 2549,
+    "compiled-skills/aerospike/references/aerospike-development-policy-write-commit-level.md": 2635,
     "compiled-skills/aerospike/references/aerospike-development-query-secondary-index-discipline.md": 1525,
     "compiled-skills/aerospike/references/aerospike-development-query-sindex-by-access-path.md": 2590,
     "compiled-skills/aerospike/references/aerospike-development-sec-client-tls-auth.md": 1044,

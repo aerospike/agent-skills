@@ -114,6 +114,30 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 ### client-singleton — Use one Aerospike client per process [HIGH]
 - Instantiate the Aerospike client once per application process (or equivalent isolation boundary) and share it across threads/workers.
 
+### ex-batch-read-by-keys — worked example
+- See the linked file for runnable code and official-doc links.
+
+### ex-bin-operate-mixed-read-write — worked example
+- See the linked file for runnable code and official-doc links.
+
+### ex-cdt-list-append — worked example
+- See the linked file for runnable code and official-doc links.
+
+### ex-cdt-map-nested-vehicles — worked example
+- See the linked file for runnable code and official-doc links.
+
+### ex-official-batch — worked example
+- See the linked file for runnable code and official-doc links.
+
+### ex-official-put-get — worked example
+- See the linked file for runnable code and official-doc links.
+
+### ex-policy-explicit-defaults — worked example
+- See the linked file for runnable code and official-doc links.
+
+### ex-singleton-client-python — worked example
+- See the linked file for runnable code and official-doc links.
+
 ### expr-compute-to-data — Use filter and operation expressions for compute-to-data [HIGH]
 - Use filter expressions and operation expressions (and path expressions for nested bins) to evaluate and update data on the server when they fit the problem.
 
@@ -154,7 +178,7 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 - Policy.sendKey controls whether the client sends the user-defined key alongside the digest on reads and writes.
 
 ### policy-write-commit-level — Choose write commit level deliberately (COMMIT_ALL vs COMMIT_MASTER) [HIGH]
-- WritePolicy.commitLevel controls when the client gets success after a write:
+- Choose WritePolicy.commitLevel deliberately — it controls when the client gets success after a write, and the two levels differ in durability, not just latency.
 
 ### query-secondary-index-discipline — Design secondary indexes for query paths—not for every column [HIGH]
 - Use secondary indexes for predicates that match a planned query path at sensible cardinality.

@@ -232,11 +232,16 @@ def render_stripped(
         for ref in sk.refs:
             secs = skillsrc.labeled_sections(ref.body)
             rule = secs.get("Rule", "").strip()
+            stem = ref.name[:-3] if ref.name.endswith(".md") else ref.name
             if not rule:
+                # Worked examples carry no **Rule**, so they used to be dropped
+                # without a trace. They ship in references/, so give each one a
+                # heading: a file nothing points at does not exist to a reader.
+                parts.append(f"\n### {stem} — worked example")
+                parts.append("- See the linked file for runnable code and official-doc links.")
                 continue
             title = ref.meta.get("title") or ref.name
             impact = ref.meta.get("impact", "")
-            stem = ref.name[:-3] if ref.name.endswith(".md") else ref.name
             head = f"\n### {stem} — {title}" + (f" [{impact}]" if impact else "")
             if density == "imperative":
                 imperative = _imperative(rule)

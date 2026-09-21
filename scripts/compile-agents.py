@@ -247,11 +247,28 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--skills", nargs="*", default=DEFAULT_SKILLS)
     ap.add_argument("--write", action="store_true")
     ap.add_argument("--check", action="store_true")
+    ap.add_argument(
+        "--coverage",
+        action="store_true",
+        help="report what SKILL.md defers to references/, and fail on content "
+        "that left the package or that nothing points at",
+    )
     args = ap.parse_args(argv)
 
     outputs = compile_outputs(args.shape, args.skills, args.layout)
     out_root = REPO_ROOT / COMPILED_DIR
     meta = {"shape": args.shape, "layout": args.layout, "sources": args.skills}
+
+    if args.coverage:
+        from scripts.skills_compile import coverage
+
+        skills = [skillsrc.load_skill(REPO_ROOT / s) for s in args.skills]
+        published = {p.split("/")[-1] for p in outputs if "/references/" in p}
+        report = coverage.coverage_report(skills, published)
+        print(report.summary())
+        for defect in report.defects:
+            print(f"::error::{defect}", file=sys.stderr)
+        return 1 if report.defects else 0
 
     if args.check:
         stale: list[str] = []

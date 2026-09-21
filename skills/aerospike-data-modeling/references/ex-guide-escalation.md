@@ -57,14 +57,7 @@ the guide at the time you need them.
 
 - Presenting a model as complete when the guide's checklist and sizing worksheets were never applied
 - Quoting a version gate or size limit from memory
-
-**If the guide is unreachable**
-
-Say so plainly and state the limitation. Deliver what this skill supports — the
-mental model, the seven failure-mode checks, a clarification document, a first
-pass at entity groups — and flag explicitly that the decision packs, sizing
-worksheets, and version-gate table were not applied. Do not silently substitute
-your own process and present the result as if the full one ran.
+- Silently substituting your own process when the guide is unreachable — say so plainly, deliver what this skill supports (the mental model, the seven failure-mode checks, a clarification document, a first pass at entity groups), and flag that the decision packs, sizing worksheets and version-gate table were not applied
 
 **See also**
 

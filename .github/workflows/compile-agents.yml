@@ -40,3 +40,7 @@ jobs:
       - run: pip install -r scripts/requirements-compile.txt
       - name: Check compiled-skills/ is up to date
         run: python3 scripts/compile-agents.py --shape stripped --check
+      - name: Report what SKILL.md defers to references/
+        run: |
+          python3 scripts/compile-agents.py --shape stripped --coverage \
+            | tee -a "$GITHUB_STEP_SUMMARY"
