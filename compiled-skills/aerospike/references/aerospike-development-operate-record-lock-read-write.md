@@ -28,14 +28,12 @@ Use the **`operate`** command when you need **multiple bin-level changes on the 
 
 - Chaining separate `get` → app logic → `put` when `operate` can express the same work on one key
 - Splitting independent bin updates on the same key into multiple commands without a concurrency story
-
-**Gotcha: bin-scoped ops vs whole-record reads**
-
-In one `operate` you **cannot** mix **bin-targeted** operations (writes or reads on specific bins, including increments and CDT ops) with a **whole-record** read that returns the entire record at once. For example, you **cannot** increment a bin and, in the **same** `operate`, request the full record as a single read—you must use **named bin** read operations (per-bin `get` / read ops, or the client’s equivalent) for every bin you need back. Plan the operation list as **per-bin** reads and writes only. Details follow the [bin operations](https://aerospike.com/docs/develop/learn/bin-operations/) model (projection is per operation, not “return everything” mixed with arbitrary bin ops in one shot).
+- Mixing **bin-targeted** operations (bin writes or reads, increments, CDT ops) with a **whole-record** read in the same `operate`—you cannot increment a bin and request the full record in one call; use **named bin** read operations for every bin you need back
+- Expecting “return everything” from an `operate` list—projection is **per operation**, so plan the list as **per-bin** reads and writes only
 
 **See also**
 
-- [binop-operate-atomicity.md](binop-operate-atomicity.md)
-- [single-record-operations.md](single-record-operations.md)
-- [cdt-server-side-ops.md](cdt-server-side-ops.md)
-- [ex-bin-operate-mixed-read-write.md](ex-bin-operate-mixed-read-write.md)
+- [operate-atomicity.md](aerospike-development-operate-atomicity.md)
+- [single-record-operations.md](aerospike-development-single-record-operations.md)
+- [cdt-server-side-ops.md](aerospike-development-cdt-server-side-ops.md)
+- [operate-mixed-read-write.md](https://github.com/aerospike/agent-skills/blob/main/skills/aerospike-development/examples/operate-mixed-read-write.md)

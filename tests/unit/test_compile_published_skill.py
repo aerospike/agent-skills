@@ -101,10 +101,49 @@ def test_description_is_one_line_so_naive_registry_parsers_read_it(published):
     assert meta["description"] == naive
 
 
-def test_header_carries_the_repository_url_for_cited_rule_files(compiler, published):
+def test_header_states_how_to_derive_a_rule_file_path(compiler, published):
+    """The header carries the only routing an agent gets.
+
+    Headings name a rule but do not link it, so the path has to be derivable.
+    If this sentence goes missing, every rule in the artifact becomes a dead
+    end -- and so does every bare-filename citation inside the rule files,
+    which resolve by the same rule.
+    """
     _, text = published
     assert compiler.REPO_URL in text
-    assert "`skills/<skill>/` or its `references/` folder" in text
+    assert "`references/<skill>-<rule>.md`" in text
+    # A skill's own sections and the prefix groups are both `###`, so the header
+    # must say how to tell a rule from them or the derivation is ambiguous.
+    assert "`<rule> — <title> [IMPACT]`" in text
+    assert "`####` heading" in text
+
+
+def test_every_rule_heading_resolves_to_a_published_file(compiler):
+    """Exercise the derivation rule itself, not a link that bypasses it.
+
+    Walks the rendered body the way an agent would: take the `##` skill
+    heading, take the `###` rule heading, join them, and require that file to
+    be in the published outputs.
+    """
+    outputs = compiler.compile_outputs("stripped", compiler.DEFAULT_SKILLS, "single")
+    body = outputs[compiler.SINGLE_OUT]
+
+    skill = None
+    checked = 0
+    for line in body.splitlines():
+        if line.startswith("## "):
+            skill = line[3:].strip()
+        elif line.startswith("#### ") and skill and " — " in line:
+            # The header's shape test: a rule is a `####` under a `###` prefix
+            # group. A `###` is a prefix group or one of the skill's sections.
+            rule = line[5:].split(" — ")[0].strip()
+            derived = f"{compiler.SINGLE_DIR}/references/{skill}-{rule}.md"
+            assert derived in outputs, (
+                f"{skill} / {rule} reads as a rule heading but derives to a "
+                f"path that was not published: {derived}"
+            )
+            checked += 1
+    assert checked >= 35, f"expected the rule corpus to be reachable, resolved only {checked}"
 
 
 def test_body_is_the_stripped_render(compiler, published):

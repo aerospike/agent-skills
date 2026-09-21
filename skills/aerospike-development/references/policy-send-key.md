@@ -3,8 +3,6 @@ title: Understand sendKey when the stored user key matters
 impact: MEDIUM
 tags: policy, send-key, primary-key, secondary-index
 doc: https://aerospike.com/docs/database/learn/policies/
-also:
-  - https://aerospike.com/docs/develop/learn/policies
 last_verified: 2026-04-21
 ---
 

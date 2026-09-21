@@ -36,120 +36,29 @@ tuning policies, choosing CDT operations, debugging a slow batch read. That is
 `aerospike-development`. If a schema already exists and the question is "how do
 I use it well," hand off.
 
-## What you produce
+## Critical deliverables: schema guide and schema summary
 
-Two documents. Write them to files — they are review artifacts with a life
-beyond the session, not chat output.
+- Design produces **two documents, written to files**: a **schema guide** (the full design and its reasoning) and a **schema summary** (the condensed contract, generated from the guide, never authored independently). Both are required before any code. Contents and the regeneration rule: [references/model-deliverables-schema-guide-summary.md](references/model-deliverables-schema-guide-summary.md).
 
-| Deliverable | Contents |
-|---|---|
-| **Schema guide** | The full design: entity and relationship map, access pattern matrix, key schema, bin schema, one JSON example record per set, relationship and consolidation decisions, sizing worksheets, index rationale, growth and hot-key plan, validation plan. Plus the **reasoning** — an assumptions log, the alternatives rejected, and what evidence would reopen each decision. |
-| **Schema summary** | The condensed contract derived from the guide: one table per set with key format, bins, types, and a one-line purpose; the index list; growth and overflow triggers. No rationale. |
+## Critical rules: the mental model for data architects
 
-The schema summary is **generated from** the schema guide, never authored
-independently. If they disagree, the schema guide wins and the summary is
-regenerated.
+- **Required reading before designing anything.** Aerospike is neither relational nor document: records are semi-structured and are the unit of I/O, there are no server-side joins, every record costs about 64 bytes of index per replica, and access patterns drive the model. The six properties and the record-sizing bounds: [references/model-mental-model.md](references/model-mental-model.md).
 
-See [references/model-deliverables-schema-guide-summary.md](references/model-deliverables-schema-guide-summary.md).
+## Clarification rules: do not design without clarifying first
 
-## Mental model for data architects
+- The first deliverable is a **written clarification document, not a schema**. Ask requirements-gap questions, never mechanism-preference ones; stop rather than assume; record an input you cannot obtain as an explicit assumption with a reconsider trigger; design one entity group at a time and pass its review before the next. The full loop: [references/model-design-time-workflow.md](references/model-design-time-workflow.md).
 
-Aerospike is neither a relational database nor a document database.
+## Common pitfalls: failure modes to check while drafting
 
-- **Records are semi-structured.** A record is a collection of **strongly typed
-  bins**, and the typing is per bin per record — there is no set-level schema.
-  Two records in the same set can have entirely different bins, and the server
-  enforces nothing. Absent bins cost nothing, so sparse and heterogeneous shapes
-  are cheap rather than wasteful. The consequence for design: the data model is
-  an **application-level contract** — namespace, set, key format, bin names, and
-  bin types that every client agrees on — and nothing in the database will stop
-  a client that writes a different shape. Write the contract down; that is what
-  the schema guide is for.
-- **Records are the unit of I/O.** Record data is stored **contiguously**, so
-  every read fetches the **entire record** from storage, and every write
-  **rewrites the entire record** — Aerospike does not do in-place updates.
-  Requesting a subset of bins trims what crosses the *network*, not what is read
-  from *device*. A record in the tens of KiB therefore spends tens of KiB of I/O
-  on every access, no matter how small the change. Record size is an I/O budget,
-  not just a storage number.
-- **There are no server-side joins.** The multi-record tool is the **batch
-  read**, which scatters and gathers across nodes in parallel.
-- **Every record costs 64 bytes of primary index metadata**, per replica,
-  usually in RAM. Many tiny records spend more memory on index than on data.
-- **Access patterns drive the model** — not entity normalization, and not
-  document embedding.
-- **Consolidate, but bound it.** Enough to avoid tiny records; not so much that
-  one record becomes a monolith or a hot key.
+- Seven ways Aerospike models go wrong — record granularity from the entity list, secondary indexes as the primary query path, ignoring CDTs, bins used as columns, normalizing instead of denormalizing, unbounded collection growth, and small entities with no sizing decision. Check them **during** design, not after. Each with a detection test you can run: [references/model-failure-modes-checklist.md](references/model-failure-modes-checklist.md).
 
-If your instinct is a table per entity and a row per sub-entity, or one giant
-embedded document, you will produce a bad Aerospike model.
+## Escalation mapping: use the data modeling guide
 
-**Record sizing** — target band, the configured `max-record-size` limit, and the
-architectural ceiling are three different bounds that are easy to conflate. Do
-not carry a number from memory; read the current values from the data modeling
-guide (see Escalation below).
-
-Whatever the band's endpoints are, read it as a **distribution, not a target**:
-design so the **bulk of records sit at the low end** (single-digit KiB), and
-treat the upper end as headroom for **outliers** and **slowly-changing
-consolidated structures** — 1:N and N:M relationship lists, where one record per
-edge would cost more. Size only hurts once multiplied by **write frequency**: a large record on a
-**hot write path** is a design defect even when it fits, because every update
-rewrites it in full — but the same size where writes are infrequent relative to
-reads is a legitimate design, not a compromise. Ask for the **update rate**, not
-just the byte count.
-
-## Do not design without clarifying first
-
-The first deliverable is a **written clarification document**, not a schema. Ask
-requirements-gap questions — "what is the p95 fan-out?", "is eventual
-consistency acceptable here?" — never mechanism-preference questions like "which
-pattern do you prefer?". If deterministic guidance already resolves a choice,
-apply it instead of asking.
-
-Do not fill gaps with assumptions and continue. When entity ownership,
-lifecycle, cardinality, or an access path is unclear, stop and ask. Where an
-input cannot be obtained, record it as an explicit assumption with a reconsider
-trigger rather than burying it.
-
-Design **one entity group at a time** and pass its review before starting the
-next. See [references/model-design-time-workflow.md](references/model-design-time-workflow.md).
-
-## Failure modes to check while drafting
-
-Seven ways Aerospike models go wrong. Check them **during** design, not after.
-Each has a detection test in
-[references/model-failure-modes-checklist.md](references/model-failure-modes-checklist.md).
-
-1. **Record granularity comes from cardinality and who drives the read** — never
-   from the entity list. One set per domain noun means the model came from an ER
-   diagram.
-2. **The most frequent reads must be key lookups or bounded batch reads.** If
-   more than one or two access patterns resolve via secondary-index query, fix
-   the keys, not the indexes.
-3. **Single-element mutations happen server-side, in place.** Any
-   read-modify-write of a whole bin should have been a CDT operation.
-4. **A bin is a container, not a field.** Bin counts that scale with data rather
-   than schema belong in one CDT bin. Bin names cap at 15 characters.
-5. **Duplicate data deliberately** when two access patterns need it in two
-   shapes. A second round trip purely to assemble a response is a normalization
-   you should have collapsed.
-6. **Every collection bin needs a growth ceiling and a decided behavior at it.**
-   If element count is driven by user behavior rather than a design decision, it
-   is unbounded.
-7. **Small independent entities still need an explicit sizing decision.** Index
-   overhead against a small payload is real cost; consolidating all of them into
-   one record is the opposite error.
-
-## Escalation: use the data modeling guide
-
-This skill covers the decision layer. The full workflow — the clarification
-gates, the per-relationship decision packs, the sizing worksheets, the
-stakeholder checkpoints — lives in the **`https://github.com/aerospike/data-modeling-guide`**
-repository.
-
-**For a new application, fetch the guide and follow its checklist. Do not design
-a complete model from this skill alone.**
+This skill covers the decision layer; the full workflow lives in the
+**`https://github.com/aerospike/data-modeling-guide`** repository. **For a new
+application, fetch the guide and follow its checklist — do not design a complete
+model from this skill alone.** Routing and the unreachable-guide fallback:
+[references/ex-guide-escalation.md](references/ex-guide-escalation.md).
 
 ```bash
 gh repo clone aerospike/data-modeling-guide
@@ -177,7 +86,7 @@ model, the failure-mode checks, a clarification document) and flag that the
 sizing worksheets and decision packs were not applied. Do not improvise a
 complete model and present it as if the full process ran.
 
-## Version-gated features
+## Version-gate rules
 
 Several patterns depend on server version. Confirm the target version and client
 support before recommending any of them; the guide's checklist has a version

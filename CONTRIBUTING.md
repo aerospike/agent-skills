@@ -10,7 +10,7 @@ Thanks for helping improve this repository. It holds **Agent Skills** under [`sk
 ### Current skills (examples)
 
 - **[`skills/aerospike-getting-started/`](skills/aerospike-getting-started/)** — Aerospike Database getting started: single-node local setup (Docker), ports/namespaces/TTL, official client snippets, Community vs Enterprise pointers, troubleshooting for new users, anti-hallucination rules. Not a substitute for full production or multi-region guides—link to [Aerospike documentation](https://aerospike.com/docs/) for that.
-- **[`skills/aerospike-development/`](skills/aerospike-development/)** — Application-level client guidance: modular rules and `ex-*` examples under [`references/`](skills/aerospike-development/references/README.md), doc map in [`reference.md`](skills/aerospike-development/reference.md). Not cluster operations.
+- **[`skills/aerospike-development/`](skills/aerospike-development/)** — Application-level client guidance: modular rules under [`references/`](skills/aerospike-development/references/README.md) and worked examples under [`examples/`](skills/aerospike-development/examples/), doc map in [`reference.md`](skills/aerospike-development/reference.md). Not cluster operations.
 
 ## Adding a new skill (especially Aerospike)
 
@@ -68,6 +68,90 @@ metadata:
 ```
 
 This closed key set applies to `SKILL.md` only. Companion files under `references/` are not skill manifests, so their frontmatter is free-form.
+
+## Writing rule files (`references/`)
+
+A rule file is compiled into [`compiled-skills/aerospike/SKILL.md`](compiled-skills/aerospike/SKILL.md) by [`scripts/compile-agents.py`](scripts/compile-agents.py), and **the compiler keeps far less of it than the file contains**. Where you put a sentence decides whether it ships.
+
+### What the published package looks like
+
+`SKILL.md` is a **router**, not a manual. Per the [Agent Skills spec's progressive disclosure](https://agentskills.io/specification), it loads whenever the skill activates and should stay under 5,000 tokens; the rule files ship beside it in `references/` and are read only when a rule applies. So:
+
+1. **Tier 1 — `SKILL.md`.** Rules are grouped under a `###` heading naming their filename prefix, and each rule is a `####` heading plus **the first sentence of its `Rule`**. That is the instruction, and nothing else. Group order follows the skill's own prefix table, so the prefix you choose also decides where the rule appears.
+2. **Tier 2 — `references/<skill>-<rule>.md`.** The whole rule file, verbatim, including everything tier 1 omits.
+3. **Tier 3 — aerospike.com/docs**, reached from tier 2.
+
+A rule's file is named by its skill and its own filename, and the artifact's header states that derivation. Rules cite each other by bare filename and resolve the same way.
+
+### Density: how much of a rule reaches tier 1
+
+Declared per skill in its `SKILL.md` frontmatter as `metadata.density`, defaulting to `imperative`. It is per skill rather than global because the skills are unequal—one carries 35 rules and another four—so a large skill can thin itself without costing a small one its instructions.
+
+| `density` | Tier 1 carries | Per rule |
+|---|---|---|
+| `imperative` *(default)* | heading + the first sentence of `Rule` | ~73 tok |
+| `bare` | heading only | ~21 tok |
+| `full` | `Rule`, `Prefer` and `Avoid` inlined | ~311 tok |
+
+```yaml
+metadata:
+  density: bare
+```
+
+**`bare` removes a duplicate, not a fact.** The sentence it drops is the first sentence of `**Rule**`, and the whole rule file ships in `references/`—so the instruction stays reachable, it just costs a file read. Reach for it when a skill grows enough to push the artifact past the spec's 5,000-token recommendation; thinning the one large skill recovers nearly as much as thinning all of them.
+
+An unrecognised value fails the compile rather than falling back, so a typo cannot quietly change what ships.
+
+### Section markers
+
+Five labels, each **bold and alone on its line**. The set is closed—[`skillsrc.py`](scripts/skills_compile/skillsrc.py) matches these and nothing else, so **a bold line that is not one of them is not a section**: it is absorbed into whichever section precedes it, and its content ships or vanishes accordingly.
+
+| Marker | Ships to `SKILL.md` | Notes |
+|---|---|---|
+| `**Rule**` | **First sentence only** | Must stand alone as the instruction. |
+| `**Prefer**` | Bullets only | Joined with `;`. Prose here ships nothing. |
+| `**Avoid**` | Bullets only | Same. |
+| `**Why**` | No | Rationale. Ships in `references/`. |
+| `**See also**` | No | Bibliography. Ships in `references/`. |
+
+**Filenames are the taxonomy.** The prefix set in [`references/README.md`](skills/aerospike-development/references/README.md) is closed, and it governs `examples/` as well as `references/`—an example about `operate` is `operate-…`, not `bin-operate-…` or `official-…`. A rule and its worked example may share a name (`references/client-singleton.md` and `examples/client-singleton.md`): they land in different folders, and the pairing is deliberate—given one, the other is derivable. Two rules, or two examples, may not.
+
+A file with **no `**Rule**`** contributes no instruction. Worked examples live in `examples/` rather than `references/`, and `SKILL.md` names them once under **Worked examples** instead of giving each a heading; the coverage check still requires every shipped example to appear in that list.
+
+### Transforms that silently change what ships
+
+- **The first sentence of `Rule` must stand alone.** It is all of `Rule` that reaches tier 1. A sentence ending in a colon announces content that will not be there; [`coverage.py`](scripts/skills_compile/coverage.py) fails the build on it.
+- **A bullet must be one physical line**, or a `**bold**` run spanning the wrap leaves a stray `**`. (Continuations are folded, but do not rely on it for readability.)
+- **Prose in `Prefer`/`Avoid` ships nothing.** Only bullets are extracted. This is a hard failure in the coverage check.
+- **Tables never survive a rule file's `Rule`, `Prefer` or `Avoid`.** Put them under a `##` heading in `SKILL.md`, or under `**Why**`.
+- **Links lose their URL** and **backticks and bold are stripped**—identifiers survive as bare words, so write `ListExp.append`, not "the append expression".
+- **Prose in `SKILL.md` does not ship at all.** Only bullets and table rows, and only from headings containing `rule`, `blacklist`, `pitfall`, `practice`, `critical`, or `mapping`. Prose is how you keep something useful to a reader of the source without paying for it on every invocation.
+
+### Deciding where a sentence goes
+
+> If this sentence were deleted, would a competent agent produce **different or wrong** code?
+
+**Yes** → `Rule`, `Prefer`, or `Avoid`: constraints, identifiers, version floors, sizing arithmetic, failure conditions. **No, it only makes the reader more confident** → `**Why**`.
+
+One corollary, because a third of this corpus once failed it: **content already carried by a `Prefer` or `Avoid` bullet does not belong in `Rule` as well.** State a constraint once.
+
+Worked examples, all real:
+
+- "Strong-consistency namespaces require `COMMIT_ALL`; otherwise writes fail" — changes the output. **Essential.**
+- "(concurrent client processes × maxConnsPerNode) counts against each node's `proto-fd-max`" — changes the sizing decision. **Essential.**
+- "Typical knobs (names vary by SDK): a maximum error count and a window length" — nothing typeable. **`Why`.**
+- `post-write-cache` defaults and cgroup interactions — operations tuning, not schema or client work. **`Why`.**
+
+### Before you open the PR
+
+- [ ] `Rule` opens with a standalone imperative—no colon introducing content that lives elsewhere
+- [ ] Every claim an agent would act on is in `Rule`, `Prefer`, or `Avoid`
+- [ ] No tables and no prose paragraphs in `Prefer` / `Avoid`
+- [ ] `impact:` is set, and `doc:` points at the canonical Aerospike page
+- [ ] Any sibling rule needed *to act* is named inline in `Prefer` / `Avoid`, not left to `See also`
+- [ ] New file added to [`references/README.md`](skills/aerospike-development/references/README.md)
+- [ ] `python scripts/compile-agents.py --coverage` reports **0 defects**
+- [ ] Do **not** bump `last_verified` for a pure reformat—moving a sentence re-verifies nothing
 
 ## Validate the skill package (skill-validator)
 
@@ -177,6 +261,8 @@ The default branch requires a pull request with one approving review from a [cod
 - **Links:** Prefer stable vendor doc URLs; if a URL might move, note the section name so maintainers can find a replacement.
 
 ### Token footprint (`ex-*` files)
+
+This governs **weight**; [Writing rule files](#writing-rule-files-references) governs **shape**—what compiles and where it lands. The concern here is skill-validator's per-file warning, not the compiled artifact: `ex-*` files carry no `**Rule**`, so they contribute no instruction to `SKILL.md` and their size is felt only when an agent opens one.
 
 Skills under [`skills/`](skills/) are checked with [skill-validator](https://github.com/agent-ecosystem/skill-validator); large pasted content triggers **high token-count** warnings. For **`references/ex-*`** files: use **link-first** tables pointing at official Aerospike **Code block** sections; add **at most one or two** short minimal snippets (e.g. Python and Java) when copy-paste anchors help—**not** a full mirror of every language. **Do not** paste the same multi-language tutorial in full here—that duplicates [Aerospike documentation](https://aerospike.com/docs/) and inflates agent context.
 

@@ -2,7 +2,7 @@
 
 Start with [`AGENTS.md`](AGENTS.md) for routing and read order across skills.
 
-**Fast path:** [`compiled-skills/aerospike/SKILL.md`](compiled-skills/aerospike/SKILL.md) carries the published rules for every skill in one file.
+**Fast path:** [`compiled-skills/aerospike/`](compiled-skills/aerospike/) — `SKILL.md` routes to every published rule, and `references/` carries them.
 
 Then open the skill that matches the task:
 

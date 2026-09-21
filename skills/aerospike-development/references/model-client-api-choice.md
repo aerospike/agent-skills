@@ -10,7 +10,7 @@ last_verified: 2026-04-23
 
 **Rule**
 
-**One key,** multiple bins or a record-shaped update: prefer **`operate`** (and [record lock / mixed R/W](binop-operate-record-lock-read-write.md) semantics) so the server does **one round-trip** and you avoid **get/put** races. **Many keys,** each known: prefer **[batch](batch-parallel-key-operations.md)** (reads, writes, or batch **`operate`** with **one entry per key**). **Server-side predicate, trim, or numeric/bin patch** on read or write: use **[filter/operation expressions](expr-compute-to-data.md)** so work stays **on the data nodes**. **Do not** string together serial **get**/**put** when a **single** `operate` or **single** expression chain can express the work.
+**One key,** multiple bins or a record-shaped update: prefer **`operate`** (and [record lock / mixed R/W](operate-record-lock-read-write.md) semantics) so the server does **one round-trip** and you avoid **get/put** races. **Many keys,** each known: prefer **[batch](batch-parallel-key-operations.md)** (reads, writes, or batch **`operate`** with **one entry per key**). **Server-side predicate, trim, or numeric/bin patch** on read or write: use **[filter/operation expressions](expr-compute-to-data.md)** so work stays **on the data nodes**. **Do not** string together serial **get**/**put** when a **single** `operate` or **single** expression chain can express the work.
 
 **Why**
 
@@ -21,7 +21,7 @@ Round-trips and client-side re-reads dominate latency. Aerospike **compute-to-da
 - **`operate`** for **one key**, **N bins**, or **CDT paths** in one call
 - **Batch** with **coalesced keys** and **per-key** result handling
 - **Expressions** for “read only if condition” or “write only if bin matches”
-- Deeper reading: [binop-operate-record-lock-read-write.md](binop-operate-record-lock-read-write.md), [binop-operate-atomicity.md](binop-operate-atomicity.md), [batch-parallel-key-operations.md](batch-parallel-key-operations.md), [expr-compute-to-data.md](expr-compute-to-data.md)
+- Deeper reading: [operate-record-lock-read-write.md](operate-record-lock-read-write.md), [operate-atomicity.md](operate-atomicity.md), [batch-parallel-key-operations.md](batch-parallel-key-operations.md), [expr-compute-to-data.md](expr-compute-to-data.md)
 
 **Avoid**
 

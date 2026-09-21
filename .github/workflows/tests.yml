@@ -5,6 +5,7 @@ name: tests
 on:
   pull_request:
     paths:
+      - 'skills/**'
       - "tests/**"
       - "scripts/**"
       - "pytest.ini"
@@ -16,6 +17,7 @@ on:
   push:
     branches: [init, main, master]
     paths:
+      - 'skills/**'
       - "tests/**"
       - "scripts/**"
       - "pytest.ini"

@@ -55,7 +55,7 @@ If the user asks an operational question (for example adding nodes or choosing r
 5. **Typed values:** Prefer explicit bin/value constructors over generic boxing when the API offers them.
 6. **Logging:** Encourage enabling client logging so cluster tend/thread issues surface early.
 7. **Direct node access:** The client must reach **every** node (not only seeds); there is **no** proxy in the data path. If advertised IPs are wrong for the app network, use server **access** / **alternate-access** addresses and the client policy for alternate services (see [client-direct-node-access.md](references/client-direct-node-access.md)).
-8. **Client source of truth:** The official clients live on GitHub under `github.com/aerospike/` — `aerospike-client-java-sdk`, `aerospike-client-python-sdk`, `aerospike-client-rust`, `aerospike-client-csharp`, `aerospike-client-go`, `aerospike-client-nodejs`, `aerospike-client-c`, and the older `aerospike-client-java` / `aerospike-client-python`. Read a repository's `README.md` — its **`AI coding agent entry point`** section — before generating code against that client, rather than recalling an API from memory. Start new Java or Python work on the Java SDK or Python SDK; the older Java and Python clients are for codebases already using them.
+8. **Client source of truth:** Read the chosen client's repository README — its **`AI coding agent entry point`** section — before generating code against it, and take the API surface from there rather than from memory (see [client-source-of-truth.md](references/client-source-of-truth.md)).
 
 ## Common pitfalls
 
@@ -83,7 +83,7 @@ Modular rules and example walkthroughs live under [`references/`](references/REA
 | `expr-` | Filter/operation/path expressions vs heavier alternatives |
 | `query-` | Secondary indexes, [cardinality/cost](references/query-secondary-index-discipline.md), and [deriving index needs from access paths](references/query-sindex-by-access-path.md) |
 | `batch-` | Many primary-key reads/writes; one key per batch entry, coalesce, batch `operate` |
-| `binop-` | `operate`, one record lock, mixed read/write, atomic multi-bin updates |
+| `operate-` | `operate`: one record lock, mixed read/write, atomic multi-bin updates |
 | `single-` | Whole-record vs partial/bin operations; TTL void-time and NSUP/default-ttl; delete and durable deletes (EE) |
 | `model-` | [Namespace and set](references/model-namespace-set-boundaries.md) boundaries; [flat bins vs CDTs vs multiple records](references/model-bin-cdt-multiple-records.md); keys, denormalization, access paths; [operate / batch / expressions](references/model-client-api-choice.md); record size vs index RAM and disk; hot keys and error 14 / KEY_BUSY |
 | `sec-` | TLS and access control on the client |

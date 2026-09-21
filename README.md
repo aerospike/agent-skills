@@ -40,7 +40,7 @@ The **canonical list of skills** (and what to copy) is [`skills/README.md`](skil
 | [skills/aerospike-development/examples.md](skills/aerospike-development/examples.md) | Additional examples for the development skill |
 | [skills/aerospike-data-modeling/SKILL.md](skills/aerospike-data-modeling/SKILL.md) | Data modeling skill: design-time workflow, mental model, pointers into references |
 | [AGENTS.md](AGENTS.md) | Short read order and routing for any AI assistant |
-| [compiled-skills/aerospike/SKILL.md](compiled-skills/aerospike/SKILL.md) | Published agent skill, compiled from `skills/` into one file |
+| [compiled-skills/aerospike/](compiled-skills/aerospike/) | Published agent skill: `SKILL.md` routes, `references/` carries the rules it names |
 | [.github/copilot-instructions.md](.github/copilot-instructions.md) | GitHub Copilot repository instructions |
 
 Skill packaging evaluation (structure A/B tests, coverage gates) runs in a separate harness repository and is not part of this repository's checks.

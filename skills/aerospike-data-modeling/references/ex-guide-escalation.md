@@ -25,6 +25,8 @@ Read `AGENTS.md` first: it carries the hard rules, the routing table, and the
 version gates. Then `new-app-modeling-checklist.md`, which is the required first
 read for a new application.
 
+**Why**
+
 **Routing**
 
 | Task | File |
@@ -39,8 +41,6 @@ read for a new application.
 | Matching a workload to a known shape and sizing profile | `workload-archetypes.md` |
 | Reviewing a drafted model | `modeling-failure-modes.md` |
 | Identifier formats; timestamp bin naming | `id-selection-guidance.md`, `timestamp-bin-naming-guidance.md` |
-
-**Why**
 
 The guide holds material that changes on server releases — version gates,
 operation complexity tables, configuration limits and their current defaults.
@@ -57,14 +57,7 @@ the guide at the time you need them.
 
 - Presenting a model as complete when the guide's checklist and sizing worksheets were never applied
 - Quoting a version gate or size limit from memory
-
-**If the guide is unreachable**
-
-Say so plainly and state the limitation. Deliver what this skill supports — the
-mental model, the seven failure-mode checks, a clarification document, a first
-pass at entity groups — and flag explicitly that the decision packs, sizing
-worksheets, and version-gate table were not applied. Do not silently substitute
-your own process and present the result as if the full one ran.
+- Silently substituting your own process when the guide is unreachable — say so plainly, deliver what this skill supports (the mental model, the seven failure-mode checks, a clarification document, a first pass at entity groups), and flag that the decision packs, sizing worksheets and version-gate table were not applied
 
 **See also**
 

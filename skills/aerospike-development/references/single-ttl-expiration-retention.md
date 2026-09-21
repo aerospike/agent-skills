@@ -14,11 +14,11 @@ last_verified: 2026-04-21
 
 **Do not reduce** a record’s remaining lifetime (**void-time**) on writes unless you intend it and accept cold-start risk. **Extending** void-time (later expiration, longer remaining TTL) is **fine** and does **not** cause the resurrection mismatch described below—the failure mode is **shortening** relative to older versions still on disk. To change bins only while keeping void-time, use **`-2`** on updates (see [single-ttl-nsup-default-ttl.md](single-ttl-nsup-default-ttl.md) for **`0` / `-1` / `-2`** and **NSUP**).
 
+**Why**
+
 **Never-expire → finite TTL:** A record set to **never expire** (`-1`) is a long-lived commitment—**do not** later assign a **positive finite TTL** in normal paths; that is the same class of problem as shortening TTL for cold-start correctness. **Eviction** under pressure applies only to records with **non-zero void-time**; **never-expire** records are **not** eviction candidates—reclaim them with **delete** or other explicit strategies.
 
 **Do not use a short TTL as a substitute for delete.** Use the client **delete** (and **durable delete** when needed—see [single-delete-durable-deletes.md](single-delete-durable-deletes.md)).
-
-**Why**
 
 On **cold restart**, the primary index is rebuilt from storage; **older versions** can remain until defragmentation overwrites them. If a **later** write **reduced** void-time but an **older** version still has a **later** void-time, that older version can **resurrect** after index rebuild. The server may mitigate some TTL reduction with **`apply-ttl-reduction`** (version specifics in the [retention](https://aerospike.com/docs/database/manage/namespace/retention) doc); application design should still avoid needless shortening. **Eviction** (when enabled) removes **non-zero void-time** records nearest expiration first. Expiration/eviction are **not** durable-delete tombstones—see [single-delete-durable-deletes.md](single-delete-durable-deletes.md).
 

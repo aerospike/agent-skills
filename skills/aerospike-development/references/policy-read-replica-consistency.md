@@ -4,8 +4,7 @@ impact: HIGH
 tags: policy, replica, read-mode-ap, read-mode-sc, consistency
 doc: https://aerospike.com/docs/database/learn/policies/
 also:
-  - https://aerospike.com/docs/develop/learn/policies
-  - https://aerospike.com/docs/develop/learn/strong-consistency
+  - https://aerospike.com/docs/database/learn/strong-consistency
 last_verified: 2026-04-21
 ---
 
@@ -30,7 +29,7 @@ Wrong read policies cause subtle staleness, extra load on the master, or unneces
 - **MASTER** or defaults when you need the simplest “read what the master has” mental model in AP
 - **MASTER_PROLES** when read scaling on a hot key is worth distributing across master and replicas (and semantics allow)
 - **ALL** in AP when stale reads during migration are unacceptable and cost is acceptable
-- Aligning client policy with namespace mode (AP vs SC) and validating with [Strong consistency](https://aerospike.com/docs/develop/learn/strong-consistency) docs when in doubt
+- Aligning client policy with namespace mode (AP vs SC) and validating with [Strong consistency](https://aerospike.com/docs/database/learn/strong-consistency) docs when in doubt
 
 **Avoid**
 
@@ -41,4 +40,4 @@ Wrong read policies cause subtle staleness, extra load on the master, or unneces
 
 - [policy-reuse-timeouts-retries.md](policy-reuse-timeouts-retries.md)
 - [single-ttl-nsup-default-ttl.md](single-ttl-nsup-default-ttl.md) (read-touch TTL and reads)
-- [binop-operate-atomicity.md](binop-operate-atomicity.md)
+- [operate-atomicity.md](operate-atomicity.md)

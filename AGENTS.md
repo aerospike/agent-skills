@@ -18,7 +18,7 @@ Apply when the user (or task) involves **Aerospike**, **Docker-based Aerospike**
 
 ## Read order
 
-**Fast path:** [`compiled-skills/aerospike/SKILL.md`](compiled-skills/aerospike/SKILL.md) — published rules for the getting-started, development, and data-modeling skills in one file, updated on every merge to `main`. [Install guide](compiled-skills/README.md).
+**Fast path:** [`compiled-skills/aerospike/`](compiled-skills/aerospike/) — `SKILL.md` routes to the getting-started, development and data-modeling rules; `references/` carries each rule in full. Updated on every merge to `main`. [Install guide](compiled-skills/README.md).
 
 **More detail** (optional, under `skills/`):
 

@@ -1,10 +1,10 @@
 # Published Aerospike skill
 
-This directory holds the **published** Aerospike agent skill — one file compiled from the three authoring folders under [`skills/`](../skills/). CI fails any pull request whose compiled output is stale, so this always matches the source skills on `main`.
+This directory holds the **published** Aerospike agent skill, compiled from the three authoring folders under [`skills/`](../skills/). `SKILL.md` is the routing layer an agent loads on activation; the rule files it names ship beside it in `references/` and are read on demand. CI fails any pull request whose compiled output is stale, so this always matches the source skills on `main`.
 
 | File | Purpose |
 |------|---------|
-| [`aerospike/SKILL.md`](aerospike/SKILL.md) | **Download this** — getting-started, application development, and data-modeling rules in one file, with frontmatter registries can validate |
+| [`aerospike/`](aerospike/) | **Install this folder** — `SKILL.md` (getting-started, application development and data-modeling rules, with frontmatter registries can validate) plus the `references/` files it routes to |
 
 ## Quick install
 

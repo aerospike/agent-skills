@@ -4,7 +4,7 @@ impact: HIGH
 tags: client, connection-pool, singleton
 doc: https://www.aerospike.com/docs/develop/client/java/connect/
 also:
-  - https://aerospike.com/docs/develop/learn/policies
+  - https://aerospike.com/docs/database/learn/policies
   - https://aerospike.com/docs/database/learn/policies/
   - https://aerospike.com/docs/develop/client/java/policies/
 last_verified: 2026-04-21
@@ -37,4 +37,4 @@ The client maintains connection pools to cluster nodes, background tending for t
 - [client-error-rate-backoff.md](client-error-rate-backoff.md)
 - [policy-client-defaults.md](policy-client-defaults.md)
 - [policy-reuse-timeouts-retries.md](policy-reuse-timeouts-retries.md)
-- [ex-singleton-client-python.md](ex-singleton-client-python.md)
+- [client-singleton.md](../examples/client-singleton.md)

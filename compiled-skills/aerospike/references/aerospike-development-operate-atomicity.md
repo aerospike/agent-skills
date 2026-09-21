@@ -24,11 +24,11 @@ Interleaved reads and writes on the same key from multiple clients produce lost 
 **Avoid**
 
 - Multiple independent puts racing without coordination
-- Mixing a whole-record read with bin-scoped ops in one `operate` (use per-bin reads only; see [binop-operate-record-lock-read-write.md](binop-operate-record-lock-read-write.md))
+- Mixing a whole-record read with bin-scoped ops in one `operate` (use per-bin reads only; see [operate-record-lock-read-write.md](aerospike-development-operate-record-lock-read-write.md))
 
 **See also**
 
-- [binop-operate-record-lock-read-write.md](binop-operate-record-lock-read-write.md) (record lock, mixed read/write, latency)
-- [ex-bin-operate-mixed-read-write.md](ex-bin-operate-mixed-read-write.md)
-- [cdt-server-side-ops.md](cdt-server-side-ops.md)
-- [single-record-operations.md](single-record-operations.md)
+- [operate-record-lock-read-write.md](aerospike-development-operate-record-lock-read-write.md) (record lock, mixed read/write, latency)
+- [operate-mixed-read-write.md](https://github.com/aerospike/agent-skills/blob/main/skills/aerospike-development/examples/operate-mixed-read-write.md)
+- [cdt-server-side-ops.md](aerospike-development-cdt-server-side-ops.md)
+- [single-record-operations.md](aerospike-development-single-record-operations.md)

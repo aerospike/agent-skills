@@ -15,11 +15,11 @@ Hub: [Building with Aerospike](https://aerospike.com/docs/develop/learn)
 | Bin operations / `operate` | [Bin operations](https://aerospike.com/docs/develop/learn/bin-operations/) |
 | Batch | [Batch](https://aerospike.com/docs/develop/learn/batch/) |
 | Queries | [Queries](https://aerospike.com/docs/develop/learn/queries/) |
-| Policies | [Policies (develop/learn)](https://aerospike.com/docs/develop/learn/policies) · [Policies (database/learn)](https://aerospike.com/docs/database/learn/policies/) |
-| Security (developer-facing) | [Security](https://aerospike.com/docs/develop/learn/security/) |
-| Best practices | [Best practices](https://aerospike.com/docs/develop/learn/best-practices) |
-| Strong consistency | [Strong consistency](https://aerospike.com/docs/develop/learn/strong-consistency) |
-| Transactions | [Create and use transactions](https://aerospike.com/docs/develop/learn/create-and-use-transactions) |
+| Policies | [Policies (develop/learn)](https://aerospike.com/docs/database/learn/policies) · [Policies (database/learn)](https://aerospike.com/docs/database/learn/policies/) |
+| Security (developer-facing) | [Security](https://aerospike.com/docs/database/learn/security/access-control) |
+| Best practices | [Best practices](https://aerospike.com/docs/database/learn/best-practices) |
+| Strong consistency | [Strong consistency](https://aerospike.com/docs/database/learn/strong-consistency) |
+| Transactions | [Create and use transactions](https://aerospike.com/docs/database/learn/transactions) |
 
 ## Data types and expressions
 
@@ -38,7 +38,7 @@ Hub: [Building with Aerospike](https://aerospike.com/docs/develop/learn)
 | Data model | [Data model](https://aerospike.com/docs/database/learn/architecture/data-storage/data-model) |
 | Primary index | [Primary index](https://aerospike.com/docs/database/learn/architecture/data-storage/primary-index) |
 | Secondary index | [Secondary index](https://aerospike.com/docs/database/learn/architecture/data-storage/secondary-index) |
-| Client architecture | [Client architecture](https://aerospike.com/docs/database/learn/architecture/client-architecture) |
+| Client architecture | [Client architecture](https://aerospike.com/docs/database/learn/architecture/clients) |
 | Durable deletes (tombstones, EE) | [Durable deletes](https://aerospike.com/docs/database/learn/architecture/durable-deletes) |
 
 ## Language clients (`develop/client`)
@@ -84,4 +84,4 @@ The section is rolling out across the clients, so a repository may not carry one
 
 ## Database hub (ops boundary)
 
-[Database documentation](https://aerospike.com/docs/database/) — configuration, clustering, and operations when leaving pure application development.
+[Database documentation](https://aerospike.com/docs/database/learn/architecture) — configuration, clustering, and operations when leaving pure application development.
