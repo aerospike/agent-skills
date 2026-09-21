@@ -6,19 +6,41 @@ This document is for whoever cuts a release, or turns publishing on for the firs
 
 ## How to publish
 
-Tag a stable semantic version — `vX.Y.Z`, above the last release — and cut a GitHub release. That is the whole procedure: a release that clears the gates below submits on its own, with nothing to approve. See [Version numbers](#version-numbers) for what the tag has to look like.
+The published skill declares its own version, so a release is **two steps, in this order**: land the version bump, then tag it.
+
+1. **Bump and recompile, in one commit.** `metadata.version` lives in [`scripts/skills_compile/published_skill.yaml`](../scripts/skills_compile/published_skill.yaml) and is compiled into the published frontmatter, so bumping it without recompiling leaves the artifact stale:
+
+   ```bash
+   # edit metadata.version, then:
+   python3 scripts/compile-agents.py --shape stripped --write
+   ```
+
+   Record what changed in [`CHANGELOG.md`](../CHANGELOG.md) in the same commit, and merge it.
+
+2. **Tag that commit and cut a GitHub release.** A release that clears the gates below submits on its own, with nothing to approve.
+
+**Order matters.** Tagging first fails the release: `metadata.version` would still hold the previous number, and gate 0 compares the two. Skipping the recompile fails it too, at gate 1, because `compile-agents.py --check` sees the artifact lagging its source.
+
+**A tag alone publishes nothing.** The workflow triggers on `release: published`, not on a tag push — so `git push origin v1.1.0` is safe to do ahead of time, and cutting the release is the act that submits.
+
+See [Version numbers](#version-numbers) for what the tag has to look like.
 
 To rehearse without submitting anything, run the workflow manually from the Actions tab with **Run workflow**. The `dry_run` input defaults to `true`, which renders the exact payloads into the job summary and contacts nothing.
 
 ## Version numbers
 
-Releases are [semantic versions](https://semver.org/) with a `v` prefix, and [`release-version.yml`](../.github/workflows/release-version.yml) enforces three rules on every release before any gate below is reached:
+Releases are [semantic versions](https://semver.org/) with a `v` prefix, and [`release-version.yml`](../.github/workflows/release-version.yml) enforces four rules on every release before any gate below is reached:
 
 | Rule | Rejected | Accepted |
 |------|----------|----------|
 | Exactly `vMAJOR.MINOR.PATCH`, no leading zeros | `1.4.0`, `v1.4`, `v1.04.0` | `v1.4.0` |
 | No prerelease suffix, no build metadata, and not flagged **Set as a pre-release** on the release | `v1.4.0-rc.1`, `v1.4.0+build.3` | `v1.4.0` |
 | Above the highest existing tag | `v1.3.9` after `v1.4.0` | `v1.4.1`, `v1.5.0`, `v2.0.0` |
+| Equal to `metadata.version` in the published artifact | `v1.4.0` while the skill says `1.3.0` | `v1.4.0` while the skill says `1.4.0` |
+
+The last rule exists because **a consumer who installed the skill reads its frontmatter, never our tag.** An artifact that misreports its own version is worse than an unversioned one, so a drifted release fails rather than shipping. What a major, minor or patch bump means for a package of prose is set out in [`CHANGELOG.md`](../CHANGELOG.md#what-a-version-means-here).
+
+The version is hand-maintained rather than derived from `git describe`, because the published frontmatter is emitted verbatim to keep `compile-agents.py --check` byte-stable. Deriving it at compile time would make the artifact churn on every commit and turn drift detection into noise.
 
 Stability is the rule worth understanding: publishing is **permanent**, because no registry documents a way to delete a submission. A release candidate that reaches a registry cannot be taken back, so a prerelease is not allowed to be a release here. Use a **draft** release to stage notes instead — drafts publish nothing until released.
 
