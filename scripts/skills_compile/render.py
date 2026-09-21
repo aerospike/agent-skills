@@ -9,19 +9,96 @@ from scripts.skills_compile import skillsrc
 _BULLET_RE = re.compile(r"^\s*(?:[-*]|\d+\.)\s+(.*)$")
 _BOLD_RE = re.compile(r"\*\*(.+?)\*\*")
 _LINK_RE = re.compile(r"\[([^\]]+)\]\([^)]+\)")
+_ITALIC_RE = re.compile(r"(?<!\*)\*([^*\n]+)\*(?!\*)")
+_FENCE_RE = re.compile(r"^\s*```")
+_LONE_BOLD_RE = re.compile(r"^\*\*(.+)\*\*$")
 _SECTION_KEYS = ("rule", "blacklist", "pitfall", "practice", "critical", "mapping")
 
 
 def _clean_inline(text: str) -> str:
     text = _LINK_RE.sub(r"\1", text)
     text = _BOLD_RE.sub(r"\1", text)
+    text = _ITALIC_RE.sub(r"\1", text)
     text = text.replace("`", "")
     return re.sub(r"\s+", " ", text).strip()
 
 
-def _collapse(text: str) -> str:
-    para = text.strip().split("\n\n", 1)[0]
-    return _clean_inline(para.replace("\n", " "))
+def split_blocks(text: str) -> list[str]:
+    """Blank-line-separated blocks, never splitting inside a fenced code block.
+
+    A fence can legally contain blank lines and lines starting with ``|`` or
+    ``-``; splitting or classifying those as markdown would mangle a literal
+    command into table rows.
+    """
+    blocks: list[str] = []
+    cur: list[str] = []
+    in_fence = False
+    for line in text.strip().splitlines():
+        if _FENCE_RE.match(line):
+            in_fence = not in_fence
+            cur.append(line)
+            continue
+        if not line.strip() and not in_fence:
+            if cur:
+                blocks.append("\n".join(cur))
+                cur = []
+            continue
+        cur.append(line)
+    if cur:
+        blocks.append("\n".join(cur))
+    return blocks
+
+
+def _block_kind(block: str) -> str:
+    """Classify a block by its first non-blank line: fence, table, list or para.
+
+    Classifying a list by its first line only is deliberate -- continuation
+    lines are indented prose, and inspecting every line would demote a wrapped
+    list back to a paragraph.
+    """
+    lines = [ln for ln in block.splitlines() if ln.strip()]
+    if not lines:
+        return "para"
+    if _FENCE_RE.match(lines[0]):
+        return "fence"
+    if lines[0].lstrip().startswith("|"):
+        return "table"
+    if _BULLET_RE.match(lines[0]):
+        return "list"
+    return "para"
+
+
+def _rule_lines(rule: str) -> list[str]:
+    """Render a whole ``**Rule**`` section, not just its first paragraph.
+
+    Paragraphs become top-level bullets; tables, lists and fenced code are
+    indented under the bullet above them, which preserves the "these belong to
+    the sentence I just read" relation that a flat list destroys. Every Rule
+    section in the corpus opens with a paragraph, so an indented run always has
+    a parent.
+    """
+    lines: list[str] = []
+    for block in split_blocks(rule):
+        kind = _block_kind(block)
+        if kind == "fence":
+            # Verbatim: _clean_inline would strip the backticks that make it code.
+            lines.extend(f"  {ln}".rstrip() for ln in block.splitlines())
+        elif kind == "table":
+            lines.extend(f"  - {row}" for row in _extract_table_rows(block))
+        elif kind == "list":
+            lines.extend(f"  - {item}" for item in _list_items(block))
+        else:
+            stripped = block.strip()
+            lone = _LONE_BOLD_RE.match(stripped)
+            if lone and "\n" not in stripped:
+                # A bold-only line is a sub-heading the compiler cannot see as a
+                # section; emit it as a label so what follows reads under it.
+                text = f"{_clean_inline(lone.group(1))}:"
+            else:
+                text = _clean_inline(block.replace("\n", " "))
+            if text:
+                lines.append(f"- {text}")
+    return lines
 
 
 def _list_items(content: str) -> list[str]:
@@ -124,7 +201,7 @@ def render_stripped(skills: list[skillsrc.SkillSource]) -> str:
             title = ref.meta.get("title") or ref.name
             impact = ref.meta.get("impact", "")
             head = f"\n### {title}" + (f" [{impact}]" if impact else "")
-            chunk = [head, f"- {_collapse(rule)}"]
+            chunk = [head, *_rule_lines(rule)]
             if secs.get("Prefer"):
                 pref = _bullets_inline(secs["Prefer"])
                 if pref:
