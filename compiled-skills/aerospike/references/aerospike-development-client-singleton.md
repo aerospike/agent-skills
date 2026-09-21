@@ -4,7 +4,7 @@ impact: HIGH
 tags: client, connection-pool, singleton
 doc: https://www.aerospike.com/docs/develop/client/java/connect/
 also:
-  - https://aerospike.com/docs/develop/learn/policies
+  - https://aerospike.com/docs/database/learn/policies
   - https://aerospike.com/docs/database/learn/policies/
   - https://aerospike.com/docs/develop/client/java/policies/
 last_verified: 2026-04-21

@@ -4,7 +4,7 @@ impact: HIGH
 tags: ttl, nsup, default-ttl, error-22, read-touch, retention
 doc: https://aerospike.com/docs/database/manage/namespace/retention
 also:
-  - https://aerospike.com/docs/develop/learn/policies
+  - https://aerospike.com/docs/database/learn/policies
   - https://aerospike.com/docs/database/learn/policies/
 last_verified: 2026-04-21
 ---

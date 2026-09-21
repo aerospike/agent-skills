@@ -4,7 +4,7 @@ Related rules: [client-singleton.md](aerospike-development-client-singleton.md),
 
 **Official source (connect pattern):** [Python client — Create — Setup](https://aerospike.com/docs/develop/client/python/usage/atomic/create#setup)
 
-**Docs:** [Python client](https://aerospike.com/docs/develop/client/python), [Client architecture](https://aerospike.com/docs/database/learn/architecture/client-architecture)
+**Docs:** [Python client](https://aerospike.com/docs/develop/client/python), [Client architecture](https://aerospike.com/docs/database/learn/architecture/clients)
 
 **Scenario:** One long-lived client per process; avoid connect/close per request.
 

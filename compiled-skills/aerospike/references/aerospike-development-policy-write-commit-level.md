@@ -3,8 +3,6 @@ title: Choose write commit level deliberately (COMMIT_ALL vs COMMIT_MASTER)
 impact: HIGH
 tags: policy, write, commit-level, replication, ap, strong-consistency
 doc: https://aerospike.com/docs/database/learn/policies/
-also:
-  - https://aerospike.com/docs/develop/learn/policies
 last_verified: 2026-04-21
 ---
 

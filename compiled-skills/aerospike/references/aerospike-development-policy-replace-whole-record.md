@@ -3,8 +3,6 @@ title: Use replace semantics when overwriting an entire record
 impact: MEDIUM
 tags: policy, write, replace, record-exists-action
 doc: https://aerospike.com/docs/database/learn/policies/
-also:
-  - https://aerospike.com/docs/develop/learn/policies
 last_verified: 2026-04-21
 ---
 

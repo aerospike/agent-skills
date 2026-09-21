@@ -59,7 +59,7 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 - Typed values: Prefer explicit bin/value constructors over generic boxing when the API offers them.
 - Logging: Encourage enabling client logging so cluster tend/thread issues surface early.
 - Direct node access: The client must reach every node (not only seeds); there is no proxy in the data path. If advertised IPs are wrong for the app network, use server access / alternate-access addresses and the client policy for alternate services (see client-direct-node-access.md).
-- Client source of truth: The official clients live on GitHub under github.com/aerospike/ — aerospike-client-java-sdk, aerospike-client-python-sdk, aerospike-client-rust, aerospike-client-csharp, aerospike-client-go, aerospike-client-nodejs, aerospike-client-c, and the older aerospike-client-java / aerospike-client-python. Read a repository's README.md — its AI coding agent entry point section — before generating code against that client, rather than recalling an API from memory. Start new Java or Python work on the Java SDK or Python SDK; the older Java and Python clients are for codebases already using them.
+- Client source of truth: Read the chosen client's repository README — its AI coding agent entry point section — before generating code against it, and take the API surface from there rather than from memory (see client-source-of-truth.md).
 
 ### Common pitfalls
 - Load balancer or proxy only to seeds; app cannot reach all node addresses -> Clients need direct TCP to every node; use access-address / alternate-access-address (and client useServicesAlternate when needed)—not a proxy in the data path; see client-direct-node-access.md
@@ -113,6 +113,9 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 
 ### client-singleton — Use one Aerospike client per process [HIGH]
 - Instantiate the Aerospike client once per application process (or equivalent isolation boundary) and share it across threads/workers.
+
+### client-source-of-truth — Read the client repository before generating code for it [HIGH]
+- Open the chosen client's repository README before writing code against it, and take the API surface from there rather than from memory.
 
 ### ex-batch-read-by-keys — worked example
 - See the linked file for runnable code and official-doc links.
