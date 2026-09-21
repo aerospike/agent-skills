@@ -165,6 +165,26 @@ def _bullets_inline(content: str) -> str:
     return "; ".join(_extract_bullets(content))
 
 
+def _rule_index(sk: skillsrc.SkillSource) -> list[str]:
+    """One line per rule: identifier, title, impact.
+
+    Rules appear below under their titles but cite each other by filename, and
+    nothing in the artifact mapped one to the other. This is that map. Entries
+    stay in filename order, which groups them by prefix (client-, policy-,
+    cdt-, ...) for free.
+    """
+    out: list[str] = []
+    for ref in sk.refs:
+        rule = skillsrc.labeled_sections(ref.body).get("Rule", "").strip()
+        if not rule:
+            continue
+        ident = skillsrc.rule_id(sk.name, ref.name)
+        title = ref.meta.get("title") or ref.name
+        impact = ref.meta.get("impact", "")
+        out.append(f"- `{ident}` — {title}" + (f" [{impact}]" if impact else ""))
+    return out
+
+
 def render_monolith(skills: list[skillsrc.SkillSource]) -> str:
     """Flatten everything into one document, reasoning retained."""
     parts = ["# Aerospike agent guide (compiled, full)\n"]
@@ -193,6 +213,10 @@ def render_stripped(skills: list[skillsrc.SkillSource]) -> str:
             if items:
                 parts.append(f"\n### {title}")
                 parts.extend(f"- {it}" for it in items)
+        index = _rule_index(sk)
+        if index:
+            parts.append("\n### Rule index")
+            parts.extend(index)
         for ref in sk.refs:
             secs = skillsrc.labeled_sections(ref.body)
             rule = secs.get("Rule", "").strip()
@@ -200,7 +224,11 @@ def render_stripped(skills: list[skillsrc.SkillSource]) -> str:
                 continue
             title = ref.meta.get("title") or ref.name
             impact = ref.meta.get("impact", "")
-            head = f"\n### {title}" + (f" [{impact}]" if impact else "")
+            ident = skillsrc.rule_id(sk.name, ref.name)
+            head = (
+                f"\n### [{ident}](references/{ident}.md) — {title}"
+                + (f" [{impact}]" if impact else "")
+            )
             chunk = [head, *_rule_lines(rule)]
             if secs.get("Prefer"):
                 pref = _bullets_inline(secs["Prefer"])

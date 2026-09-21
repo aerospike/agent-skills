@@ -68,6 +68,22 @@ def heading_sections(body: str) -> list[tuple[int, str, str]]:
     return out
 
 
+def rule_id(skill_name: str, ref_name: str) -> str:
+    """Skill-qualified, stable identifier for a rule file.
+
+    ``aerospike-development`` + ``policy-write-commit-level.md`` becomes
+    ``aerospike-development-policy-write-commit-level``.
+
+    The published package flattens every skill's ``references/`` into one
+    folder, so the skill qualifier is what makes a basename collision between
+    two skills impossible. It is derived here rather than stored in the source
+    filename: under ``skills/<skill>/references/`` the qualifier is redundant,
+    and it would only add noise to the 84 inline cross-references.
+    """
+    stem = ref_name[:-3] if ref_name.endswith(".md") else ref_name
+    return f"{skill_name}-{stem}"
+
+
 @dataclass
 class RefFile:
     name: str  # basename, e.g. client-singleton.md
