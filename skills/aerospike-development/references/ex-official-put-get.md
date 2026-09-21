@@ -2,6 +2,8 @@
 
 Related rules: [single-record-operations.md](single-record-operations.md), [policy-reuse-timeouts-retries.md](policy-reuse-timeouts-retries.md)
 
+**All languages.** The linked documentation page carries this in tabbed examples, in the canonical tab order: **Java SDK, Python SDK, Rust, C#, Go, Node.js, C, Java (legacy), Python (legacy)**. Java, Python and C are on essentially every page, with Go, C# and Node.js close behind; **Java SDK, Python SDK and Rust are still rolling out** and are present on a minority of pages today. The snippets below are one or two languages for orientation — the documentation is the complete set, and the client's own repository is authoritative for its API surface ([client-source-of-truth.md](client-source-of-truth.md)).
+
 Aerospike publishes **full runnable Create/Read samples** on each language page (ufodata-style tutorials with GeoJSON, policies, etc.). **Do not duplicate** those long listings here—use the links below. The **minimal Python and Java** snippets only show connect → put → get shape.
 
 **Official guides (Create + Read — use each page’s Code block for the full program):**

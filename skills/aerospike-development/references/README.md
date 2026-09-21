@@ -8,7 +8,7 @@
 |------|--------|
 | [ex-cdt-list-append.md](ex-cdt-list-append.md) | CDT list append (Java) |
 | [ex-cdt-map-nested-vehicles.md](ex-cdt-map-nested-vehicles.md) | Nested maps / vehicles (Java + Python) |
-| [ex-singleton-client-python.md](ex-singleton-client-python.md) | Singleton client (Python) |
+| [ex-singleton-client.md](ex-singleton-client.md) | Singleton client (Python) |
 | [ex-policy-explicit-defaults.md](ex-policy-explicit-defaults.md) | Policy defaults (Python) |
 | [ex-batch-read-by-keys.md](ex-batch-read-by-keys.md) | Batch reads (conceptual) |
 | [ex-official-put-get.md](ex-official-put-get.md) | Create/Read **links** + minimal Python/Java |

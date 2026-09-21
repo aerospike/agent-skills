@@ -6,7 +6,7 @@ Topic files live in [`references/`](references/README.md) with an `ex-` prefix; 
 |-------|------|
 | Append to a list with CDT `operate` (Java) | [references/ex-cdt-list-append.md](references/ex-cdt-list-append.md) |
 | Nested list of maps (vehicles; Java + Python) | [references/ex-cdt-map-nested-vehicles.md](references/ex-cdt-map-nested-vehicles.md) |
-| Singleton client, shared policies (Python) | [references/ex-singleton-client-python.md](references/ex-singleton-client-python.md) |
+| Singleton client, shared policies (Python) | [references/ex-singleton-client.md](references/ex-singleton-client.md) |
 | Default timeouts/retries on the client (Python) | [references/ex-policy-explicit-defaults.md](references/ex-policy-explicit-defaults.md) |
 | Batch primary-key reads (conceptual + links) | [references/ex-batch-read-by-keys.md](references/ex-batch-read-by-keys.md) |
 | **Rules:** namespace vs set boundaries, bins vs CDTs | [references/model-namespace-set-boundaries.md](references/model-namespace-set-boundaries.md), [references/model-bin-cdt-multiple-records.md](references/model-bin-cdt-multiple-records.md) |

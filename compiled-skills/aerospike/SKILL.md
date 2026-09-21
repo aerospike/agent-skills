@@ -138,7 +138,7 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 ### ex-policy-explicit-defaults — worked example
 - See the linked file for runnable code and official-doc links.
 
-### ex-singleton-client-python — worked example
+### ex-singleton-client — worked example
 - See the linked file for runnable code and official-doc links.
 
 ### expr-compute-to-data — Use filter and operation expressions for compute-to-data [HIGH]

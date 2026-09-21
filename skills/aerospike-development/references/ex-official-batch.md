@@ -2,6 +2,8 @@
 
 Related rules: [batch-parallel-key-operations.md](batch-parallel-key-operations.md)
 
+**All languages.** The linked documentation page carries this in tabbed examples, in the canonical tab order: **Java SDK, Python SDK, Rust, C#, Go, Node.js, C, Java (legacy), Python (legacy)**. Java, Python and C are on essentially every page, with Go, C# and Node.js close behind; **Java SDK, Python SDK and Rust are still rolling out** and are present on a minority of pages today. The snippets below are one or two languages for orientation — the documentation is the complete set, and the client's own repository is authoritative for its API surface ([client-source-of-truth.md](client-source-of-truth.md)).
+
 **Concept:** [Batched commands](https://aerospike.com/docs/develop/learn/batch). Full **Setup + policies + `BatchResults`** samples live on each language’s **Batched commands** page—use the linked **Code block**, not a copy here.
 
 **Official batch read guides:**
