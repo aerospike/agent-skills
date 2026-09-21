@@ -36,7 +36,7 @@ tuning policies, choosing CDT operations, debugging a slow batch read. That is
 `aerospike-development`. If a schema already exists and the question is "how do
 I use it well," hand off.
 
-## What you produce
+## Critical deliverables: schema guide and schema summary
 
 Two documents. Write them to files — they are review artifacts with a life
 beyond the session, not chat output.
@@ -52,7 +52,7 @@ regenerated.
 
 See [references/model-deliverables-schema-guide-summary.md](references/model-deliverables-schema-guide-summary.md).
 
-## Mental model for data architects
+## Critical rules: the mental model for data architects
 
 Aerospike is neither a relational database nor a document database.
 
@@ -99,23 +99,18 @@ rewrites it in full — but the same size where writes are infrequent relative t
 reads is a legitimate design, not a compromise. Ask for the **update rate**, not
 just the byte count.
 
-## Do not design without clarifying first
+## Clarification rules: do not design without clarifying first
 
-The first deliverable is a **written clarification document**, not a schema. Ask
-requirements-gap questions — "what is the p95 fan-out?", "is eventual
-consistency acceptable here?" — never mechanism-preference questions like "which
-pattern do you prefer?". If deterministic guidance already resolves a choice,
-apply it instead of asking.
+- **Produce a written clarification document first**, not a schema — it is the first deliverable.
+- **Ask requirements-gap questions** — "what is the p95 fan-out?", "is eventual consistency acceptable here?" — never mechanism-preference questions like "which pattern do you prefer?".
+- **Apply deterministic guidance instead of asking** when it already resolves a choice.
+- **Stop and ask rather than assuming** when entity ownership, lifecycle, cardinality, or an access path is unclear — do not fill the gap and continue.
+- **Record an input you cannot obtain as an explicit assumption** with a reconsider trigger, rather than burying it.
+- **Design one entity group at a time** and pass its review before starting the next.
 
-Do not fill gaps with assumptions and continue. When entity ownership,
-lifecycle, cardinality, or an access path is unclear, stop and ask. Where an
-input cannot be obtained, record it as an explicit assumption with a reconsider
-trigger rather than burying it.
+See [references/model-design-time-workflow.md](references/model-design-time-workflow.md).
 
-Design **one entity group at a time** and pass its review before starting the
-next. See [references/model-design-time-workflow.md](references/model-design-time-workflow.md).
-
-## Failure modes to check while drafting
+## Common pitfalls: failure modes to check while drafting
 
 Seven ways Aerospike models go wrong. Check them **during** design, not after.
 Each has a detection test in
@@ -141,7 +136,7 @@ Each has a detection test in
    overhead against a small payload is real cost; consolidating all of them into
    one record is the opposite error.
 
-## Escalation: use the data modeling guide
+## Escalation mapping: use the data modeling guide
 
 This skill covers the decision layer. The full workflow — the clarification
 gates, the per-relationship decision packs, the sizing worksheets, the
@@ -177,7 +172,7 @@ model, the failure-mode checks, a clarification document) and flag that the
 sizing worksheets and decision packs were not applied. Do not improvise a
 complete model and present it as if the full process ran.
 
-## Version-gated features
+## Version-gate rules
 
 Several patterns depend on server version. Confirm the target version and client
 support before recommending any of them; the guide's checklist has a version

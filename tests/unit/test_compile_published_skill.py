@@ -112,6 +112,9 @@ def test_header_states_how_to_derive_a_rule_file_path(compiler, published):
     _, text = published
     assert compiler.REPO_URL in text
     assert "`references/<skill>-<rule>.md`" in text
+    # A skill's own sections are `###` too, so the header must say how to tell
+    # a rule heading from one of them or the derivation is ambiguous.
+    assert "`<rule> — <title> [IMPACT]`" in text
 
 
 def test_every_rule_heading_resolves_to_a_published_file(compiler):
@@ -129,17 +132,16 @@ def test_every_rule_heading_resolves_to_a_published_file(compiler):
     for line in body.splitlines():
         if line.startswith("## "):
             skill = line[3:].strip()
-        elif line.startswith("### ") and skill:
+        elif line.startswith("### ") and skill and " — " in line:
+            # The header's shape test: `<rule> — <title> [IMPACT]`. A `###`
+            # without an em-dash is one of the skill's own sections.
             rule = line[4:].split(" — ")[0].strip()
             derived = f"{compiler.SINGLE_DIR}/references/{skill}-{rule}.md"
-            if derived in outputs:
-                checked += 1
-                continue
-            # SKILL.md prose sections are also `###` and name no rule file.
-            assert not (compiler.REPO_ROOT / "skills" / skill / "references" / f"{rule}.md").exists(), (
-                f"{skill} / {rule} has a rule file but derives to a path that "
-                f"was not published: {derived}"
+            assert derived in outputs, (
+                f"{skill} / {rule} reads as a rule heading but derives to a "
+                f"path that was not published: {derived}"
             )
+            checked += 1
     assert checked >= 35, f"expected the rule corpus to be reachable, resolved only {checked}"
 
 
