@@ -44,6 +44,7 @@ TOC: [examples.md](../examples.md).
 
 ### client-
 
+- [client-source-of-truth.md](client-source-of-truth.md) — read the client repository's AI coding agent entry point before generating code for it
 - [client-singleton.md](client-singleton.md)
 - [client-pools-warmup.md](client-pools-warmup.md)
 - [client-direct-node-access.md](client-direct-node-access.md)
