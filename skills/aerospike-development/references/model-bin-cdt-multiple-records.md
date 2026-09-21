@@ -27,7 +27,7 @@ Bins are cheap to address individually; CDTs add path operations and size but av
 **Avoid**
 
 - **Unbounded** list/map growth on a “document-shaped” record; see [cdt-bounded-collections.md](cdt-bounded-collections.md)
-- **Giant** nested JSON-like blobs updated only via full-record **get**/**put** under **concurrent writers**; prefer [binop](binop-operate-record-lock-read-write.md) and [expressions](expr-compute-to-data.md) on the server
+- **Giant** nested JSON-like blobs updated only via full-record **get**/**put** under **concurrent writers**; prefer [binop](operate-record-lock-read-write.md) and [expressions](expr-compute-to-data.md) on the server
 - **Multiple records** for “normalization” alone when every read still needs all of them—[denormalize](model-access-paths-denormalization.md) for the dominant path
 
 **See also**

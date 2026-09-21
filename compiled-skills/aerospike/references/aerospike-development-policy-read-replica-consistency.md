@@ -40,4 +40,4 @@ Wrong read policies cause subtle staleness, extra load on the master, or unneces
 
 - [policy-reuse-timeouts-retries.md](aerospike-development-policy-reuse-timeouts-retries.md)
 - [single-ttl-nsup-default-ttl.md](aerospike-development-single-ttl-nsup-default-ttl.md) (read-touch TTL and reads)
-- [binop-operate-atomicity.md](aerospike-development-binop-operate-atomicity.md)
+- [operate-atomicity.md](aerospike-development-operate-atomicity.md)

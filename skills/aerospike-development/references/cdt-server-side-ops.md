@@ -40,7 +40,7 @@ Read-modify-write costs two round trips and loses races unless you add generatio
 
 - [cdt-nested-collections.md](cdt-nested-collections.md)
 - [cdt-bounded-collections.md](cdt-bounded-collections.md)
-- [binop-operate-atomicity.md](binop-operate-atomicity.md)
+- [operate-atomicity.md](operate-atomicity.md)
 - [cdt-list-append.md](../examples/cdt-list-append.md)
 - [cdt-map-nested-vehicles.md](../examples/cdt-map-nested-vehicles.md)
 - [policy-generation-cas.md](policy-generation-cas.md)

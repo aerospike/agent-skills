@@ -22,7 +22,7 @@ One key lives on **one partition**; concurrent reads and writes **queue** behind
 **Prefer**
 
 - **Spreading** work across **more keys** when the product allows—**shard** counters or aggregates instead of a **single** global row everyone updates
-- **One** `operate` (or **one** batch entry) **per key** when a key needs several changes—see [batch-parallel-key-operations.md](batch-parallel-key-operations.md) and [binop-operate-record-lock-read-write.md](binop-operate-record-lock-read-write.md)
+- **One** `operate` (or **one** batch entry) **per key** when a key needs several changes—see [batch-parallel-key-operations.md](batch-parallel-key-operations.md) and [operate-record-lock-read-write.md](operate-record-lock-read-write.md)
 - **Read** policies that **spread read load** when **slightly stale** data is OK—[policy-read-replica-consistency.md](policy-read-replica-consistency.md) (**MASTER_PROLES**, etc.)
 - **Server-side** namespace tuning such as **`read-page-cache`** so the **OS page cache** can absorb **repeated reads** of the same device blocks—can **ease read-heavy hot keys** when storage layout fits; see [model-record-size-hardware-efficiency.md](model-record-size-hardware-efficiency.md) and the [`read-page-cache`](https://aerospike.com/docs/database/reference/config#namespace__read-page-cache) reference (not a substitute for **sharding** hot keys in the app)
 - **Backoff with jitter** on transient errors instead of tight spin loops

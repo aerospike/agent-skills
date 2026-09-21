@@ -32,5 +32,5 @@ CDTs make it easy to append; operations teams see incidents when “history” o
 - [model-record-size-hardware-efficiency.md](aerospike-development-model-record-size-hardware-efficiency.md)
 - [cdt-nested-collections.md](aerospike-development-cdt-nested-collections.md)
 - [cdt-server-side-ops.md](aerospike-development-cdt-server-side-ops.md)
-- [cdt-list-append.md](../examples/aerospike-development-cdt-list-append.md)
-- [cdt-map-nested-vehicles.md](../examples/aerospike-development-cdt-map-nested-vehicles.md)
+- [cdt-list-append.md](https://github.com/aerospike/agent-skills/blob/main/skills/aerospike-development/examples/cdt-list-append.md)
+- [cdt-map-nested-vehicles.md](https://github.com/aerospike/agent-skills/blob/main/skills/aerospike-development/examples/cdt-map-nested-vehicles.md)

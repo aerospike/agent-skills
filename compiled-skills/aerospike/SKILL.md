@@ -79,22 +79,16 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 - expr- -> Filter/operation/path expressions vs heavier alternatives
 - query- -> Secondary indexes, cardinality/cost, and deriving index needs from access paths
 - batch- -> Many primary-key reads/writes; one key per batch entry, coalesce, batch operate
-- binop- -> operate, one record lock, mixed read/write, atomic multi-bin updates
+- operate- -> operate: one record lock, mixed read/write, atomic multi-bin updates
 - single- -> Whole-record vs partial/bin operations; TTL void-time and NSUP/default-ttl; delete and durable deletes (EE)
 - model- -> Namespace and set boundaries; flat bins vs CDTs vs multiple records; keys, denormalization, access paths; operate / batch / expressions; record size vs index RAM and disk; hot keys and error 14 / KEY_BUSY
 - sec- -> TLS and access control on the client
 
 ### Worked examples
-- Runnable code for a task, in `examples/`: batch-read-by-keys, bin-operate-mixed-read-write, cdt-list-append, cdt-map-nested-vehicles, official-batch, official-put-get, policy-explicit-defaults, singleton-client
+- Runnable code for a task, in `examples/`: batch-official-links, batch-read-by-keys, cdt-list-append, cdt-map-nested-vehicles, client-singleton, operate-mixed-read-write, policy-explicit-defaults, single-put-get
 
 ### batch-parallel-key-operations — Use batch APIs for many primary-key operations [MEDIUM]
 - When reading or writing many records by known primary keys, use the client’s batch APIs instead of serial single-key calls, subject to reasonable batch sizes and error-handling needs.
-
-### binop-operate-atomicity — Use operate for multi-bin atomic updates on one key [HIGH]
-- When a single logical update touches multiple bins or uses CDT ops on one record, use operate (multi-operation) so the server applies the sequence atomically for that record, rather than separate put/get cycles that can interleave with other writers.
-
-### binop-operate-record-lock-read-write — Use operate for one record lock, many ops, and mixed reads and writes [HIGH]
-- Use the operate command when you need multiple bin-level changes on the same record key in one server round trip.
 
 ### cdt-bounded-collections — Keep lists and maps bounded [HIGH]
 - Never grow lists or maps without bounds.
@@ -140,6 +134,12 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 
 ### model-record-size-hardware-efficiency — Size records for primary-index overhead and disk bandwidth [HIGH]
 - In hybrid memory architecture (HMA) and All Flash deployments, record data lives on device and reads generally come from the storage path—plan I/O accordingly.
+
+### operate-atomicity — Use operate for multi-bin atomic updates on one key [HIGH]
+- When a single logical update touches multiple bins or uses CDT ops on one record, use operate (multi-operation) so the server applies the sequence atomically for that record, rather than separate put/get cycles that can interleave with other writers.
+
+### operate-record-lock-read-write — Use operate for one record lock, many ops, and mixed reads and writes [HIGH]
+- Use the operate command when you need multiple bin-level changes on the same record key in one server round trip.
 
 ### policy-client-defaults — Set client-level policy defaults per operation type [MEDIUM]
 - Aerospike clients let you attach default policies to the client object so API calls that pass null (or use implicit defaults) still get predictable timeouts, retries, and behavior.

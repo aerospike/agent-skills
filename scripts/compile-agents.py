@@ -113,6 +113,7 @@ def _portable_links(
     skill_dir: str,
     published: dict[str, tuple[str, str]],
     folder: str = "references",
+    siblings: dict[str, tuple[str, str]] | None = None,
 ) -> str:
     """Make a rule file's relative links resolve inside the published package.
 
@@ -139,8 +140,18 @@ def _portable_links(
         path, _, frag = target.partition("#")
         suffix = f"#{frag}" if frag else ""
         base = posixpath.basename(path)
-        if base in published:
-            dest_folder, name = published[base]
+        # A name may exist in both folders. Resolve to this file's own folder
+        # first, so a citation means the nearest thing, then fall back to the
+        # rules -- deterministic either way, never ambiguous.
+        table = None
+        if siblings and base in siblings and not path.startswith("../"):
+            table = siblings
+        elif base in published:
+            table = published
+        elif siblings and base in siblings:
+            table = siblings
+        if table is not None:
+            dest_folder, name = table[base]
             prefix = "" if dest_folder == folder else f"../{dest_folder}/"
             return f"{m.group(1)}{prefix}{name}{suffix}{m.group(3)}"
         resolved = posixpath.normpath(posixpath.join(f"{skill_dir}/{folder}", path))
@@ -169,14 +180,20 @@ def _reference_outputs(skills: list[skillsrc.SkillSource]) -> dict[str, str]:
                 )
             published[ref.name] = ("references", f"{skillsrc.rule_id(sk.name, ref.name)}.md")
 
+    # A rule and its worked example may share a name -- references/client-singleton.md
+    # and examples/client-singleton.md are the rule and the example of that rule,
+    # and the pairing is the point: given one, the other is derivable. They land in
+    # different folders, so nothing is overwritten. Examples are keyed separately so
+    # a bare citation still resolves to exactly one file (see _portable_links).
+    example_names: dict[str, tuple[str, str]] = {}
     for sk in skills:
         for ex in sk.examples:
-            if ex.name in published:
+            if ex.name in example_names:
                 raise ValueError(
-                    f"{ex.name} appears in more than one skill or as both a rule "
-                    "and an example; published names must be unique"
+                    f"{ex.name} is an example in more than one skill; the published "
+                    "examples/ folder is flat, so basenames must be unique across skills"
                 )
-            published[ex.name] = ("examples", f"{skillsrc.rule_id(sk.name, ex.name)}.md")
+            example_names[ex.name] = ("examples", f"{skillsrc.rule_id(sk.name, ex.name)}.md")
 
     out: dict[str, str] = {}
     for sk in skills:
@@ -185,8 +202,10 @@ def _reference_outputs(skills: list[skillsrc.SkillSource]) -> dict[str, str]:
             rel = f"{SINGLE_DIR}/references/{published[ref.name][1]}"
             out[rel] = _portable_links(ref.raw, skill_dir, published)
         for ex in sk.examples:
-            rel = f"{SINGLE_DIR}/examples/{published[ex.name][1]}"
-            out[rel] = _portable_links(ex.raw, skill_dir, published, folder="examples")
+            rel = f"{SINGLE_DIR}/examples/{example_names[ex.name][1]}"
+            out[rel] = _portable_links(
+                ex.raw, skill_dir, published, folder="examples", siblings=example_names
+            )
     return out
 
 

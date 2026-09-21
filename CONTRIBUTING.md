@@ -114,6 +114,8 @@ Five labels, each **bold and alone on its line**. The set is closed—[`skillsrc
 | `**Why**` | No | Rationale. Ships in `references/`. |
 | `**See also**` | No | Bibliography. Ships in `references/`. |
 
+**Filenames are the taxonomy.** The prefix set in [`references/README.md`](skills/aerospike-development/references/README.md) is closed, and it governs `examples/` as well as `references/`—an example about `operate` is `operate-…`, not `bin-operate-…` or `official-…`. A rule and its worked example may share a name (`references/client-singleton.md` and `examples/client-singleton.md`): they land in different folders, and the pairing is deliberate—given one, the other is derivable. Two rules, or two examples, may not.
+
 A file with **no `**Rule**`** contributes no instruction. Worked examples live in `examples/` rather than `references/`, and `SKILL.md` names them once under **Worked examples** instead of giving each a heading; the coverage check still requires every shipped example to appear in that list.
 
 ### Transforms that silently change what ships

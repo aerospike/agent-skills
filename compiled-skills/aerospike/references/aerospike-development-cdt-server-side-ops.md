@@ -40,8 +40,8 @@ Read-modify-write costs two round trips and loses races unless you add generatio
 
 - [cdt-nested-collections.md](aerospike-development-cdt-nested-collections.md)
 - [cdt-bounded-collections.md](aerospike-development-cdt-bounded-collections.md)
-- [binop-operate-atomicity.md](aerospike-development-binop-operate-atomicity.md)
-- [cdt-list-append.md](../examples/aerospike-development-cdt-list-append.md)
-- [cdt-map-nested-vehicles.md](../examples/aerospike-development-cdt-map-nested-vehicles.md)
+- [operate-atomicity.md](aerospike-development-operate-atomicity.md)
+- [cdt-list-append.md](https://github.com/aerospike/agent-skills/blob/main/skills/aerospike-development/examples/cdt-list-append.md)
+- [cdt-map-nested-vehicles.md](https://github.com/aerospike/agent-skills/blob/main/skills/aerospike-development/examples/cdt-map-nested-vehicles.md)
 - [policy-generation-cas.md](aerospike-development-policy-generation-cas.md)
 - [policy-client-defaults.md](aerospike-development-policy-client-defaults.md)

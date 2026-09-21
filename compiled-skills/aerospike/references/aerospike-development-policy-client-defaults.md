@@ -36,4 +36,4 @@ Implicit defaults differ between **reads** and **writes** and between **single-k
 - [client-singleton.md](aerospike-development-client-singleton.md)
 - [policy-reuse-timeouts-retries.md](aerospike-development-policy-reuse-timeouts-retries.md)
 - [batch-parallel-key-operations.md](aerospike-development-batch-parallel-key-operations.md)
-- [policy-explicit-defaults.md](../examples/aerospike-development-policy-explicit-defaults.md)
+- [policy-explicit-defaults.md](https://github.com/aerospike/agent-skills/blob/main/skills/aerospike-development/examples/policy-explicit-defaults.md)

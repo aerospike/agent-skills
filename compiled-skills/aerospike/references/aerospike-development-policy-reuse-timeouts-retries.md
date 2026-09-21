@@ -49,6 +49,6 @@ Per-call policy allocation adds GC pressure in managed languages and obscures wh
 - [policy-generation-cas.md](aerospike-development-policy-generation-cas.md)
 - [policy-replace-whole-record.md](aerospike-development-policy-replace-whole-record.md)
 - [policy-read-replica-consistency.md](aerospike-development-policy-read-replica-consistency.md)
-- [policy-explicit-defaults.md](../examples/aerospike-development-policy-explicit-defaults.md)
+- [policy-explicit-defaults.md](https://github.com/aerospike/agent-skills/blob/main/skills/aerospike-development/examples/policy-explicit-defaults.md)
 - [policy-client-defaults.md](aerospike-development-policy-client-defaults.md)
 - [sec-client-tls-auth.md](aerospike-development-sec-client-tls-auth.md)

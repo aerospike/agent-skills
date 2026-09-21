@@ -35,6 +35,6 @@ Fetching or writing entire records when only one bin changes wastes bandwidth at
 - [single-ttl-expiration-retention.md](aerospike-development-single-ttl-expiration-retention.md)
 - [single-ttl-nsup-default-ttl.md](aerospike-development-single-ttl-nsup-default-ttl.md)
 - [single-delete-durable-deletes.md](aerospike-development-single-delete-durable-deletes.md)
-- [binop-operate-record-lock-read-write.md](aerospike-development-binop-operate-record-lock-read-write.md)
-- [binop-operate-atomicity.md](aerospike-development-binop-operate-atomicity.md)
+- [operate-record-lock-read-write.md](aerospike-development-operate-record-lock-read-write.md)
+- [operate-atomicity.md](aerospike-development-operate-atomicity.md)
 - [policy-replace-whole-record.md](aerospike-development-policy-replace-whole-record.md)

@@ -35,6 +35,6 @@ Fetching or writing entire records when only one bin changes wastes bandwidth at
 - [single-ttl-expiration-retention.md](single-ttl-expiration-retention.md)
 - [single-ttl-nsup-default-ttl.md](single-ttl-nsup-default-ttl.md)
 - [single-delete-durable-deletes.md](single-delete-durable-deletes.md)
-- [binop-operate-record-lock-read-write.md](binop-operate-record-lock-read-write.md)
-- [binop-operate-atomicity.md](binop-operate-atomicity.md)
+- [operate-record-lock-read-write.md](operate-record-lock-read-write.md)
+- [operate-atomicity.md](operate-atomicity.md)
 - [policy-replace-whole-record.md](policy-replace-whole-record.md)

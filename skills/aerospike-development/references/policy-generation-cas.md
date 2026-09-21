@@ -40,5 +40,5 @@ Without **policy + generation from the same read**, you do not have CAS—only a
 **See also**
 
 - [policy-replace-whole-record.md](policy-replace-whole-record.md)
-- [binop-operate-atomicity.md](binop-operate-atomicity.md)
+- [operate-atomicity.md](operate-atomicity.md)
 - [policy-write-commit-level.md](policy-write-commit-level.md) (orthogonal: commit level vs CAS)

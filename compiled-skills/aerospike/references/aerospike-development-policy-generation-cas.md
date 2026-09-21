@@ -40,5 +40,5 @@ Without **policy + generation from the same read**, you do not have CAS—only a
 **See also**
 
 - [policy-replace-whole-record.md](aerospike-development-policy-replace-whole-record.md)
-- [binop-operate-atomicity.md](aerospike-development-binop-operate-atomicity.md)
+- [operate-atomicity.md](aerospike-development-operate-atomicity.md)
 - [policy-write-commit-level.md](aerospike-development-policy-write-commit-level.md) (orthogonal: commit level vs CAS)

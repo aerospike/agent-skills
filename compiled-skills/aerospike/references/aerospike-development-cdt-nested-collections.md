@@ -36,8 +36,8 @@ Unordered map construction from the client can omit the K-ordered flag or reorde
 
 **See also**
 
-- [cdt-map-nested-vehicles.md](../examples/aerospike-development-cdt-map-nested-vehicles.md)
-- [cdt-list-append.md](../examples/aerospike-development-cdt-list-append.md)
+- [cdt-map-nested-vehicles.md](https://github.com/aerospike/agent-skills/blob/main/skills/aerospike-development/examples/cdt-map-nested-vehicles.md)
+- [cdt-list-append.md](https://github.com/aerospike/agent-skills/blob/main/skills/aerospike-development/examples/cdt-list-append.md)
 - [cdt-server-side-ops.md](aerospike-development-cdt-server-side-ops.md)
 - [cdt-bounded-collections.md](aerospike-development-cdt-bounded-collections.md)
 - [expr-compute-to-data.md](aerospike-development-expr-compute-to-data.md)

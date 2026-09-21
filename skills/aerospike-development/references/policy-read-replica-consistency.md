@@ -40,4 +40,4 @@ Wrong read policies cause subtle staleness, extra load on the master, or unneces
 
 - [policy-reuse-timeouts-retries.md](policy-reuse-timeouts-retries.md)
 - [single-ttl-nsup-default-ttl.md](single-ttl-nsup-default-ttl.md) (read-touch TTL and reads)
-- [binop-operate-atomicity.md](binop-operate-atomicity.md)
+- [operate-atomicity.md](operate-atomicity.md)

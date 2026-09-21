@@ -38,5 +38,5 @@ In **strong consistency**, **regular** (non-durable) deletes—**expunges**—ma
 - [single-ttl-expiration-retention.md](aerospike-development-single-ttl-expiration-retention.md)
 - [single-ttl-nsup-default-ttl.md](aerospike-development-single-ttl-nsup-default-ttl.md)
 - [single-record-operations.md](aerospike-development-single-record-operations.md)
-- [binop-operate-record-lock-read-write.md](aerospike-development-binop-operate-record-lock-read-write.md) (`operate` delete path)
+- [operate-record-lock-read-write.md](aerospike-development-operate-record-lock-read-write.md) (`operate` delete path)
 - [policy-reuse-timeouts-retries.md](aerospike-development-policy-reuse-timeouts-retries.md)

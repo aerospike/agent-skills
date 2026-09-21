@@ -10,7 +10,7 @@ last_verified: 2026-04-23
 
 **Rule**
 
-**One key,** multiple bins or a record-shaped update: prefer **`operate`** (and [record lock / mixed R/W](aerospike-development-binop-operate-record-lock-read-write.md) semantics) so the server does **one round-trip** and you avoid **get/put** races. **Many keys,** each known: prefer **[batch](aerospike-development-batch-parallel-key-operations.md)** (reads, writes, or batch **`operate`** with **one entry per key**). **Server-side predicate, trim, or numeric/bin patch** on read or write: use **[filter/operation expressions](aerospike-development-expr-compute-to-data.md)** so work stays **on the data nodes**. **Do not** string together serial **get**/**put** when a **single** `operate` or **single** expression chain can express the work.
+**One key,** multiple bins or a record-shaped update: prefer **`operate`** (and [record lock / mixed R/W](aerospike-development-operate-record-lock-read-write.md) semantics) so the server does **one round-trip** and you avoid **get/put** races. **Many keys,** each known: prefer **[batch](aerospike-development-batch-parallel-key-operations.md)** (reads, writes, or batch **`operate`** with **one entry per key**). **Server-side predicate, trim, or numeric/bin patch** on read or write: use **[filter/operation expressions](aerospike-development-expr-compute-to-data.md)** so work stays **on the data nodes**. **Do not** string together serial **get**/**put** when a **single** `operate` or **single** expression chain can express the work.
 
 **Why**
 
@@ -21,7 +21,7 @@ Round-trips and client-side re-reads dominate latency. Aerospike **compute-to-da
 - **`operate`** for **one key**, **N bins**, or **CDT paths** in one call
 - **Batch** with **coalesced keys** and **per-key** result handling
 - **Expressions** for “read only if condition” or “write only if bin matches”
-- Deeper reading: [binop-operate-record-lock-read-write.md](aerospike-development-binop-operate-record-lock-read-write.md), [binop-operate-atomicity.md](aerospike-development-binop-operate-atomicity.md), [batch-parallel-key-operations.md](aerospike-development-batch-parallel-key-operations.md), [expr-compute-to-data.md](aerospike-development-expr-compute-to-data.md)
+- Deeper reading: [operate-record-lock-read-write.md](aerospike-development-operate-record-lock-read-write.md), [operate-atomicity.md](aerospike-development-operate-atomicity.md), [batch-parallel-key-operations.md](aerospike-development-batch-parallel-key-operations.md), [expr-compute-to-data.md](aerospike-development-expr-compute-to-data.md)
 
 **Avoid**
 

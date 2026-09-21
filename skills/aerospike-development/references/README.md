@@ -8,12 +8,12 @@
 |------|--------|
 | [cdt-list-append.md](../examples/cdt-list-append.md) | CDT list append (Java) |
 | [cdt-map-nested-vehicles.md](../examples/cdt-map-nested-vehicles.md) | Nested maps / vehicles (Java + Python) |
-| [singleton-client.md](../examples/singleton-client.md) | Singleton client (Python) |
+| [client-singleton.md](../examples/client-singleton.md) | Singleton client (Python) |
 | [policy-explicit-defaults.md](../examples/policy-explicit-defaults.md) | Policy defaults (Python) |
 | [batch-read-by-keys.md](../examples/batch-read-by-keys.md) | Batch reads (conceptual) |
-| [official-put-get.md](../examples/official-put-get.md) | Create/Read **links** + minimal Python/Java |
-| [official-batch.md](../examples/official-batch.md) | Batch **links** + minimal Python/Java |
-| [bin-operate-mixed-read-write.md](../examples/bin-operate-mixed-read-write.md) | `operate` mixed R/W (Java) |
+| [single-put-get.md](../examples/single-put-get.md) | Create/Read **links** + minimal Python/Java |
+| [batch-official-links.md](../examples/batch-official-links.md) | Batch **links** + minimal Python/Java |
+| [operate-mixed-read-write.md](../examples/operate-mixed-read-write.md) | `operate` mixed R/W (Java) |
 
 TOC: [examples.md](../examples.md).
 
@@ -35,7 +35,7 @@ TOC: [examples.md](../examples.md).
 | `expr-` | Filter and operation expressions; compute-to-data |
 | `query-` | Queries, secondary indexes, cardinality, index choices from access paths |
 | `batch-` | Batch reads/writes across keys; dedupe keys, `operate` per key |
-| `binop-` | `operate`, record lock, mixed read/write, bin-level atomicity |
+| `operate-` | `operate`: record lock, mixed read/write, bin-level atomicity |
 | `single-` | Single-record CRUD, TTL/void-time, NSUP/default-ttl, delete, durable deletes (EE) |
 | `model-` | Keys, namespace/set boundaries, flat bins vs CDT vs multiple records, denormalization, access paths, record size vs index and disk, hot keys, client API choice |
 | `sec-` | App-facing security (TLS, auth); not cluster ops |
@@ -95,10 +95,10 @@ TOC: [examples.md](../examples.md).
 
 - [batch-parallel-key-operations.md](batch-parallel-key-operations.md)
 
-### binop-
+### operate-
 
-- [binop-operate-record-lock-read-write.md](binop-operate-record-lock-read-write.md)
-- [binop-operate-atomicity.md](binop-operate-atomicity.md)
+- [operate-record-lock-read-write.md](operate-record-lock-read-write.md)
+- [operate-atomicity.md](operate-atomicity.md)
 
 ### sec-
 
