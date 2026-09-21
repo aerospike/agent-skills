@@ -165,24 +165,22 @@ def _bullets_inline(content: str) -> str:
     return "; ".join(_extract_bullets(content))
 
 
-def _rule_index(sk: skillsrc.SkillSource) -> list[str]:
-    """One line per rule: identifier, title, impact.
+_SENTENCE_END_RE = re.compile(r"(?<=[.!?]) ")
 
-    Rules appear below under their titles but cite each other by filename, and
-    nothing in the artifact mapped one to the other. This is that map. Entries
-    stay in filename order, which groups them by prefix (client-, policy-,
-    cdt-, ...) for free.
+
+def _imperative(rule: str) -> str:
+    """The rule's first sentence: what to do, without the supporting detail.
+
+    Tier 1 states the instruction and the rule file carries the rest, so this
+    has to be a sentence that stands alone. A `**Rule**` whose first sentence
+    trails off in a colon fails that, which the coverage check enforces rather
+    than this function papering over.
     """
-    out: list[str] = []
-    for ref in sk.refs:
-        rule = skillsrc.labeled_sections(ref.body).get("Rule", "").strip()
-        if not rule:
-            continue
-        ident = skillsrc.rule_id(sk.name, ref.name)
-        title = ref.meta.get("title") or ref.name
-        impact = ref.meta.get("impact", "")
-        out.append(f"- `{ident}` — {title}" + (f" [{impact}]" if impact else ""))
-    return out
+    blocks = split_blocks(rule)
+    if not blocks:
+        return ""
+    first = _clean_inline(blocks[0].replace("\n", " "))
+    return _SENTENCE_END_RE.split(first)[0] if first else ""
 
 
 def render_monolith(skills: list[skillsrc.SkillSource]) -> str:
@@ -201,8 +199,26 @@ def render_monolith(skills: list[skillsrc.SkillSource]) -> str:
     return "\n".join(parts)
 
 
-def render_stripped(skills: list[skillsrc.SkillSource]) -> str:
-    """Compile to imperative IF/THEN rules with reasoning removed."""
+def render_stripped(
+    skills: list[skillsrc.SkillSource], density: str = "imperative"
+) -> str:
+    """Compile to a routing layer over the rule files shipped beside it.
+
+    ``density`` picks how much of each rule reaches this always-loaded file:
+
+    ``imperative``
+        The rule's first sentence only. The file stays a router: it says what
+        each rule instructs and where to read the rest, which is the shape the
+        Agent Skills spec's progressive disclosure describes and the shape
+        redis/agent-skills uses. Adding a rule costs ~21 tokens here.
+    ``full``
+        Rule, Prefer and Avoid inlined. Self-contained without the reference
+        files, at roughly three times the size and ~311 tokens per new rule.
+
+    Headings carry the bare rule name, not a link: the path is derivable from
+    the skill and rule headings (see ``_header``), and the same derivation
+    resolves the bare filenames the rules already use to cite each other.
+    """
     parts = ["# Aerospike agent rules\n"]
     for sk in skills:
         parts.append(f"\n## {sk.name}\n")
@@ -213,10 +229,6 @@ def render_stripped(skills: list[skillsrc.SkillSource]) -> str:
             if items:
                 parts.append(f"\n### {title}")
                 parts.extend(f"- {it}" for it in items)
-        index = _rule_index(sk)
-        if index:
-            parts.append("\n### Rule index")
-            parts.extend(index)
         for ref in sk.refs:
             secs = skillsrc.labeled_sections(ref.body)
             rule = secs.get("Rule", "").strip()
@@ -224,19 +236,20 @@ def render_stripped(skills: list[skillsrc.SkillSource]) -> str:
                 continue
             title = ref.meta.get("title") or ref.name
             impact = ref.meta.get("impact", "")
-            ident = skillsrc.rule_id(sk.name, ref.name)
-            head = (
-                f"\n### [{ident}](references/{ident}.md) — {title}"
-                + (f" [{impact}]" if impact else "")
-            )
-            chunk = [head, *_rule_lines(rule)]
-            if secs.get("Prefer"):
-                pref = _bullets_inline(secs["Prefer"])
-                if pref:
-                    chunk.append(f"- Prefer: {pref}")
-            if secs.get("Avoid"):
-                avoid = _bullets_inline(secs["Avoid"])
-                if avoid:
-                    chunk.append(f"- Avoid: {avoid}")
+            stem = ref.name[:-3] if ref.name.endswith(".md") else ref.name
+            head = f"\n### {stem} — {title}" + (f" [{impact}]" if impact else "")
+            if density == "imperative":
+                imperative = _imperative(rule)
+                chunk = [head, f"- {imperative}"] if imperative else [head]
+            else:
+                chunk = [head, *_rule_lines(rule)]
+                if secs.get("Prefer"):
+                    pref = _bullets_inline(secs["Prefer"])
+                    if pref:
+                        chunk.append(f"- Prefer: {pref}")
+                if secs.get("Avoid"):
+                    avoid = _bullets_inline(secs["Avoid"])
+                    if avoid:
+                        chunk.append(f"- Avoid: {avoid}")
             parts.extend(chunk)
     return "\n".join(parts)

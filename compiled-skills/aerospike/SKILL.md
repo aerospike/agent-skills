@@ -7,7 +7,9 @@ metadata:
   server_versions: "7.0+"
 ---
 
-_Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-development`, `skills/aerospike-data-modeling` in https://github.com/aerospike/agent-skills. Rule files cited below by bare filename live under `skills/<skill>/` or its `references/` folder in that repository. Edit the skills under `skills/`, not this file._
+_Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-development`, `skills/aerospike-data-modeling` in https://github.com/aerospike/agent-skills. Edit the skills under `skills/`, not this file._
+
+**Reading a rule in full.** Each rule below states its instruction and nothing more; the reasoning, the worked detail and the documentation links live in its own file, shipped in the `references/` folder beside this one. A rule's file is `references/<skill>-<rule>.md`, where `<skill>` is the `##` heading it sits under and `<rule>` is its own `###` heading — so `client-singleton` under `aerospike-development` is `references/aerospike-development-client-singleton.md`. Rules cite each other by bare filename and resolve the same way._
 
 # Aerospike agent rules
 
@@ -82,180 +84,110 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 - model- -> Namespace and set boundaries; flat bins vs CDTs vs multiple records; keys, denormalization, access paths; operate / batch / expressions; record size vs index RAM and disk; hot keys and error 14 / KEY_BUSY
 - sec- -> TLS and access control on the client
 
-### Use batch APIs for many primary-key operations [MEDIUM]
+### batch-parallel-key-operations — Use batch APIs for many primary-key operations [MEDIUM]
 - When reading or writing many records by known primary keys, use the client’s batch APIs instead of serial single-key calls, subject to reasonable batch sizes and error-handling needs.
-- Prefer: Chunked batches if the SDK or service limits batch size; One entry per key per batch; merge or drop duplicates on the client before batch_*; Batch operate (or equivalent) when one key needs multiple operations atomically in the batch; After each batch: walk every entry’s result code or exception slot—partial success is normal for batch APIs; Retrying or compensating only for keys that actually failed (once you have per-key status)
-- Avoid: Thousands of sequential gets when a batch interface exists; Duplicate keys in the same batch when you can coalesce or combine into operate—especially on keys that are already hot or latency-sensitive; Assuming no exception or overall OK means every key in the batch succeeded
 
-### Use operate for multi-bin atomic updates on one key [HIGH]
+### binop-operate-atomicity — Use operate for multi-bin atomic updates on one key [HIGH]
 - When a single logical update touches multiple bins or uses CDT ops on one record, use operate (multi-operation) so the server applies the sequence atomically for that record, rather than separate put/get cycles that can interleave with other writers.
-- Prefer: One operate call combining the bin ops you need; Generations when you need compare-and-swap across clients
-- Avoid: Multiple independent puts racing without coordination; Mixing a whole-record read with bin-scoped ops in one operate (use per-bin reads only; see binop-operate-record-lock-read-write.md)
 
-### Use operate for one record lock, many ops, and mixed reads and writes [HIGH]
-- Use the operate command when you need multiple bin-level changes on the same record key in one server round trip. The server acquires a record lock, runs an ordered list of bin operations atomically and in isolation against an in-memory copy of the record, then persists if any write occurred. Mix read and write operations in the same operate call when you need updated values back without a separate get: later operations see the effects of earlier ones in the list (including writes before reads). This cuts client/server chatter, reduces lock hold time versus separate get/put sequences from the app, and improves throughput and tail latency for hot keys compared to naïve multi-call patterns.
-- Prefer: One operate with all bin ops (scalar, CDT, expressions as supported) for that unit of work; Mixed read+write lists when the response must reflect post-write state (e.g. increment then read counter); Filter expressions on operate when the doc pattern fits conditional updates
-- Avoid: Chaining separate get → app logic → put when operate can express the same work on one key; Splitting independent bin updates on the same key into multiple commands without a concurrency story
+### binop-operate-record-lock-read-write — Use operate for one record lock, many ops, and mixed reads and writes [HIGH]
+- Use the operate command when you need multiple bin-level changes on the same record key in one server round trip.
 
-### Keep lists and maps bounded [HIGH]
-- Never grow lists or maps without bounds. Records have a maximum size; unbounded appends cause failures and hot records. Use trims, capped policies, rank/size-limited reads, or partition data across keys.
-- Prefer: Server-side ops that trim or cap (where your model allows); Separate keys or sets when history must be long-lived at scale
-- Avoid: Unbounded append to lists in hot paths
+### cdt-bounded-collections — Keep lists and maps bounded [HIGH]
+- Never grow lists or maps without bounds.
 
-### Model nested lists and maps with CDT context, ordering, and expressions [HIGH]
-- When you store lists of maps, maps of lists, or deeper nesting, use the official patterns in Working with nested collection data types: CDT operate APIs with context where you address a single slot, expression composition (ListExp / MapExp) for filters and computed reads, and path expressions (selectByPath / modifyByPath) when you traverse or change multiple nested elements in one shot. Path expressions require Aerospike Database 8.1.2 or later; use a client version that supports them (feature compatibility matrix). Build K-ordered maps (or the client equivalent) when the server must compare whole map values—for example ADD_UNIQUE on a list of vehicle maps—so wire representation matches and duplicate detection works.
-- Prefer: One operate call with ListOperation / MapOperation and explicit list/map policies; Sorted maps and ordered unique lists where semantics allow—better CDT performance; see cdt-server-side-ops.md; Language-specific ordered map types when the docs require them (TreeMap, KeyOrderedDict, sorted MapPair slices in Go, etc.); The nesting guide’s full page for read/filter/index/query examples beyond a single insert
-- Avoid: Path expression APIs on clusters below 8.1.2 (use context + ListOperation / MapOperation / composed expressions instead); Treating nested bins like JSON blobs updated only via full-record get/put under contention; Relying on duplicate suppression for list-of-maps if maps are not built in the ordered form the server compares
+### cdt-nested-collections — Model nested lists and maps with CDT context, ordering, and expressions [HIGH]
+- When you store lists of maps, maps of lists, or deeper nesting, use the official patterns in Working with nested collection data types: CDT operate APIs with context where you address a single slot, expression composition (ListExp / MapExp) for filters and computed reads, and path expressions (selectByPath / modifyByPath) when you traverse or change multiple nested elements in one shot.
 
-### Prefer server-side CDT operations over read-modify-write [HIGH]
-- For updates to lists, maps, or nested documents modeled in CDTs, use operate with CDT operations so work runs atomically on the server. Avoid get → mutate in app → put for contended data.
-- Prefer: Sorted maps by default unless the domain truly needs unsorted or arbitrary key order; Ordered list + unique-list semantics when you need uniqueness and can assign index meaning (see list ordering options); ListOperation / MapOperation (or equivalent) via operate, with list/map policy and write flags chosen deliberately; Generations when you truly need cross-bin transactional semantics in the client
-- Avoid: Fetching entire large collections to append one element; Unordered map or unordered unique-list policies when sorted / ordered would match the model and improve performance
+### cdt-server-side-ops — Prefer server-side CDT operations over read-modify-write [HIGH]
+- For updates to lists, maps, or nested documents modeled in CDTs, use operate with CDT operations so work runs atomically on the server.
 
-### Reach every cluster node directly (no proxy in the data path) [HIGH]
-- The Aerospike client must have direct network reachability to every node in the cluster (not only to seed hosts). It automatically maintains the current node list (via seeds and ongoing tending) and works against the full cluster—partitioning, replica placement, and migrations direct traffic to the right nodes. Using a single seed for bootstrap does not limit the client to that node; in a cluster, work is not confined to the seed you picked.
-- Prefer: Firewall and routing that allow the app tier to reach each node’s client-facing service port; Server network settings so advertised addresses match how clients actually reach the nodes; Multiple seed hosts for bootstrap resilience (still not a substitute for reaching all nodes)
-- Avoid: Assuming traffic stays on the seed you configured—operations run across all nodes the client knows about; Treating the seed list as the only hosts that must be reachable; Inserting a proxy or LB between clients and nodes for normal database traffic; Assuming localhost or internal-only IPs work from a different network without access / alternate address configuration
+### client-direct-node-access — Reach every cluster node directly (no proxy in the data path) [HIGH]
+- The Aerospike client must have direct network reachability to every node in the cluster (not only to seed hosts).
 
-### Use client error-rate backoff to protect the cluster under failure storms [MEDIUM]
+### client-error-rate-backoff — Use client error-rate backoff to protect the cluster under failure storms [MEDIUM]
 - Many Aerospike clients support client-side error-rate limiting (sometimes described as backoff): if a node returns too many errors within a sliding window of client tend iterations, the client stops sending new commands to that node until the error rate drops—surfacing a backoff-style exception to the application instead of hammering a sick node.
-- Prefer: Enabling error-rate backoff for large or autoscaled app tiers sharing one cluster; Pairing backoff awareness with metrics and alerts on the thrown exception class
-- Avoid: Assuming every SDK exposes identical field names—read your client’s policy docs; Treating backoff as a substitute for fixing root cause (network, capacity, config)
 
-### Size connection pools and warm up on startup [MEDIUM]
-- Configure minimum and maximum connections per node (SDK-specific names such as minConnsPerNode / maxConnsPerNode) for your workload. maxConnsPerNode caps concurrent synchronous connections to each cluster node from this client instance. When the pool is exhausted, further requests can fail with a “no more connections”–class error (exact code varies by SDK) rather than blocking forever—size max for peak concurrency per node, or scale out clients.
-- Prefer: Sizing maxConnsPerNode and client instance count so (instances × maxConnsPerNode) stays within proto-fd-max (and ops guidance) with margin for non-app traffic; Pool sizing from measured concurrency per node and observed errors; Warmup after client construction when tail latency after deploy matters; minConnsPerNode when workloads have idle gaps then bursts—but not so high that startup or reconnect storms overload server CPU (monitor with TLS especially)
-- Avoid: Default pool sizes for high-QPS services without measurement; maxConnsPerNode so low that normal bursts hit connection exhaustion; Scaling out many client replicas each with a high maxConnsPerNode without checking per-node proto-fd-max and total concurrent clients; Very high minConnsPerNode combined with mass simultaneous client restarts or network flaps—expect CPU pressure on nodes when connections are re-established (TLS amplifies)
+### client-pools-warmup — Size connection pools and warm up on startup [MEDIUM]
+- Configure minimum and maximum connections per node (SDK-specific names such as minConnsPerNode / maxConnsPerNode) for your workload.
 
-### Use one Aerospike client per process [HIGH]
-- Instantiate the Aerospike client once per application process (or equivalent isolation boundary) and share it across threads/workers. Do not create and destroy a client per request.
-- Prefer: A single global/module-level client initialized at startup; Graceful close only on shutdown; Explicit client logging in non-trivial deployments
-- Avoid: new client / connect / close inside per-request handlers
+### client-singleton — Use one Aerospike client per process [HIGH]
+- Instantiate the Aerospike client once per application process (or equivalent isolation boundary) and share it across threads/workers.
 
-### Use filter and operation expressions for compute-to-data [HIGH]
-- Use filter expressions and operation expressions (and path expressions for nested bins) to evaluate and update data on the server when they fit the problem. Reach for Lua UDFs only when expressions cannot express the logic or product guidance requires server-side procedures.
-- Prefer: Predicates and updates expressible as expressions; Path expressions for nested map/list updates where supported
-- Avoid: UDF for arithmetic or filters that expressions cover
+### expr-compute-to-data — Use filter and operation expressions for compute-to-data [HIGH]
+- Use filter expressions and operation expressions (and path expressions for nested bins) to evaluate and update data on the server when they fit the problem.
 
-### Model for primary-key access paths and denormalize deliberately [HIGH]
-- Design schemas around how data is read and written: namespace, set, and user key should make the common path a single primary-key operation. There are no server-side joins—duplicate or embed via bins and CDTs when that matches query needs.
-- Prefer: Access-pattern-first key design; CDTs for embedded aggregates when reads are colocated by key
-- Avoid: Join-shaped APIs in application code mirroring SQL without redesign
+### model-access-paths-denormalization — Model for primary-key access paths and denormalize deliberately [HIGH]
+- Design schemas around how data is read and written: namespace, set, and user key should make the common path a single primary-key operation.
 
-### Choose flat bins, nested CDTs, or multiple records for one logical entity [HIGH]
-- Flat bins: prefer when fields are read or written together under one primary key, record size stays within bounds, and you do not need deep partial structure. Nested CDTs (lists/maps): use when a sub-structure is updated in place (server-side operate on a path), you need ordering or map key semantics from the type system, and growth is bounded per cdt-bounded-collections.md. Multiple records (same or related keys): use when different slices of a logical entity have different read/write hotness, independent primary-key access paths, or you must stay under max record size and avoid a single contended row—accept fan-out reads or batch to reassemble, and denormalize where a single PK read must win.
-- Prefer: One PK + flat bins when the happy path is one get/put or one operate over known bin names; CDT operate on a nested path when updates are partial and colocated with the same key; Extra records keyed by a natural access path (for example user:orders:<id>) when paths split cleanly and you can batch or index only what queries need; pair with query-sindex-by-access-path.md for predicate-driven indexes
-- Avoid: Unbounded list/map growth on a “document-shaped” record; see cdt-bounded-collections.md; Giant nested JSON-like blobs updated only via full-record get/put under concurrent writers; prefer binop and expressions on the server; Multiple records for “normalization” alone when every read still needs all of them—denormalize for the dominant path
+### model-bin-cdt-multiple-records — Choose flat bins, nested CDTs, or multiple records for one logical entity [HIGH]
+- Flat bins: prefer when fields are read or written together under one primary key, record size stays within bounds, and you do not need deep partial structure.
 
-### Pick client APIs by key cardinality and work done per request [MEDIUM]
-- One key, multiple bins or a record-shaped update: prefer operate (and record lock / mixed R/W semantics) so the server does one round-trip and you avoid get/put races. Many keys, each known: prefer batch (reads, writes, or batch operate with one entry per key). Server-side predicate, trim, or numeric/bin patch on read or write: use filter/operation expressions so work stays on the data nodes. Do not string together serial get/put when a single operate or single expression chain can express the work.
-- Prefer: operate for one key, N bins, or CDT paths in one call; Batch with coalesced keys and per-key result handling; Expressions for “read only if condition” or “write only if bin matches”; Deeper reading: binop-operate-record-lock-read-write.md, binop-operate-atomicity.md, batch-parallel-key-operations.md, expr-compute-to-data.md
-- Avoid: Parallel single-key calls in a loop for hundreds+ hot keys with no batching when the API is appropriate; read-modify-write in the app for bins that the server can operate or express into one request
+### model-client-api-choice — Pick client APIs by key cardinality and work done per request [MEDIUM]
+- One key, multiple bins or a record-shaped update: prefer operate (and record lock / mixed R/W semantics) so the server does one round-trip and you avoid get/put races.
 
-### Design and mitigate hot keys (error 14 / KEY_BUSY) [HIGH]
-- When many clients hit the same primary key at once, that record becomes a hot key: work serializes on the server and you can see high latency, timeouts, or failures such as error code 14 / KEY_BUSY (exact name depends on the client—see the support article and your SDK). That usually means too much load on one key, not a random cluster bug.
-- Prefer: Spreading work across more keys when the product allows—shard counters or aggregates instead of a single global row everyone updates; One operate (or one batch entry) per key when a key needs several changes—see batch-parallel-key-operations.md and binop-operate-record-lock-read-write.md; Read policies that spread read load when slightly stale data is OK—policy-read-replica-consistency.md (MASTER_PROLES, etc.); Server-side namespace tuning such as read-page-cache so the OS page cache can absorb repeated reads of the same device blocks—can ease read-heavy hot keys when storage layout fits; see model-record-size-hardware-efficiency.md and the read-page-cache reference (not a substitute for sharding hot keys in the app); Backoff with jitter on transient errors instead of tight spin loops
-- Avoid: A single key as the only place for high-QPS writes (global sequence, one shared counter with no sharding); Blind retries without backoff when you see hot-key / busy errors
+### model-hot-keys — Design and mitigate hot keys (error 14 / KEY_BUSY) [HIGH]
+- When many clients hit the same primary key at once, that record becomes a hot key: work serializes on the server and you can see high latency, timeouts, or failures such as error code 14 / KEY_BUSY (exact name depends on the client—see the support article and your SDK).
 
-### Draw namespace and set boundaries for retention, security, and operations [HIGH]
-- Use one namespace when a single set of cluster-scoped options (replication, strong consistency vs AP mode where applicable, default TTL, NSUP behavior) and one operational “slice” of data fits the workload. Split into multiple namespaces when you need different retention/expiration policy, different consistency or replication expectations that the product exposes at namespace level, or isolation for security, chargeback, or operational boundaries (for example different backup/restore or admin concerns). Sets group records within a namespace: treat them like logical tables or type groupings, not a substitute for key design. Do not use sets to solve cross-key transactions, joins, or independent tuning knobs that are actually namespace- or cluster-level; those belong in the model, operations hand-off, and official Operations docs.
-- Prefer: One namespace for one product domain when options and ops model align; Clear set names aligned with access paths and primary-key design; Explicit TTL, default TTL, and NSUP alignment with the client; see single-ttl-nsup-default-ttl.md and single-ttl-expiration-retention.md; Asking Operations for cluster- and node-level placement, replication, and security when the split is for infra—not modeling it only in the app
-- Avoid: Many namespaces “because we have many services” when a single namespace with sets and a consistent policy would suffice—each extra namespace adds operational surface; Treating a set as a shard or partitioning mechanism; user key and partition distribution drive that, not the set name alone; Expecting namespace or set to enforce row-level app security without access control and TLS configuration; see sec-client-tls-auth.md and official Operations documentation for the deployment
+### model-namespace-set-boundaries — Draw namespace and set boundaries for retention, security, and operations [HIGH]
+- Use one namespace when a single set of cluster-scoped options (replication, strong consistency vs AP mode where applicable, default TTL, NSUP behavior) and one operational “slice” of data fits the workload.
 
-### Size records for primary-index overhead and disk bandwidth [HIGH]
-- In hybrid memory architecture (HMA) and All Flash deployments, record data lives on device and reads generally come from the storage path—plan I/O accordingly. Aerospike does not keep an application-style DRAM cache of arbitrary records keyed by digest, so you cannot assume a hot record is free to re-read.
-- Prefer: Single-digit KiB for the bulk of records, with 1–128 KiB as the band that distribution spans; treat anything over ~50 KiB as a decision to justify rather than a default; Splitting or denormalizing huge documents across keys when hot paths only need part of the data; Capacity planning that includes index RAM (records × replicas × ~64 B) and device throughput for object size × QPS; Storage compression (LZ4 or zstd; zstd usually the better ratio-to-CPU trade) when records are large. Smaller on-disk records cut bytes read and written per operation directly, fit more records per write block (better defrag efficiency), and stretch both the post-write cache and page cache further; Coordinating with operations on post-write-cache sizing and read-page-cache when read-heavy access to the same blocks dominates latency (after confirming namespace layout and the constraints above)
-- Avoid: Carrying sizing intuition from other databases: B-tree and document stores apply an incremental update without rewriting the whole object, and in-memory stores have no device I/O to amortize. Neither holds in Aerospike—every update rewrites the full record contiguously; Assuming a tiny bin payload is “free” on the server—it still pays index + full storage I/O on access; Expecting read-page-cache to fix application-level hot keys by itself—shard or spread keys where needed first; Megabyte-scale records on hot keys without measuring disk and replication cost
+### model-record-size-hardware-efficiency — Size records for primary-index overhead and disk bandwidth [HIGH]
+- In hybrid memory architecture (HMA) and All Flash deployments, record data lives on device and reads generally come from the storage path—plan I/O accordingly.
 
-### Set client-level policy defaults per operation type [MEDIUM]
-- Aerospike clients let you attach default policies to the client object so API calls that pass null (or use implicit defaults) still get predictable timeouts, retries, and behavior. Defaults are usually per operation family: for example separate defaults for single-record read, single-record write, scan, query, and batch—confirm structure in your SDK.
-- Prefer: Explicit client-level defaults at startup for each operation class you rely on; Copy-from-default then mutate patterns when overriding one field for a call (per SDK); Verifying batch default coverage for read vs write vs delete vs UDF if you use those APIs
-- Avoid: Relying on “global” policy defaults without checking scan vs get vs batch behavior; Assuming all batch sub-policies inherit the same base—check the docs
+### policy-client-defaults — Set client-level policy defaults per operation type [MEDIUM]
+- Aerospike clients let you attach default policies to the client object so API calls that pass null (or use implicit defaults) still get predictable timeouts, retries, and behavior.
 
-### Use generation policy only for CAS (optimistic concurrency) [HIGH]
-- WritePolicy.generationPolicy is for CAS: read → edit on the client → write that must fail if the record changed meanwhile. You must use EXPECT_GEN_EQUAL / EXPECT_GEN_GT (names vary by SDK) and pass the generation from the read on the write. NONE skips the check—typical writes that are not read–modify–verify do not need this.
-- Prefer: EXPECT_GEN_* and the generation field from the read for client-side read–modify–write under contention (or use atomic operate / server-side updates when they cover the whole change); Retry after AS_ERR_GENERATION by repeating read → manipulate → write from scratch (not only re-issuing the write)
-- Avoid: Generation policy without supplying the read generation on the write; CAS that assumes read-touch always bumps generation; Treating generation as a change counter (only same-read equality for CAS is valid); Blind retries of non-idempotent writes (policy-reuse-timeouts-retries.md); Retrying only the write after AS_ERR_GENERATION while reusing the same client-side edit computed from a stale read
+### policy-generation-cas — Use generation policy only for CAS (optimistic concurrency) [HIGH]
+- WritePolicy.generationPolicy is for CAS: read → edit on the client → write that must fail if the record changed meanwhile.
 
-### Set read replica, AP read mode, and SC read mode to match namespace semantics [HIGH]
-- Configure Policy.replica, readModeAP (AP namespaces), and readModeSC (strong-consistency namespaces) so reads see the staleness and ordering guarantees your application needs. Defaults are not universally safe under migration or for hot keys—override deliberately.
-- Prefer: MASTER or defaults when you need the simplest “read what the master has” mental model in AP; MASTER_PROLES when read scaling on a hot key is worth distributing across master and replicas (and semantics allow); ALL in AP when stale reads during migration are unacceptable and cost is acceptable; Aligning client policy with namespace mode (AP vs SC) and validating with Strong consistency docs when in doubt
-- Avoid: RANDOM unless replication factor matches cluster topology as the doc recommends; Assuming ONE is always fresh while partitions are migrating
+### policy-read-replica-consistency — Set read replica, AP read mode, and SC read mode to match namespace semantics [HIGH]
+- Configure Policy.replica, readModeAP (AP namespaces), and readModeSC (strong-consistency namespaces) so reads see the staleness and ordering guarantees your application needs.
 
-### Use replace semantics when overwriting an entire record [MEDIUM]
-- Match recordExistsAction (or the SDK’s WritePolicy equivalent) to the real operation. When the application replaces all bins for a record (full overwrite), prefer REPLACE or REPLACE_ONLY so unspecified bins are removed; use UPDATE / UPDATE_ONLY / CREATE_ONLY when merge or insert-only semantics are intended.
-- Prefer: CREATE_ONLY — insert; fail if the record exists; UPDATE_ONLY — update; fail if missing; merges bins into existing; UPDATE (common default) — upsert; merges bins if record exists; REPLACE — create or replace whole record; drops bins not in this write; REPLACE_ONLY — replace; fail if missing; drops bins not in this write; Generation-guarded updates when you need CAS (see policy-generation-cas.md)
-- Avoid: Default write modes chosen without matching access pattern; Using UPDATE when you meant a full bin set replacement (use REPLACE)
+### policy-replace-whole-record — Use replace semantics when overwriting an entire record [MEDIUM]
+- Match recordExistsAction (or the SDK’s WritePolicy equivalent) to the real operation.
 
-### Reuse policies and set explicit timeouts and retries [HIGH]
-- Reuse read/write/operate policy objects (or set defaults on the client) instead of allocating new policy instances on hot paths. Configure socket timeout, total timeout, and retry behavior appropriate to the operation class (single-key vs batch vs query).
-- Prefer: Client-level or module-level default policies; Explicit timeouts for batch and query workloads; maxRetries 0 on write policies for non-idempotent operations; Understanding totalTimeout 0 vs server default before tuning latency; Knowing read vs write default retries when debugging duplicate or missing effects
-- Avoid: Relying on implicit defaults for long-running operations; New policy objects inside tight loops; Retrying writes that are not safe to repeat without idempotency guarantees; Expecting sleepBetweenRetries to run on every socket-idle timeout (see Policies semantics)
+### policy-reuse-timeouts-retries — Reuse policies and set explicit timeouts and retries [HIGH]
+- Reuse read/write/operate policy objects (or set defaults on the client) instead of allocating new policy instances on hot paths.
 
-### Understand sendKey when the stored user key matters [MEDIUM]
-- Policy.sendKey controls whether the client sends the user-defined key alongside the digest on reads and writes. If enabled on a write, the key is stored with the record and can be returned on reads and secondary-index queries that surface keys. Once stored, it persists until the record is deleted—even if later writes omit sendKey—unless your application replaces behavior per doc.
-- Prefer: Enabling sendKey when queries or clients must recover the original key field; Consistent policy for creates vs updates if your access pattern assumes the key is present
-- Avoid: Assuming the key is stored without sendKey on the write path that created the record; Relying on sendKey toggles to “remove” a stored key without understanding persistence semantics
+### policy-send-key — Understand sendKey when the stored user key matters [MEDIUM]
+- Policy.sendKey controls whether the client sends the user-defined key alongside the digest on reads and writes.
 
-### Choose write commit level deliberately (COMMIT_ALL vs COMMIT_MASTER) [HIGH]
+### policy-write-commit-level — Choose write commit level deliberately (COMMIT_ALL vs COMMIT_MASTER) [HIGH]
 - WritePolicy.commitLevel controls when the client gets success after a write:
-- Prefer: COMMIT_ALL for SC namespaces and when you need the write durable on replicas before the client proceeds; COMMIT_MASTER in AP only when replica lag or stale replica reads are acceptable
-- Avoid: COMMIT_MASTER in SC namespaces (invalid); COMMIT_MASTER in AP when the app cannot tolerate lag or stale replica reads; COMMIT_MASTER in AP at extreme sustained write rates without headroom—watch for network saturation
 
-### Design secondary indexes for query paths—not for every column [HIGH]
-- Use secondary indexes for predicates that match a planned query path at sensible cardinality. Do not index high-cardinality values (for example unique UUIDs per row) as a substitute for a primary key redesign. Prefer primary-key access when the key is known.
-- Prefer: Modeling that answers “how do I look this up?” with PK when possible; Indexes on fields that partition the key space usefully for queries
-- Avoid: “Index everything” patterns carried over from relational databases
+### query-secondary-index-discipline — Design secondary indexes for query paths—not for every column [HIGH]
+- Use secondary indexes for predicates that match a planned query path at sensible cardinality.
 
-### Derive secondary index needs from read and write access paths [HIGH]
-- Before adding a secondary index, list access paths (one line each: who reads, predicate, key known or not, latency budget). For each path: (1) If the primary key is knowable, use PK get/operate/batch first. (2) If the path needs a duplicate of data already stored elsewhere, denormalize to a key that already exists; see model-access-paths-denormalization.md. (3) Add a secondary index only for predicates with viable cardinality and a true query path, per query-secondary-index-discipline.md. (4) Narrow the candidate set with the index predicate; use query + filter for stricter server-side checks when the doc pattern fits. (5) Re-fetch by PK when the query should return or drive updates for specific keys—sendKey if stored keys are required in results.
-- Prefer: A short ordered checklist in design reviews: path → PK/denorm → sindex only if needed; Batch get to hydrate rows after a query that returns key material you can use; policy-send-key.md when query APIs must return user keys that are not in bin values
-- Avoid: An index per field that appears in WHERE in a relational dump without cardinality analysis; Query as a substitute for a known key; redesign keys first
+### query-sindex-by-access-path — Derive secondary index needs from read and write access paths [HIGH]
+- Before adding a secondary index, list access paths (one line each: who reads, predicate, key known or not, latency budget).
 
-### Terminate TLS and apply access credentials in the client [MEDIUM]
-- When the cluster requires TLS or access control, configure the client with the correct TLS context and credentials per official security guides—not custom shortcuts. Treat credentials as secrets; never embed them in repos.
-- Prefer: Follow the security docs for your client version; Separate configs per environment
-- Avoid: Disabling verification or using shared prod keys in dev without understanding risk
+### sec-client-tls-auth — Terminate TLS and apply access credentials in the client [MEDIUM]
+- When the cluster requires TLS or access control, configure the client with the correct TLS context and credentials per official security guides—not custom shortcuts.
 
-### Use delete/remove correctly and opt into durable deletes when the app requires them [HIGH]
-- Use the client’s single-record delete API (delete / remove per SDK) to remove a record by primary key, as described under Delete a record. When deletes must stay deleted across cold starts and older on-disk versions must not resurrect, enable the durable delete flag on the write policy for that delete (and for any write or operate that removes the last bin and therefore deletes the record). Durable deletes are an Enterprise Edition capability: they generate a tombstone so conflict resolution and cold-start index rebuild behave correctly. The default client behavior keeps durable delete off for backward compatibility—turn it on explicitly where your correctness requirements need it.
-- Prefer: Plain delete when resurrection on cold start is acceptable for the workload; durableDelete / durable_delete (or equivalent) on the delete policy when you need tombstone semantics and run Enterprise; Verifying server edition and namespace policy before relying on durable deletes in production
-- Avoid: Assuming delete always creates a tombstone (it does only when durable delete is used appropriately on supported calls); Sending durable-delete policies to Community Edition servers (see compatibility in the architecture doc); Treating SC expunge semantics like AP without checking strong-consistency-allow-expunge and ops guidance
+### single-delete-durable-deletes — Use delete/remove correctly and opt into durable deletes when the app requires them [HIGH]
+- Use the client’s single-record delete API (delete / remove per SDK) to remove a record by primary key, as described under Delete a record.
 
-### Know single-record CRUD vs bin-level operations [MEDIUM]
-- Distinguish whole-record put/get/delete from bin operations and operate. Choose the narrowest API that matches the access pattern to limit data movement and clarify semantics.
-- Prefer: get/put when the unit of work is the full record; operate with bin ops when updating parts of a record or using CDTs; Smaller records when the workload issues many touch / TTL / single-bin updates—large blobs amplify hidden full-record I/O
-- Avoid: Habitual full-record reads for small field changes; Assuming a bin-level or TTL-only API guarantees partial storage writes—it usually does not at the record level
+### single-record-operations — Know single-record CRUD vs bin-level operations [MEDIUM]
+- Distinguish whole-record put/get/delete from bin operations and operate.
 
-### Do not shorten void-time carelessly—cold restart and retention semantics [HIGH]
-- Do not reduce a record’s remaining lifetime (void-time) on writes unless you intend it and accept cold-start risk. Extending void-time (later expiration, longer remaining TTL) is fine and does not cause the resurrection mismatch described below—the failure mode is shortening relative to older versions still on disk. To change bins only while keeping void-time, use -2 on updates (see single-ttl-nsup-default-ttl.md for 0 / -1 / -2 and NSUP).
-- Prefer: Preserve void-time on updates unless shortening expiration is deliberate; clear create vs update policy; Decide finite TTL vs never-expire per record and avoid flipping never-expire back to finite TTL except rare, deliberate migrations; Delete for intentional removal; TTL for natural retention horizons
-- Avoid: Re-enabling expiration on a never-expire record with a new positive TTL except deliberate, well-understood migrations; Using short TTL instead of delete when you mean removal; Routinely smaller TTL on every update to “refresh” without understanding void-time; Expecting eviction to trim never-expire records; Assuming expiration removed all on-disk history (vs durable delete semantics)
+### single-ttl-expiration-retention — Do not shorten void-time carelessly—cold restart and retention semantics [HIGH]
+- Do not reduce a record’s remaining lifetime (void-time) on writes unless you intend it and accept cold-start risk.
 
-### Align client TTL with NSUP, default-ttl, and special write TTL values [HIGH]
-- Namespace Supervisor (NSUP) must be configured consistently with how the app sends TTL on writes. When NSUP is enabled and the namespace allows TTL-backed writes, a write or Touch (or equivalent) that uses client TTL 0 tells the server to set void-time from default-ttl, with set-level default-ttl overriding namespace when both exist. Each such call can re-apply that horizon to the record; to change bins only without resetting void-time, use -2 or an explicit TTL. Reads that extend TTL via read-touch use default-read-touch-ttl-pct and client read policies—that is separate from default-ttl on writes.
-- Prefer: nsup-period > 0 when using positive integer TTLs on writes, unless operations explicitly align with the doc’s exceptions; Knowing whether every write with TTL 0 re-bases the record to default-ttl (set vs namespace) before relying on “refresh” behavior; Checking nsup-period when you see error 22 on TTL writes before blaming application logic; Using -2 on updates when only bin data should change and void-time must stay as-is
-- Avoid: Assuming unspecified client TTL behaves the same across SDKs—confirm whether the default maps to 0 (server default-ttl) or something else; Conflating read-touch TTL extension with default-ttl on writes; Using allow-ttl-without-nsup outside the doc’s intended testing-only scope
+### single-ttl-nsup-default-ttl — Align client TTL with NSUP, default-ttl, and special write TTL values [HIGH]
+- Namespace Supervisor (NSUP) must be configured consistently with how the app sends TTL on writes.
 
 ## aerospike-data-modeling
 
 
-### Fetch the data modeling guide before designing a full model [HIGH]
-- This skill carries the decision layer. The full design-time process lives in the https://github.com/aerospike/data-modeling-guide repository. For a new application or a redesign, fetch it and follow its checklist — do not produce a complete model from this skill alone.
-- Prefer: Reading current values (version minimums, size limits, complexity) from the guide rather than recalling them; Naming the specific guide file you used, so a reviewer can retrace the decision
-- Avoid: Presenting a model as complete when the guide's checklist and sizing worksheets were never applied; Quoting a version gate or size limit from memory
+### ex-guide-escalation — Fetch the data modeling guide before designing a full model [HIGH]
+- This skill carries the decision layer.
 
-### Produce a schema guide and a derived schema summary [MEDIUM]
-- Design work produces two documents, written to files. Know which one you are writing at any moment, and never author the second independently of the first.
-- Prefer: Writing both to files, not pasting a schema into chat; Building the guide incrementally, one entity group at a time, and generating the summary only once every group is done; Regenerating the summary from the guide whenever the model changes; Stating explicitly, in the guide, which decisions were assumptions rather than confirmed inputs
-- Avoid: Editing the schema summary directly when the model changes — update the guide, regenerate the summary; Omitting the assumptions log because the model "seems obvious"; Treating a chat-delivered schema as a deliverable
+### model-deliverables-schema-guide-summary — Produce a schema guide and a derived schema summary [MEDIUM]
+- Design work produces two documents, written to files.
 
-### Work the design-time loop one entity group at a time [HIGH]
-- Data model design is an interactive process with mandatory stop points, not a document you fill in. Produce a written clarification document first, partition the domain into entity groups, then design each group and pass its review before starting the next.
-- Prefer: A written clarification document as the first artifact, before any schema; Requirements-gap questions ("what is the p95 fan-out?") over mechanism-preference questions ("which pattern do you prefer?"); The baseline shape by default — introduce a new set, split record, extra index, or materialized view only when a requirement cannot be met otherwise, or measurement shows the baseline misses an SLO; Explicit assumptions with reconsider triggers when an input cannot be obtained; A developer walkthrough per group: trace a create-and-read flow, a multi-record mutation, and a cleanup/cascade through the drafted schema
-- Avoid: Producing a complete schema for every entity group with no clarifying question asked and no checkpoint held; Pre-filling pattern choices into the entity-group plan — those are outputs of per-group design, not routing decisions; Treating "we discussed the data model" as equivalent to having a schema guide
+### model-design-time-workflow — Work the design-time loop one entity group at a time [HIGH]
+- Data model design is an interactive process with mandatory stop points, not a document you fill in.
 
-### Run the seven failure-mode detection tests against a drafted model [HIGH]
-- Each failure mode below has a detection test — something you can run against a draft and get a yes/no answer. Use them twice: as priming before designing, and as a review rubric against a drafted schema. These are not LLM-specific; they are relational and document-database habits applied to an architecture that rewards neither.
-- Prefer: Running all seven against the drafted schema before the stakeholder review; Treating an unanswerable growth question as a blocker, not a footnote
-- Avoid: Running these only at the end — most are cheaper to fix during design than after
+### model-failure-modes-checklist — Run the seven failure-mode detection tests against a drafted model [HIGH]
+- Each failure mode below has a detection test — something you can run against a draft and get a yes/no answer.
