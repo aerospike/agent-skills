@@ -48,7 +48,16 @@ fi
 # failure in the other. Exit 2 means warnings-only when --strict is off.
 worst=0
 for root in "${SKILL_ROOTS[@]}"; do
-  skip_args=()
+  # Build the argument list in one array and expand it once. Optional flags are
+  # appended only when they have content, so no empty array is ever expanded:
+  # bash 3.2, still the system bash on macOS, treats an empty array expansion as
+  # an unbound variable under `set -u` and aborts before the validator runs.
+  # bash 4.4+ does not, which is why CI on Linux never saw this.
+  cmd=(skill-validator check)
+  if [[ ${#strict_flag[@]} -gt 0 ]]; then
+    cmd+=("${strict_flag[@]}")
+  fi
+  cmd+=(--allow-flat-layouts)
   # Skip only the links group for compiled-skills/. The compiled body's links
   # are inherited from skills/, which this loop still link-checks in full, and
   # two of the URLs (github.com/aerospike/agent-skills and
@@ -56,15 +65,14 @@ for root in "${SKILL_ROOTS[@]}"; do
   # repositories are public. A blanket --skip links on both roots would hide
   # real authoring bugs in skills/.
   if [[ "${root}" == "${ROOT}/compiled-skills" ]]; then
-    skip_args+=(--skip links)
+    cmd+=(--skip links)
   fi
+  if [[ ${#extra_args[@]} -gt 0 ]]; then
+    cmd+=("${extra_args[@]}")
+  fi
+  cmd+=("${root}/")
   set +e
-  skill-validator check \
-    "${strict_flag[@]}" \
-    --allow-flat-layouts \
-    "${skip_args[@]}" \
-    "${extra_args[@]}" \
-    "${root}/"
+  "${cmd[@]}"
   code=$?
   set -e
   # skill-validator exits 1 for errors and 2 for warnings-only, so 1 outranks 2.
