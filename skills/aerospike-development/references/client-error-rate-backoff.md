@@ -14,9 +14,9 @@ last_verified: 2026-04-21
 
 Many Aerospike clients support **client-side error-rate limiting** (sometimes described as **backoff**): if a node returns **too many errors** within a **sliding window** of client tend iterations, the client **stops sending new commands** to that node until the error rate drops—surfacing a **backoff**-style exception to the application instead of hammering a sick node.
 
-Typical knobs (names vary by SDK): a **maximum error count** per window and an **error-rate window** length (often measured in **tend intervals**). When the limit is **disabled** (zero / off), no backoff is applied.
-
 **Why**
+
+Typical knobs (names vary by SDK): a **maximum error count** per window and an **error-rate window** length (often measured in **tend intervals**). When the limit is **disabled** (zero / off), no backoff is applied.
 
 Under partial outages or misconfiguration, an unbounded client can amplify load on failing nodes and worsen cluster recovery. Backoff bounds blast radius and gives operators time to heal the cluster.
 

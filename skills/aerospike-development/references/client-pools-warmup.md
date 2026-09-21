@@ -17,6 +17,8 @@ Configure **minimum** and **maximum** connections per node (SDK-specific names s
 
 **Aggregate limit:** Every client instance can open up to **`maxConnsPerNode`** connections **to every node** it uses. Roughly, **(number of concurrent client processes or instances) × `maxConnsPerNode`** contributes to connection load **on each node** from your application tier. That total—plus other apps, tools, and overhead—must **not** exceed what the server allows for client protocol connections, typically governed by **`proto-fd-max`** (and related service limits; confirm in your server version’s configuration reference). Size pools and instance counts so you stay **under** that budget with headroom.
 
+**Why**
+
 **`minConnsPerNode`** keeps a **floor** of live connections so bursts after idle periods do not pay repeated connect cost; raising it increases steady **client-side** resource use. Setting **min equal to max** yields a **fixed** pool size and predictable footprint at the cost of flexibility.
 
 A **high `minConnsPerNode`** means **many connections open at once** when the client **starts**, when pools are **warmed**, or after **network drops** that force **reconnect storms**. Each new connection costs work on **both** client and server; **TLS** adds certificate handshakes and noticeably raises **server CPU** during those bursts. Stagger deploys, keep **min** only as high as needed, or accept that reconnect events can briefly stress the cluster.
@@ -24,8 +26,6 @@ A **high `minConnsPerNode`** means **many connections open at once** when the cl
 Use **connection warmup** APIs where available so the first application requests after startup do not pay cold-pool latency—while understanding warmup **concentrates** the same connect cost into startup unless you throttle or spread it operationally.
 
 The client runs a **cluster tend** loop that refreshes topology on an interval (**`tendInterval`** or equivalent). Lower values detect membership changes sooner; higher values reduce background chatter. Tune only when you understand the tradeoff (defaults are usually fine).
-
-**Why**
 
 Under-provisioned pools serialize work or error under spike load; over-provisioned pools waste file descriptors and server sessions. Ignoring **aggregate** client connections vs **`proto-fd-max`** causes connection failures or instability cluster-wide. Large **`minConnsPerNode`** × many instances can **spike server CPU** during mass connect/reconnect (worse with **TLS**). Cold starts without warmup show as tail latency spikes after deploy.
 

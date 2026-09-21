@@ -25,6 +25,8 @@ Read `AGENTS.md` first: it carries the hard rules, the routing table, and the
 version gates. Then `new-app-modeling-checklist.md`, which is the required first
 read for a new application.
 
+**Why**
+
 **Routing**
 
 | Task | File |
@@ -39,8 +41,6 @@ read for a new application.
 | Matching a workload to a known shape and sizing profile | `workload-archetypes.md` |
 | Reviewing a drafted model | `modeling-failure-modes.md` |
 | Identifier formats; timestamp bin naming | `id-selection-guidance.md`, `timestamp-bin-naming-guidance.md` |
-
-**Why**
 
 The guide holds material that changes on server releases — version gates,
 operation complexity tables, configuration limits and their current defaults.

@@ -19,9 +19,9 @@ The server stores a per-record **generation** on writes; ordinary reads do not b
 
 **Read-touch** (TTL extension via **`readTouchTtlPercent`**) **does not advance generation**, so CAS that only compares generation can disagree with TTL changes ([Policies](https://aerospike.com/docs/database/learn/policies/); [single-ttl-nsup-default-ttl.md](single-ttl-nsup-default-ttl.md)). On mismatch the write fails with **`AS_ERR_GENERATION` (error 3)**.
 
-When the generation check **fails**, **restart the whole read–modify–write**: **read the record again** (new generation and bins), **recompute** your change from that fresh state, then **write** with the new generation. Do **not** resend the previous write with a tweaked policy—the in-memory “modification” may be wrong once another writer has changed the record.
-
 **Why**
+
+When the generation check **fails**, **restart the whole read–modify–write**: **read the record again** (new generation and bins), **recompute** your change from that fresh state, then **write** with the new generation. Do **not** resend the previous write with a tweaked policy—the in-memory “modification” may be wrong once another writer has changed the record.
 
 Without **policy + generation from the same read**, you do not have CAS—only a blind write. Misinterpreting generation as a monotonic change counter breaks when the value wraps or skips.
 

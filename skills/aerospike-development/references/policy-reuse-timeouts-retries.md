@@ -23,9 +23,9 @@ Reuse read/write/operate policy objects (or set defaults on the client) instead 
 
 **Sleep between retries (`sleepBetweenRetries`):** Sleep runs only on **connection errors** and **server timeouts** that suggest a node is down and the cluster is reforming—it does **not** run merely because the client’s **socketTimeout** (idle) fired. **`sleepBetweenRetries` is ignored** when **`maxRetries` is 0** and **ignored in async mode**. For **writes** with **`maxRetries` > 0**, set sleep high enough for the cluster to reform (often **≥ 500 ms** per [Policies](https://aerospike.com/docs/database/learn/policies/)).
 
-**Timeout delay (`timeoutDelay`):** Some clients expose a **grace period after a timeout** before tearing down the socket: the app still receives the timeout immediately, but the client may **hold the connection** briefly in case a **late response** arrives—then it can return the connection to the pool instead of closing it. This matters most when new connections are expensive (for example **TLS** handshakes); see [sec-client-tls-auth.md](sec-client-tls-auth.md). Confirm field names in your SDK ([Java policies](https://aerospike.com/docs/develop/client/java/policies/) describe the idea).
-
 **Why**
+
+**Timeout delay (`timeoutDelay`):** Some clients expose a **grace period after a timeout** before tearing down the socket: the app still receives the timeout immediately, but the client may **hold the connection** briefly in case a **late response** arrives—then it can return the connection to the pool instead of closing it. This matters most when new connections are expensive (for example **TLS** handshakes); see [sec-client-tls-auth.md](sec-client-tls-auth.md). Confirm field names in your SDK ([Java policies](https://aerospike.com/docs/develop/client/java/policies/) describe the idea).
 
 Per-call policy allocation adds GC pressure in managed languages and obscures which timeouts apply. Network-heavy or large scans need different limits than single-key gets. Wrong retry settings on non-idempotent operations cause duplicate side effects.
 
