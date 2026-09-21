@@ -199,21 +199,47 @@ def render_monolith(skills: list[skillsrc.SkillSource]) -> str:
     return "\n".join(parts)
 
 
+DENSITIES = ("bare", "imperative", "full")
+
+
+def skill_density(sk: skillsrc.SkillSource, default: str = "imperative") -> str:
+    """How much of each rule this skill contributes to the always-loaded file.
+
+    Declared per skill in ``SKILL.md`` frontmatter as ``metadata.density``,
+    because the skills are very unequal: one large skill should be able to thin
+    itself without costing the small ones their instructions.
+
+    An unrecognised value raises rather than falling back, so a typo cannot
+    quietly change what ships.
+    """
+    value = (sk.skill_md_meta.get("metadata") or {}).get("density", default)
+    if value not in DENSITIES:
+        raise ValueError(
+            f"{sk.name}: metadata.density is {value!r}; expected one of {list(DENSITIES)}"
+        )
+    return value
+
+
 def render_stripped(
     skills: list[skillsrc.SkillSource], density: str = "imperative"
 ) -> str:
     """Compile to a routing layer over the rule files shipped beside it.
 
-    ``density`` picks how much of each rule reaches this always-loaded file:
+    ``density`` is the default for skills that do not declare one; a skill
+    overrides it with ``metadata.density``. It picks how much of each rule
+    reaches this always-loaded file:
 
+    ``bare``
+        Heading only -- rule name, title, impact. The instruction itself is the
+        first sentence of ``**Rule**`` in the shipped reference file, so nothing
+        becomes unreachable; what goes is a duplicate. ~21 tokens per rule.
     ``imperative``
-        The rule's first sentence only. The file stays a router: it says what
-        each rule instructs and where to read the rest, which is the shape the
-        Agent Skills spec's progressive disclosure describes and the shape
-        redis/agent-skills uses. Adding a rule costs ~21 tokens here.
+        Adds the rule's first sentence, so the artifact states what to do
+        without opening anything. The shape the Agent Skills spec's progressive
+        disclosure describes and redis/agent-skills uses. ~73 tokens per rule.
     ``full``
         Rule, Prefer and Avoid inlined. Self-contained without the reference
-        files, at roughly three times the size and ~311 tokens per new rule.
+        files, at roughly four times the size and ~311 tokens per new rule.
 
     Headings carry the bare rule name, not a link: the path is derivable from
     the skill and rule headings (see ``_header``), and the same derivation
@@ -221,6 +247,9 @@ def render_stripped(
     """
     parts = ["# Aerospike agent rules\n"]
     for sk in skills:
+        # Bound per skill, not reassigned into `density`: one skill declaring
+        # `bare` must not become the default for every skill after it.
+        sk_density = skill_density(sk, density)
         parts.append(f"\n## {sk.name}\n")
         for _level, title, content in skillsrc.heading_sections(sk.skill_md_body):
             if not any(k in title.lower() for k in _SECTION_KEYS):
@@ -243,7 +272,11 @@ def render_stripped(
             title = ref.meta.get("title") or ref.name
             impact = ref.meta.get("impact", "")
             head = f"\n### {stem} — {title}" + (f" [{impact}]" if impact else "")
-            if density == "imperative":
+            if sk_density == "bare":
+                # The instruction is the first sentence of **Rule** in the
+                # shipped reference file, so this drops a duplicate, not a fact.
+                chunk = [head]
+            elif sk_density == "imperative":
                 imperative = _imperative(rule)
                 chunk = [head, f"- {imperative}"] if imperative else [head]
             else:

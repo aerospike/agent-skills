@@ -83,6 +83,25 @@ A rule file is compiled into [`compiled-skills/aerospike/SKILL.md`](compiled-ski
 
 A rule's file is named by its skill and its own filename, and the artifact's header states that derivation. Rules cite each other by bare filename and resolve the same way.
 
+### Density: how much of a rule reaches tier 1
+
+Declared per skill in its `SKILL.md` frontmatter as `metadata.density`, defaulting to `imperative`. It is per skill rather than global because the skills are unequal—one carries 35 rules and another four—so a large skill can thin itself without costing a small one its instructions.
+
+| `density` | Tier 1 carries | Per rule |
+|---|---|---|
+| `imperative` *(default)* | heading + the first sentence of `Rule` | ~73 tok |
+| `bare` | heading only | ~21 tok |
+| `full` | `Rule`, `Prefer` and `Avoid` inlined | ~311 tok |
+
+```yaml
+metadata:
+  density: bare
+```
+
+**`bare` removes a duplicate, not a fact.** The sentence it drops is the first sentence of `**Rule**`, and the whole rule file ships in `references/`—so the instruction stays reachable, it just costs a file read. Reach for it when a skill grows enough to push the artifact past the spec's 5,000-token recommendation; thinning the one large skill recovers nearly as much as thinning all of them.
+
+An unrecognised value fails the compile rather than falling back, so a typo cannot quietly change what ships.
+
 ### Section markers
 
 Five labels, each **bold and alone on its line**. The set is closed—[`skillsrc.py`](scripts/skills_compile/skillsrc.py) matches these and nothing else, so **a bold line that is not one of them is not a section**: it is absorbed into whichever section precedes it, and its content ships or vanishes accordingly.
