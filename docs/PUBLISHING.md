@@ -194,12 +194,41 @@ Fill in as submissions land, and record the same links on [AIE-13](https://aeros
 
 **Never record a status token here, and do not go looking for one in the receipts.** This repository is public, including its workflow artifacts, and a token has no place in either. The submit script redacts both `token` and the `statusUrl` that embeds it, so a receipt carries the submission id alone — that is what belongs in this table. To poll a submission you no longer hold a token for, re-submit and use the fresh one it returns.
 
-| Registry | Listing URL | Submission id | First submitted | Notes |
-|----------|-------------|---------------|-----------------|-------|
-| openagentskill | https://www.openagentskill.com/skills/aerospike-agent-skills-aerospike | `baeeb4f7-98d2-47e4-84cc-76def25a6a48` | 2026-08-26 (v1.0.0) | Live. Approved 36/36, status `duplicate` — see the note below |
-| upskill | _pending review_ | `eb288fce-e87c-4c92-8c00-e7c198092c88` | 2026-08-26 (v1.0.0) | Accepted with status `pending_review`. No public listing URL yet |
+One row per registry, carrying the **most recent** submission. Earlier ones are in the history below.
+
+| Registry | Listing URL | Latest submission id | Submitted | Notes |
+|----------|-------------|----------------------|-----------|-------|
+| openagentskill | https://www.openagentskill.com/skills/aerospike-agent-skills-aerospike | `e6b0ab8b-ae13-49f6-bf2e-877e084220be` | 2026-09-22 (v1.1.0) | Accepted, status `submitted`. Review is asynchronous — the listing served v1.0.0 content at the time of writing |
+| upskill | _none_ | `eb288fce-e87c-4c92-8c00-e7c198092c88` | 2026-08-26 (v1.0.0) | **v1.1.0 was not submitted** — see below. The v1.0.0 submission was accepted, status `pending_review`, and never produced a public listing URL |
 | skills.sh | _pending_ | n/a | n/a | Telemetry-driven; no submission |
 
-**Two openagentskill submissions exist, and the id above is the second one.** The publish job ran four times on 2026-08-26 while the workflow itself was being fixed. Run `33010412564` submitted successfully to openagentskill and *then* failed on upskill, so `308e1dd3-23be-4f68-800a-5d87561e4efc` was created by a run that reports as failed; the v1.0.0 release run `33016216646` submitted again and got `baeeb4f7…`, which is the one the release actually produced. Both resolve to the same slug. Record the release's id, not the first one that happened to land.
+### upskill did not receive v1.1.0
 
-**What is listed there is v1.0.0, not `main`.** openagentskill submits a single `skillPath` and snapshots its contents; it has not re-fetched since. The listing therefore still serves the pre-router `SKILL.md` from `7f9ce43`, without the `references/` and `examples/` files that [PR #45](https://github.com/aerospike/agent-skills/pull/45) added. Only a new release refreshes it. Whether that registry can serve a directory package at all is open, and is tracked with the AI ecosystem team rather than here.
+The v1.1.0 release ([run `35675460991`](https://github.com/aerospike/agent-skills/actions/runs/35675460991)) failed on the upskill leg with `error: fetch failed`. That is a transport failure, not a rejection: `mcp.autoloops.ai` resolves but does not answer, while `autoloops.ai` serves normally. Nothing in this repository needs changing.
+
+Retry once their API answers again — the submission is idempotent, and re-running also re-submits to openagentskill harmlessly:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" --max-time 15 https://mcp.autoloops.ai/   # 000 means still down
+gh run rerun 35675460991 --failed
+```
+
+The red run is the design working rather than a defect: `continue-on-error` kept upskill's failure from blocking openagentskill, and the final gate step still failed the job so a half-completed publish could not report green. Note that the two submit steps show `success` in the UI — `continue-on-error` masks `conclusion`, and the gate reads `outcome`.
+
+### openagentskill pins to a commit, and does not re-fetch
+
+Its submission records a `sourceUrl`, and v1.1.0's names a **commit SHA** where v1.0.0's named a branch:
+
+```
+v1.0.0   tree/main/compiled-skills/aerospike
+v1.1.0   tree/166fbf03fd118ce3f864d3f1db41386a3055ec45/compiled-skills/aerospike
+```
+
+Between the two releases the listing never changed, still serving the pre-router `SKILL.md` from `7f9ce43` almost a month later. So the listing is a **pinned snapshot that only a release moves**, and the registry submits a single `skillPath` — meaning the `references/` and `examples/` files that [PR #45](https://github.com/aerospike/agent-skills/pull/45) added are very likely not served there at all. Whether that registry can carry a directory package is tracked with the AI ecosystem team rather than here.
+
+### Earlier submissions
+
+| Id | Release | Registry | Why it is not the row above |
+|---|---|---|---|
+| `baeeb4f7-98d2-47e4-84cc-76def25a6a48` | v1.0.0 | openagentskill | Superseded by the v1.1.0 submission |
+| `308e1dd3-23be-4f68-800a-5d87561e4efc` | v1.0.0 | openagentskill | Created by run `33010412564`, which submitted to openagentskill and *then* failed on upskill — so it exists despite that run reporting as failed. All three resolve to the same slug |
