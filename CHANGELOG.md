@@ -13,7 +13,7 @@ than an API — see [What a version means here](#what-a-version-means-here).
 
 ## [Unreleased]
 
-## [1.1.0] — unreleased
+## [1.1.0] — 2026-09-21
 
 ### Changed
 
@@ -86,5 +86,5 @@ Renaming a rule file is a **minor** bump when the old path was never published, 
 **major** one when it was. The 1.1.0 renames are minor for that reason — 1.0.0 shipped
 `SKILL.md` alone, so no consumer could have depended on a reference path.
 
-[1.1.0]: https://github.com/aerospike/agent-skills/compare/v1.0.0...HEAD
+[1.1.0]: https://github.com/aerospike/agent-skills/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/aerospike/agent-skills/releases/tag/v1.0.0
