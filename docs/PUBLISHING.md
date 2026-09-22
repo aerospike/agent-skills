@@ -97,7 +97,15 @@ Four behaviors worth knowing:
 
 `/validate` ignores any `ref` and always reads the default branch, so a fix cannot be rehearsed from a branch — it has to land on `main` before the registry will see it.
 
-Each submission returns `{id, token, statusUrl}`. **The token is the only way to poll that submission later.** Tokens are private, so the workflow keeps them out of logs and the job summary, uploading them as the `registry-receipts` artifact (90-day retention). Transcribe them into the table below before the artifact expires.
+Each submission returns `{id, token, statusUrl}`. **The token is the only way to poll that submission later**, and `statusUrl` embeds the same value in its query string.
+
+[`scripts/publish-openagentskill.sh`](../scripts/publish-openagentskill.sh) strips both before writing the receipt, so the `registry-receipts` artifact records the submission id and nothing that authenticates.
+
+**What the token is.** openagentskill submission is anonymous and free — there is no Aerospike account behind it, so this is not an organisational credential, and losing or exposing one does not put a publishing identity at risk. Its only documented purpose is polling the status of the submission that returned it.
+
+**Why it is redacted anyway.** The script used to archive the whole response, on the reasoning that an artifact is more private than a log. That reasoning does not hold on a public repository: workflow artifacts are downloadable by anyone who can read it. And while the documentation describes the token as read-only, it nowhere states that it *cannot* be used to modify a submission. Redacting costs nothing and retires the question, which is better than depending on an undocumented boundary.
+
+Losing the token costs little in return. Submission is idempotent and each one returns its own fresh token, so **re-submitting is the supported way to get a pollable handle back** — which is also what a release already does. The id is what identifies the listing, and the id is what the receipt keeps.
 
 ### upskill (Autoloops) — secondary
 
@@ -162,10 +170,14 @@ Both run in CI on every pull request that touches `skills/`. Both also cover `co
 
 Fill in as submissions land, and record the same links on [AIE-13](https://aerospike.atlassian.net/browse/AIE-13).
 
-**Never record a status token here.** A token is private and this repository is public. The `statusUrl` in a receipt embeds one, so record the submission id alone and leave the token in the `registry-receipts` artifact.
+**Never record a status token here, and do not go looking for one in the receipts.** This repository is public, including its workflow artifacts, and a token has no place in either. The submit script redacts both `token` and the `statusUrl` that embeds it, so a receipt carries the submission id alone — that is what belongs in this table. To poll a submission you no longer hold a token for, re-submit and use the fresh one it returns.
 
 | Registry | Listing URL | Submission id | First submitted | Notes |
 |----------|-------------|---------------|-----------------|-------|
-| openagentskill | _pending review_ | `308e1dd3-23be-4f68-800a-5d87561e4efc` | 2026-08-26 (v1.0.0) | Accepted with status `submitted`. Token in the `registry-receipts` artifact of that run |
-| upskill | _pending_ | n/a | _not yet submitted_ | First attempt failed on the config key mismatch above | 
+| openagentskill | https://www.openagentskill.com/skills/aerospike-agent-skills-aerospike | `baeeb4f7-98d2-47e4-84cc-76def25a6a48` | 2026-08-26 (v1.0.0) | Live. Approved 36/36, status `duplicate` — see the note below |
+| upskill | _pending review_ | `eb288fce-e87c-4c92-8c00-e7c198092c88` | 2026-08-26 (v1.0.0) | Accepted with status `pending_review`. No public listing URL yet |
 | skills.sh | _pending_ | n/a | n/a | Telemetry-driven; no submission |
+
+**Two openagentskill submissions exist, and the id above is the second one.** The publish job ran four times on 2026-08-26 while the workflow itself was being fixed. Run `33010412564` submitted successfully to openagentskill and *then* failed on upskill, so `308e1dd3-23be-4f68-800a-5d87561e4efc` was created by a run that reports as failed; the v1.0.0 release run `33016216646` submitted again and got `baeeb4f7…`, which is the one the release actually produced. Both resolve to the same slug. Record the release's id, not the first one that happened to land.
+
+**What is listed there is v1.0.0, not `main`.** openagentskill submits a single `skillPath` and snapshots its contents; it has not re-fetched since. The listing therefore still serves the pre-router `SKILL.md` from `7f9ce43`, without the `references/` and `examples/` files that [PR #45](https://github.com/aerospike/agent-skills/pull/45) added. Only a new release refreshes it. Whether that registry can serve a directory package at all is open, and is tracked with the AI ecosystem team rather than here.
