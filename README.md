@@ -51,6 +51,8 @@ The **canonical** `aerospike.conf` and commands for local setup live in [`skills
 
 We publish **one** skill: [`compiled-skills/aerospike/SKILL.md`](compiled-skills/aerospike/SKILL.md), compiled from the three authoring folders under [`skills/`](skills/). Registries list that artifact only. The folders under `skills/` are maintained for editing and compilation, not as separate install targets.
 
+The skill and its rule files ship together — install the **directory**, not the single file, or the rules `SKILL.md` names will be missing. It is [semantically versioned](CHANGELOG.md): each [release](https://github.com/aerospike/agent-skills/releases) is tagged `vX.Y.Z`, and an installed copy states its own version in `metadata.version` so you can tell what you have without checking back here.
+
 | Tool | What to do |
 |------|----------------|
 | **Any agent (recommended)** | Add [`compiled-skills/aerospike/SKILL.md`](compiled-skills/aerospike/SKILL.md) to always-on context. [Install guide](compiled-skills/README.md). Raw URL: `https://raw.githubusercontent.com/aerospike/agent-skills/main/compiled-skills/aerospike/SKILL.md` |

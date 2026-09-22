@@ -15,12 +15,18 @@
 #                release candidate must not be able to reach one.
 #   3. Ordering  strictly greater than the highest tag already in the repository.
 #                Needs the full tag list, which a shallow checkout does not have.
+#   4. Version   equal to metadata.version in the published artifact. A consumer who
+#                installed the skill reads the frontmatter, not the tag, so the two
+#                must not drift. Skipped for a tree with no compiled artifact.
 #
 # Keep the rules here rather than in the workflow, so cutting a release is not the
 # first time anyone finds out the tag is wrong. See docs/PUBLISHING.md.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# The artifact registries fetch. Its frontmatter carries metadata.version, and a
+# release tag has to agree with it -- see the version-match check below.
+ARTIFACT="compiled-skills/aerospike/SKILL.md"
 TAG=""
 FLAGGED_PRERELEASE="false"
 CHECK_ORDERING=1
@@ -141,6 +147,53 @@ if ! newer_than "${TAG}" "${highest}"; then
   echo "minor, or patch above it. If ${highest} looks wrong, a shallow clone without" >&2
   echo "the full tag history reports the wrong answer here." >&2
   exit 1
+fi
+
+# Rule 4: the tag matches the version inside the artifact that ships.
+#
+# metadata.version is hand-maintained in scripts/skills_compile/published_skill.yaml
+# and compiled into the published frontmatter. That is deliberate: the frontmatter is
+# emitted verbatim so `compile-agents.py --check` stays byte-stable, which rules out
+# deriving the version from `git describe` at compile time.
+#
+# The cost of maintaining it by hand is that it can drift from the tag -- and a
+# consumer who installs the skill sees the frontmatter, never the tag. So a release
+# whose artifact still says 1.0.0 fails here rather than shipping a file that
+# misreports its own version.
+#
+# Read from the artifact, not the YAML source, because the artifact is what is
+# published. If those two disagree, `compile-agents.py --check` catches it, and it
+# runs as gate 1 on the same release.
+#
+# Runs after ordering, so --skip-ordering keeps its documented meaning: format and
+# stability only, for a tree without the full history.
+artifact_version() {
+  awk 'NR==1 && $0=="---" {inside=1; next} inside && $0=="---" {exit} inside' \
+    "${ROOT}/${ARTIFACT}" 2>/dev/null |
+    sed -n 's/^[[:space:]]\{1,\}version:[[:space:]]*"\{0,1\}\([0-9][0-9.]*\)"\{0,1\}[[:space:]]*$/\1/p' |
+    head -n1
+}
+
+if [[ -f "${ROOT}/${ARTIFACT}" ]]; then
+  shipped="$(artifact_version)"
+  if [[ -z "${shipped}" ]]; then
+    echo "${ARTIFACT} declares no metadata.version." >&2
+    echo >&2
+    echo "A published skill states its own version, because that is all a consumer" >&2
+    echo "who installed it can see. Add it to scripts/skills_compile/published_skill.yaml" >&2
+    echo "under metadata, then run: python3 scripts/compile-agents.py --write" >&2
+    exit 1
+  fi
+  if [[ "v${shipped}" != "${TAG}" ]]; then
+    echo "Release tag ${TAG} does not match the version in ${ARTIFACT} (${shipped})." >&2
+    echo >&2
+    echo "Bump metadata.version in scripts/skills_compile/published_skill.yaml to" >&2
+    echo "${TAG#v}, recompile, and commit the result before tagging:" >&2
+    echo >&2
+    echo "  python3 scripts/compile-agents.py --write" >&2
+    exit 1
+  fi
+  echo "${ARTIFACT} declares version ${shipped}, matching ${TAG}."
 fi
 
 echo "${TAG} is a stable semantic version and supersedes ${highest}."

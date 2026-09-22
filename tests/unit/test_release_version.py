@@ -181,3 +181,105 @@ def test_the_version_workflow_fetches_the_full_tag_history():
 
     assert "fetch-depth: 0" in workflow
     assert "check-release-version.sh" in workflow
+
+
+# --- The tag must match the version the published artifact declares -----------
+#
+# metadata.version is hand-maintained, so it can drift from the tag. A consumer who
+# installs the skill sees the frontmatter and never the tag, which is what makes a
+# mismatch worth failing a release over rather than tolerating.
+
+ARTIFACT_REL = pathlib.Path("compiled-skills/aerospike/SKILL.md")
+
+
+@pytest.fixture
+def repo_with_artifact(tmp_path):
+    """A scratch repo carrying scripts/ and a published artifact of a given version."""
+    shutil.copytree(REPO_ROOT / "scripts", tmp_path / "scripts")
+    subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+    subprocess.run(
+        ["git", "-c", "user.email=t@t", "-c", "user.name=t", "commit",
+         "-q", "--allow-empty", "-m", "root"],
+        cwd=tmp_path,
+        check=True,
+    )
+
+    def build(frontmatter, *tags):
+        artifact = tmp_path / ARTIFACT_REL
+        artifact.parent.mkdir(parents=True, exist_ok=True)
+        artifact.write_text(f"---\n{frontmatter}\n---\n\n# Aerospike agent rules\n")
+        for name in tags:
+            subprocess.run(["git", "tag", name], cwd=tmp_path, check=True)
+        return tmp_path
+
+    return build
+
+
+_META = 'name: aerospike\nlicense: Apache-2.0\nmetadata:\n  version: "{v}"\n  last_verified: "2026-04-21"'
+
+
+def test_a_tag_matching_the_artifact_version_passes(repo_with_artifact):
+    repo = repo_with_artifact(_META.format(v="1.1.0"), "v1.0.0")
+    result = _check("--tag", "v1.1.0", repo=repo)
+
+    assert result.returncode == 0, result.stderr
+    assert "declares version 1.1.0, matching v1.1.0" in result.stdout
+
+
+def test_a_tag_ahead_of_the_artifact_version_fails(repo_with_artifact):
+    """The forget-to-bump case: ordering passes, so only this check catches it."""
+    repo = repo_with_artifact(_META.format(v="1.1.0"), "v1.0.0")
+    result = _check("--tag", "v1.2.0", repo=repo)
+
+    assert result.returncode == 1
+    assert "does not match the version" in result.stderr
+    # The message has to say how to fix it, not just that it is wrong.
+    assert "compile-agents.py --write" in result.stderr
+
+
+def test_an_artifact_with_no_declared_version_fails(repo_with_artifact):
+    repo = repo_with_artifact(
+        "name: aerospike\nlicense: Apache-2.0\nmetadata:\n  last_verified: \"2026-04-21\"",
+        "v1.0.0",
+    )
+    result = _check("--tag", "v1.1.0", repo=repo)
+
+    assert result.returncode == 1
+    assert "declares no metadata.version" in result.stderr
+
+
+def test_the_check_is_skipped_when_there_is_no_artifact(tagged_repo):
+    """`tagged_repo` copies scripts/ alone. A tree without the compiled artifact
+    still gets the format, stability and ordering rules rather than an error."""
+    repo = tagged_repo("v1.0.0")
+    result = _check("--tag", "v1.1.0", repo=repo)
+
+    assert result.returncode == 0, result.stderr
+    assert "metadata.version" not in result.stderr
+
+
+def test_the_version_the_repository_ships_is_a_stable_semver():
+    """Guards this repository's own artifact, not a scratch copy: the shipped
+    version has to be a version a tag could equal."""
+    import re
+
+    text = (REPO_ROOT / ARTIFACT_REL).read_text()
+    frontmatter = text[4 : text.index("\n---", 4)]
+    match = re.search(r'^\s+version:\s*"?(\d+\.\d+\.\d+)"?\s*$', frontmatter, re.M)
+
+    assert match, "the published artifact must declare metadata.version"
+    assert _check("--tag", f"v{match.group(1)}").returncode == 0
+
+
+def test_the_source_and_the_artifact_agree_on_the_version():
+    """published_skill.yaml is the source; the artifact is what ships. If a bump
+    lands without a recompile these diverge, and the artifact is what consumers get."""
+    import yaml
+
+    source = yaml.safe_load(
+        (REPO_ROOT / "scripts" / "skills_compile" / "published_skill.yaml").read_text()
+    )
+    text = (REPO_ROOT / ARTIFACT_REL).read_text()
+    published = yaml.safe_load(text[4 : text.index("\n---", 4)])
+
+    assert source["metadata"]["version"] == published["metadata"]["version"]
