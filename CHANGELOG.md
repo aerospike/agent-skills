@@ -13,6 +13,54 @@ than an API — see [What a version means here](#what-a-version-means-here).
 
 ## [Unreleased]
 
+## [1.2.0] — 2026-10-02
+
+Brings the skill up to date with Aerospike Database 8.2.0, for the parts that apply to
+every client. The rules name no client methods; those still come from each client's own
+repository.
+
+### Added
+
+- **A rule for the 64-level nesting limit.** Database 8.2.0 rejects a List or Map nested
+  deeper than 64 levels in any request. Values already stored deeper stay readable and
+  fail only when something sends them back: a read-modify-write, an XDR shipment to an
+  8.2.0 destination, or a restore. `references/aerospike-development-cdt-nesting-depth-limit.md`
+  records the limit, the status codes returned, the upgrade hazards, and alternatives
+  for trees and JSON-derived documents.
+- **Server-side string operations**, in `references/aerospike-development-expr-compute-to-data.md`:
+  the 8.2.0 version gate, Unicode codepoint positions, what `NO_FAIL` does and does not
+  cover, invalid UTF-8, ICU regex, and flag mix-ups. The rule's one-line instruction now
+  names them.
+- **Operations versus expressions**, in `references/aerospike-development-model-client-api-choice.md`:
+  an operation changes one named bin in place and an expression evaluates to a value;
+  read versus write expressions; a modify expression is not a write; unknown results and
+  the evaluate-no-fail flag; and the read/write rule for query projections.
+- **Error details and node-join timeouts**, in `policy-client-defaults` and
+  `policy-reuse-timeouts-retries`: opt-in error-detail verbosity, branching on
+  `(status, subcode)`, and that an 8.2.0 node that is joining or restarting accepts the
+  connection and then answers nothing, so requests to it time out.
+
+### Changed
+
+- **K-ordered maps are a performance recommendation from 8.2.0, not a correctness
+  requirement.** `cdt-nested-collections` and its worked example now say the server
+  compares maps by content whatever their ordering. Below 8.2.0 the existing advice
+  for comparison and `ADD_UNIQUE` stands.
+- **Lua UDFs are hardened by default from 8.2.0.** `expr-compute-to-data` records what a
+  UDF can no longer use and that the setting is static.
+- **`integer` replaces `numeric` as the secondary index key type on 8.2.0 and later**, in
+  `query-secondary-index-discipline` and the getting-started hallucination blacklist.
+- **Error 22 has subcodes on 8.2.0**, in `single-ttl-nsup-default-ttl`; none of them is
+  the NSUP-off rejection, so a subcode names a different cause.
+- **The always-loaded `SKILL.md` grew from 4,871 to 4,990 tokens**, still inside the
+  Agent Skills spec's 5,000-token recommendation. Only one-line instructions and one
+  blacklist row were added; the detail lives in the rule files.
+
+### Fixed
+
+- `model-client-api-choice` listed trimming a string under expressions. The docs treat
+  it as an operation, and the rule now says so.
+
 ## [1.1.0] — 2026-09-21
 
 ### Changed
@@ -86,5 +134,6 @@ Renaming a rule file is a **minor** bump when the old path was never published, 
 **major** one when it was. The 1.1.0 renames are minor for that reason — 1.0.0 shipped
 `SKILL.md` alone, so no consumer could have depended on a reference path.
 
+[1.2.0]: https://github.com/aerospike/agent-skills/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/aerospike/agent-skills/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/aerospike/agent-skills/releases/tag/v1.0.0
