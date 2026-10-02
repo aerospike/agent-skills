@@ -80,6 +80,7 @@ TOC: [examples.md](../examples.md).
 
 - [cdt-bounded-collections.md](cdt-bounded-collections.md)
 - [cdt-nested-collections.md](cdt-nested-collections.md)
+- [cdt-nesting-depth-limit.md](cdt-nesting-depth-limit.md)
 - [cdt-server-side-ops.md](cdt-server-side-ops.md)
 
 ### expr-

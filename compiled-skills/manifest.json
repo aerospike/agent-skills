@@ -7,7 +7,7 @@
     "skills/aerospike-data-modeling"
   ],
   "files": {
-    "compiled-skills/aerospike/SKILL.md": 23460,
+    "compiled-skills/aerospike/SKILL.md": 23744,
     "compiled-skills/aerospike/examples/aerospike-development-batch-official-links.md": 2815,
     "compiled-skills/aerospike/examples/aerospike-development-batch-read-by-keys.md": 2402,
     "compiled-skills/aerospike/examples/aerospike-development-cdt-list-append.md": 2317,
@@ -24,6 +24,7 @@
     "compiled-skills/aerospike/references/aerospike-development-batch-parallel-key-operations.md": 4198,
     "compiled-skills/aerospike/references/aerospike-development-cdt-bounded-collections.md": 1436,
     "compiled-skills/aerospike/references/aerospike-development-cdt-nested-collections.md": 3418,
+    "compiled-skills/aerospike/references/aerospike-development-cdt-nesting-depth-limit.md": 3258,
     "compiled-skills/aerospike/references/aerospike-development-cdt-server-side-ops.md": 3296,
     "compiled-skills/aerospike/references/aerospike-development-client-direct-node-access.md": 3331,
     "compiled-skills/aerospike/references/aerospike-development-client-error-rate-backoff.md": 1856,
