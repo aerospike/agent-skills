@@ -7,7 +7,7 @@
     "skills/aerospike-data-modeling"
   ],
   "files": {
-    "compiled-skills/aerospike/SKILL.md": 23744,
+    "compiled-skills/aerospike/SKILL.md": 23899,
     "compiled-skills/aerospike/examples/aerospike-development-batch-official-links.md": 2815,
     "compiled-skills/aerospike/examples/aerospike-development-batch-read-by-keys.md": 2402,
     "compiled-skills/aerospike/examples/aerospike-development-cdt-list-append.md": 2317,
@@ -31,7 +31,7 @@
     "compiled-skills/aerospike/references/aerospike-development-client-pools-warmup.md": 4669,
     "compiled-skills/aerospike/references/aerospike-development-client-singleton.md": 1584,
     "compiled-skills/aerospike/references/aerospike-development-client-source-of-truth.md": 3916,
-    "compiled-skills/aerospike/references/aerospike-development-expr-compute-to-data.md": 1346,
+    "compiled-skills/aerospike/references/aerospike-development-expr-compute-to-data.md": 2637,
     "compiled-skills/aerospike/references/aerospike-development-model-access-paths-denormalization.md": 1516,
     "compiled-skills/aerospike/references/aerospike-development-model-bin-cdt-multiple-records.md": 3290,
     "compiled-skills/aerospike/references/aerospike-development-model-client-api-choice.md": 2399,
@@ -47,7 +47,7 @@
     "compiled-skills/aerospike/references/aerospike-development-policy-reuse-timeouts-retries.md": 4538,
     "compiled-skills/aerospike/references/aerospike-development-policy-send-key.md": 2175,
     "compiled-skills/aerospike/references/aerospike-development-policy-write-commit-level.md": 2575,
-    "compiled-skills/aerospike/references/aerospike-development-query-secondary-index-discipline.md": 1525,
+    "compiled-skills/aerospike/references/aerospike-development-query-secondary-index-discipline.md": 1714,
     "compiled-skills/aerospike/references/aerospike-development-query-sindex-by-access-path.md": 2590,
     "compiled-skills/aerospike/references/aerospike-development-sec-client-tls-auth.md": 1059,
     "compiled-skills/aerospike/references/aerospike-development-single-delete-durable-deletes.md": 3436,

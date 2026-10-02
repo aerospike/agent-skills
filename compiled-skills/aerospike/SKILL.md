@@ -38,6 +38,7 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 - Wrong: aerospike.Client() or aerospike.client.Client() in Python — Use: the factory function aerospike.client({...}).
 - Wrong: require('aerospike-client') in Node.js — Use: require('aerospike').
 - Wrong: Setting a positive integer TTL while nsup-period is 0, unless allow-ttl-without-nsup is explicitly enabled for testing.
+- Wrong: Secondary index key type numeric on Database 8.2.0 and later — Use: integer; numeric is a deprecated alias that still works but logs a warning.
 - Wrong: Any REST API endpoints — Aerospike uses a binary wire protocol via client SDKs, not HTTP.
 - Wrong: CREATE NAMESPACE or CREATE SET SQL-like commands — namespaces are defined in config; sets are auto-created.
 
