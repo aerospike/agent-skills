@@ -6,7 +6,7 @@ Related rules: [cdt-nested-collections.md](../references/cdt-nested-collections.
 
 **Official source:** [Working with nested collection data types — Add a new vehicle as the default](https://aerospike.com/docs/develop/expressions/nesting#add-a-new-vehicle-as-the-default)
 
-The doc models a `vehicles` bin as a **list of maps** (each map is a vehicle). This sample inserts a new map at index `0` with `ListOrder.UNORDERED` and `ADD_UNIQUE | NO_FAIL` so duplicates are rejected without failing the call—see the nesting guide for why **K-ordered** maps matter for `ADD_UNIQUE` comparison.
+The doc models a `vehicles` bin as a **list of maps** (each map is a vehicle). This sample inserts a new map at index `0` with `ListOrder.UNORDERED` and `ADD_UNIQUE | NO_FAIL` so duplicates are rejected without failing the call—see the nesting guide for **K-ordered** maps, which are recommended for performance and which servers below 8.2.0 need for `ADD_UNIQUE` comparison.
 
 ## Java
 
@@ -66,6 +66,6 @@ ops = [
 (key, meta, bins) = client.operate(key, ops)
 ```
 
-**Why:** Server-side `operate` updates the nested structure atomically; `TreeMap` / `KeyOrderedDict` match the **K-ordered** map wire form the server expects for reliable map equality checks.
+**Why:** Server-side `operate` updates the nested structure atomically; `TreeMap` / `KeyOrderedDict` build the **K-ordered** map form, which is recommended for performance and, below 8.2.0, needed for reliable map equality checks.
 
 **More:** [Map operation cards](https://aerospike.com/docs/develop/data-types/collections/map/operations/) (every map operation with args, return, and a code tab per client) · [Context (CDT paths)](https://aerospike.com/docs/develop/data-types/collections/context/) · [Path expressions](https://aerospike.com/docs/develop/expressions/path/) · [Go / C# / Node.js tabs](https://aerospike.com/docs/develop/expressions/nesting#add-a-new-vehicle-as-the-default) on the same page
