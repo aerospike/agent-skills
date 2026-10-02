@@ -198,19 +198,21 @@ One row per registry, carrying the **most recent** submission. Earlier ones are 
 
 | Registry | Listing URL | Latest submission id | Submitted | Notes |
 |----------|-------------|----------------------|-----------|-------|
-| openagentskill | https://www.openagentskill.com/skills/aerospike-agent-skills-aerospike | `e6b0ab8b-ae13-49f6-bf2e-877e084220be` | 2026-09-22 (v1.1.0) | Accepted, status `submitted`. Review is asynchronous — the listing served v1.0.0 content at the time of writing |
-| upskill | _none_ | `eb288fce-e87c-4c92-8c00-e7c198092c88` | 2026-08-26 (v1.0.0) | **v1.1.0 was not submitted** — see below. The v1.0.0 submission was accepted, status `pending_review`, and never produced a public listing URL |
+| openagentskill | https://www.openagentskill.com/skills/aerospike-agent-skills-aerospike | `8c842667-5510-4651-a330-294d1fda71b8` | 2026-10-02 (v1.2.0) | Accepted, status `submitted`. Review is asynchronous — the listing still served the pre-router v1.0.0 `SKILL.md` when checked on 2026-10-02 |
+| upskill | _none_ | `eb288fce-e87c-4c92-8c00-e7c198092c88` | 2026-08-26 (v1.0.0) | **v1.1.0 and v1.2.0 were not submitted** — see below. The v1.0.0 submission was accepted, status `pending_review`, and never produced a public listing URL |
 | skills.sh | _pending_ | n/a | n/a | Telemetry-driven; no submission |
 
-### upskill did not receive v1.1.0
+### upskill did not receive v1.1.0 or v1.2.0
 
 The v1.1.0 release ([run `35675460991`](https://github.com/aerospike/agent-skills/actions/runs/35675460991)) failed on the upskill leg with `error: fetch failed`. That is a transport failure, not a rejection: `mcp.autoloops.ai` resolves but does not answer, while `autoloops.ai` serves normally. Nothing in this repository needs changing.
 
-Retry once their API answers again — the submission is idempotent, and re-running also re-submits to openagentskill harmlessly:
+The v1.2.0 release ([run `37055304348`](https://github.com/aerospike/agent-skills/actions/runs/37055304348)) failed the same way, ten days later. All four gates passed and openagentskill accepted the submission, but upskill failed twice: its CLI's register call reported `fetch failed`, and then the submit itself did. The gate step logged `OPENAGENTSKILL: success` and `UPSKILL: failure`. Probing on 2026-10-02 gave the same result as before: `mcp.autoloops.ai` returned `000` while `autoloops.ai` returned `200`. This is not a transient blip.
+
+Retry once their API answers again — the submission is idempotent, and re-running also re-submits to openagentskill harmlessly. The upskill step submits `main`, so one successful retry of the newest run sends current content and the v1.1.0 run needs no retry of its own:
 
 ```bash
 curl -s -o /dev/null -w "%{http_code}\n" --max-time 15 https://mcp.autoloops.ai/   # 000 means still down
-gh run rerun 35675460991 --failed
+gh run rerun 37055304348 --failed
 ```
 
 The red run is the design working rather than a defect: `continue-on-error` kept upskill's failure from blocking openagentskill, and the final gate step still failed the job so a half-completed publish could not report green. Note that the two submit steps show `success` in the UI — `continue-on-error` masks `conclusion`, and the gate reads `outcome`.
@@ -226,9 +228,12 @@ v1.1.0   tree/166fbf03fd118ce3f864d3f1db41386a3055ec45/compiled-skills/aerospike
 
 Between the two releases the listing never changed, still serving the pre-router `SKILL.md` from `7f9ce43` almost a month later. So the listing is a **pinned snapshot that only a release moves**, and the registry submits a single `skillPath` — meaning the `references/` and `examples/` files that [PR #45](https://github.com/aerospike/agent-skills/pull/45) added are very likely not served there at all. Whether that registry can carry a directory package is tracked with the AI ecosystem team rather than here.
 
+Checked again on 2026-10-02, after the v1.2.0 submission: the listing still serves the pre-router file. The page carries no router headings and no `references/` paths, and was last updated on 2026-09-02. So neither v1.1.0 nor v1.2.0 content is live there yet, which fits the pinned-snapshot reading above.
+
 ### Earlier submissions
 
 | Id | Release | Registry | Why it is not the row above |
 |---|---|---|---|
 | `baeeb4f7-98d2-47e4-84cc-76def25a6a48` | v1.0.0 | openagentskill | Superseded by the v1.1.0 submission |
-| `308e1dd3-23be-4f68-800a-5d87561e4efc` | v1.0.0 | openagentskill | Created by run `33010412564`, which submitted to openagentskill and *then* failed on upskill — so it exists despite that run reporting as failed. All three resolve to the same slug |
+| `308e1dd3-23be-4f68-800a-5d87561e4efc` | v1.0.0 | openagentskill | Created by run `33010412564`, which submitted to openagentskill and *then* failed on upskill — so it exists despite that run reporting as failed. These two and the v1.1.0 id below all resolve to the same slug |
+| `e6b0ab8b-ae13-49f6-bf2e-877e084220be` | v1.1.0 | openagentskill | Superseded by the v1.2.0 submission |
