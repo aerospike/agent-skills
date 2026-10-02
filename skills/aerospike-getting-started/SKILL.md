@@ -82,6 +82,7 @@ These are commonly hallucinated. Check generated code against this list:
 - **Wrong:** `aerospike.Client()` or `aerospike.client.Client()` in Python — **Use:** the factory function `aerospike.client({...})`.
 - **Wrong:** `require('aerospike-client')` in Node.js — **Use:** `require('aerospike')`.
 - **Wrong:** Setting a positive integer TTL while `nsup-period` is `0`, unless `allow-ttl-without-nsup` is explicitly enabled for testing.
+- **Wrong:** Secondary index key type `numeric` on Database 8.2.0 and later — **Use:** `integer`; `numeric` is a deprecated alias that still works but logs a warning.
 - **Wrong:** Any REST API endpoints — Aerospike uses a binary wire protocol via client SDKs, not HTTP.
 - **Wrong:** `CREATE NAMESPACE` or `CREATE SET` SQL-like commands — namespaces are defined in config; sets are auto-created.
 
@@ -172,7 +173,7 @@ Wait 3 seconds for startup, then check:
 docker logs aerospike 2>&1 | tail -5
 ```
 
-Look for `service ready: soon there will be cake!` in the logs to confirm successful startup.
+Look for `service ready: soon there will be cake!` in the logs to confirm successful startup. On Database 8.2.0 and later the node answers client connections only after `initial SMD sync done`, which followed `service ready` by about 2 seconds on a fresh single node; if the first client call times out, check for that line and retry.
 
 **Step 4: Detect language and install SDK**
 

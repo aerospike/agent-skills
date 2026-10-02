@@ -6,7 +6,7 @@ doc: https://aerospike.com/docs/database/manage/namespace/retention
 also:
   - https://aerospike.com/docs/database/learn/policies
   - https://aerospike.com/docs/database/learn/policies/
-last_verified: 2026-04-21
+last_verified: 2026-10-01
 ---
 
 ## Align client TTL with NSUP, default-ttl, and special write TTL values
@@ -27,7 +27,7 @@ If **NSUP is not running** (`nsup-period` 0, the default), the server **rejects 
 
 - **`nsup-period` > 0** when using **positive integer TTLs** on writes, unless operations explicitly align with the doc’s exceptions
 - Knowing whether every write with **TTL `0`** re-bases the record to **`default-ttl`** (set vs namespace) before relying on “refresh” behavior
-- Checking **`nsup-period`** when you see **error 22** on TTL writes before blaming application logic
+- Checking **`nsup-period`** when you see **error 22** on TTL writes before blaming application logic; on 8.2.0 and later with error details enabled, a subcode on the 22 (XDR filter, set stop-writes, clock-skew stop-writes, replace conflict, truncation or durability violation) names a different cause, and the NSUP-off rejection has no subcode in that catalog
 - Using **`-2`** on updates when only bin data should change and void-time must stay as-is
 
 **Avoid**

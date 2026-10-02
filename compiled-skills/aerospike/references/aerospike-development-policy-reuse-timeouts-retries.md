@@ -5,7 +5,8 @@ tags: policy, timeouts, retries, socket-timeout, total-timeout, max-retries, ide
 doc: https://aerospike.com/docs/database/learn/policies/
 also:
   - https://aerospike.com/docs/develop/client/java/policies/
-last_verified: 2026-04-21
+  - https://aerospike.com/docs/database/manage/cluster/smd-readiness
+last_verified: 2026-10-01
 ---
 
 ## Reuse policies and set explicit timeouts and retries
@@ -28,6 +29,8 @@ Reuse read/write/operate policy objects (or set defaults on the client) instead 
 
 Per-call policy allocation adds GC pressure in managed languages and obscures which timeouts apply. Network-heavy or large scans need different limits than single-key gets. Wrong retry settings on non-idempotent operations cause duplicate side effects.
 
+On Database 8.2.0 and later, a node that is joining or restarting completes the TCP handshake and then answers nothing until its initial system metadata (SMD) sync finishes, so requests to it time out instead of being refused. The wait applies only once every node runs 8.2.0 or later and has no timeout of its own, and the last node upgraded from an earlier release is the first to wait.
+
 **Prefer**
 
 - Client-level or module-level default policies
@@ -35,6 +38,7 @@ Per-call policy allocation adds GC pressure in managed languages and obscures wh
 - **`maxRetries` 0** on write policies for non-idempotent operations
 - Understanding **`totalTimeout` 0** vs server default before tuning latency
 - Knowing read vs write **default retries** when debugging duplicate or missing effects
+- On Database 8.2.0 and later, retry decisions that branch on `(status, subcode)`: `AS_ERR_UNAVAILABLE` (11) separates unresolved initial partition balance, an unavailable replica and a node that is shutting down; enable error details per [policy-client-defaults.md](aerospike-development-policy-client-defaults.md)
 
 **Avoid**
 
@@ -42,6 +46,7 @@ Per-call policy allocation adds GC pressure in managed languages and obscures wh
 - New policy objects inside tight loops
 - Retrying writes that are not safe to repeat without idempotency guarantees
 - Expecting **`sleepBetweenRetries`** to run on every socket-idle timeout (see [Policies](https://aerospike.com/docs/database/learn/policies/) semantics)
+- Treating a successful TCP connection to a node, or its `service ready` log line, as proof an 8.2.0 node answers requests: the `initial SMD sync done` log line, or a request that completes, is the signal
 
 **See also**
 
@@ -52,3 +57,4 @@ Per-call policy allocation adds GC pressure in managed languages and obscures wh
 - [policy-explicit-defaults.md](https://github.com/aerospike/agent-skills/blob/main/skills/aerospike-development/examples/policy-explicit-defaults.md)
 - [policy-client-defaults.md](aerospike-development-policy-client-defaults.md)
 - [sec-client-tls-auth.md](aerospike-development-sec-client-tls-auth.md)
+- [System metadata readiness on node join](https://aerospike.com/docs/database/manage/cluster/smd-readiness)

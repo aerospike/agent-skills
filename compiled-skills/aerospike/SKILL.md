@@ -38,6 +38,7 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 - Wrong: aerospike.Client() or aerospike.client.Client() in Python — Use: the factory function aerospike.client({...}).
 - Wrong: require('aerospike-client') in Node.js — Use: require('aerospike').
 - Wrong: Setting a positive integer TTL while nsup-period is 0, unless allow-ttl-without-nsup is explicitly enabled for testing.
+- Wrong: Secondary index key type numeric on Database 8.2.0 and later — Use: integer; numeric is a deprecated alias that still works but logs a warning.
 - Wrong: Any REST API endpoints — Aerospike uses a binary wire protocol via client SDKs, not HTTP.
 - Wrong: CREATE NAMESPACE or CREATE SET SQL-like commands — namespaces are defined in config; sets are auto-created.
 
@@ -136,13 +137,16 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 #### cdt-nested-collections — Model nested lists and maps with CDT context, ordering, and expressions [HIGH]
 - When you store lists of maps, maps of lists, or deeper nesting, use the official patterns in Working with nested collection data types: CDT operate APIs with context where you address a single slot, expression composition (ListExp / MapExp) for filters and computed reads, and path expressions (selectByPath / modifyByPath) when you traverse or change multiple nested elements in one shot.
 
+#### cdt-nesting-depth-limit — Keep List and Map nesting within 64 levels [HIGH]
+- On Database 8.2.0 and later, keep every List and Map value within 64 levels of nesting, counting the bin's top-level collection as level 1, because the server rejects a deeper value in any request.
+
 #### cdt-server-side-ops — Prefer server-side CDT operations over read-modify-write [HIGH]
 - For updates to lists, maps, or nested documents modeled in CDTs, use operate with CDT operations so work runs atomically on the server.
 
 ### expr-
 
 #### expr-compute-to-data — Use filter and operation expressions for compute-to-data [HIGH]
-- Use filter expressions and operation expressions (and path expressions for nested bins) to evaluate and update data on the server when they fit the problem.
+- Use filter expressions and operation expressions (plus path expressions for nested bins and, from Database 8.2.0, string operations for text) to evaluate and update data on the server when they fit the problem.
 
 ### query-
 

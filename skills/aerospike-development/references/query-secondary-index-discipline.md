@@ -5,7 +5,7 @@ tags: query, secondary-index, cardinality
 doc: https://aerospike.com/docs/develop/learn/queries/
 also:
   - https://aerospike.com/docs/database/learn/architecture/data-storage/secondary-index
-last_verified: 2026-04-21
+last_verified: 2026-10-01
 ---
 
 ## Design secondary indexes for query paths—not for every column
@@ -22,6 +22,7 @@ Indexes have memory and write-amplification cost. Wrong index choices yield larg
 
 - Modeling that answers “how do I look this up?” with PK when possible
 - Indexes on fields that partition the key space usefully for queries
+- The `integer` key type when indexing integer values on Database 8.2.0 and later; `numeric` is a deprecated alias that still works but logs a warning, and existing indexes need no rebuild
 
 **Avoid**
 
