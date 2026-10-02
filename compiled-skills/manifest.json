@@ -7,7 +7,7 @@
     "skills/aerospike-data-modeling"
   ],
   "files": {
-    "compiled-skills/aerospike/SKILL.md": 23899,
+    "compiled-skills/aerospike/SKILL.md": 23953,
     "compiled-skills/aerospike/examples/aerospike-development-batch-official-links.md": 2815,
     "compiled-skills/aerospike/examples/aerospike-development-batch-read-by-keys.md": 2402,
     "compiled-skills/aerospike/examples/aerospike-development-cdt-list-append.md": 2317,
@@ -31,7 +31,7 @@
     "compiled-skills/aerospike/references/aerospike-development-client-pools-warmup.md": 4669,
     "compiled-skills/aerospike/references/aerospike-development-client-singleton.md": 1584,
     "compiled-skills/aerospike/references/aerospike-development-client-source-of-truth.md": 3916,
-    "compiled-skills/aerospike/references/aerospike-development-expr-compute-to-data.md": 2637,
+    "compiled-skills/aerospike/references/aerospike-development-expr-compute-to-data.md": 4996,
     "compiled-skills/aerospike/references/aerospike-development-model-access-paths-denormalization.md": 1516,
     "compiled-skills/aerospike/references/aerospike-development-model-bin-cdt-multiple-records.md": 3290,
     "compiled-skills/aerospike/references/aerospike-development-model-client-api-choice.md": 2399,

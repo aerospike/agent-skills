@@ -146,7 +146,7 @@ _Auto-generated from `skills/aerospike-getting-started`, `skills/aerospike-devel
 ### expr-
 
 #### expr-compute-to-data — Use filter and operation expressions for compute-to-data [HIGH]
-- Use filter expressions and operation expressions (and path expressions for nested bins) to evaluate and update data on the server when they fit the problem.
+- Use filter expressions and operation expressions (plus path expressions for nested bins and, from Database 8.2.0, string operations for text) to evaluate and update data on the server when they fit the problem.
 
 ### query-
 
