@@ -40,11 +40,11 @@
     "compiled-skills/aerospike/references/aerospike-development-model-record-size-hardware-efficiency.md": 7511,
     "compiled-skills/aerospike/references/aerospike-development-operate-atomicity.md": 1530,
     "compiled-skills/aerospike/references/aerospike-development-operate-record-lock-read-write.md": 2866,
-    "compiled-skills/aerospike/references/aerospike-development-policy-client-defaults.md": 2293,
+    "compiled-skills/aerospike/references/aerospike-development-policy-client-defaults.md": 3558,
     "compiled-skills/aerospike/references/aerospike-development-policy-generation-cas.md": 3274,
     "compiled-skills/aerospike/references/aerospike-development-policy-read-replica-consistency.md": 2950,
     "compiled-skills/aerospike/references/aerospike-development-policy-replace-whole-record.md": 1800,
-    "compiled-skills/aerospike/references/aerospike-development-policy-reuse-timeouts-retries.md": 4538,
+    "compiled-skills/aerospike/references/aerospike-development-policy-reuse-timeouts-retries.md": 5627,
     "compiled-skills/aerospike/references/aerospike-development-policy-send-key.md": 2175,
     "compiled-skills/aerospike/references/aerospike-development-policy-write-commit-level.md": 2575,
     "compiled-skills/aerospike/references/aerospike-development-query-secondary-index-discipline.md": 1714,
@@ -53,6 +53,6 @@
     "compiled-skills/aerospike/references/aerospike-development-single-delete-durable-deletes.md": 3436,
     "compiled-skills/aerospike/references/aerospike-development-single-record-operations.md": 2494,
     "compiled-skills/aerospike/references/aerospike-development-single-ttl-expiration-retention.md": 3649,
-    "compiled-skills/aerospike/references/aerospike-development-single-ttl-nsup-default-ttl.md": 3857
+    "compiled-skills/aerospike/references/aerospike-development-single-ttl-nsup-default-ttl.md": 4116
   }
 }

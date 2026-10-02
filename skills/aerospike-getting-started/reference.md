@@ -118,6 +118,6 @@ Some Aerospike client SDKs include native (C/C++) extensions and have platform-s
 ### General troubleshooting
 
 - **Container won't start:** Check if port 3000 is already in use: `lsof -i :3000` (macOS/Linux) or `netstat -ano | findstr :3000` (Windows). Kill the conflicting process or map to a different host port.
-- **"Connection refused" from SDK:** The container may still be starting. Wait 5 seconds and retry. Verify with `docker logs aerospike 2>&1 | grep "service ready"`.
+- **"Connection refused" or a timeout from SDK:** The container may still be starting. On Database 8.2.0 and later, a timeout just after `service ready` is the node finishing its initial SMD sync. Wait 5 seconds and retry. Verify with `docker logs aerospike 2>&1 | grep -E "service ready|initial SMD sync done"`.
 - **Apple Silicon (M1/M2/M3) Macs:** The `aerospike/aerospike-server` Docker image provides both `linux/amd64` and `linux/arm64` variants. It runs natively on Apple Silicon — no Rosetta emulation or extra flags needed.
 - **SDK version mismatch with server:** Clients are generally backward-compatible with older servers. If you see protocol errors, ensure both client and server are reasonably current. See [client compatibility](https://aerospike.com/docs/develop/client).

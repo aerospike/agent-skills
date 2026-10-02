@@ -173,7 +173,7 @@ Wait 3 seconds for startup, then check:
 docker logs aerospike 2>&1 | tail -5
 ```
 
-Look for `service ready: soon there will be cake!` in the logs to confirm successful startup.
+Look for `service ready: soon there will be cake!` in the logs to confirm successful startup. On Database 8.2.0 and later the node answers client connections only after `initial SMD sync done`, which followed `service ready` by about 2 seconds on a fresh single node; if the first client call times out, check for that line and retry.
 
 **Step 4: Detect language and install SDK**
 
